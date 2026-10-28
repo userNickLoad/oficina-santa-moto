@@ -132,6 +132,20 @@ CREATE TABLE IF NOT EXISTS cliente(
 	email VARCHAR(100)
 );
 
+DROP TABLE IF EXISTS modelo;
+CREATE TABLE IF NOT EXISTS modelo(
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(20) NOT NULL UNIQUE,
+	id_marca INTEGE NOT NULL REFERENCES marca(id)
+);
+
+DROP TABLE IF EXISTS veiculo;
+CREATE TABLE IF NOT EXISTS veiculo(
+	id SERIAL PRIMARY KEY,
+	ano INT NOT NULL,
+	id_modelo NOT NULL REFERENCES veiculo(id)
+);
+
 DROP TABLE IF EXISTS venda;
 CREATE TABLE IF NOT EXISTS venda(
 	id SERIAL PRIMARY KEY,
@@ -142,4 +156,51 @@ CREATE TABLE IF NOT EXISTS venda(
 );
 
 
+DROP TABLE IF EXISTS venda_produto;
+CREATE TABLE IF NOT EXISTS venda_produto(
+	id_venda INTEGER NOT NULL,
+	id_produto INTEGER NOT NULL,
+	quantidade INT NOT NULL CHECK (quantidade >= 0),
+	preco FLOAT NOT NULL CHECK (preco >= 0.0),
+	PRIMARY KEY(id_venda, id_produto)
+);
 
+DROP TABLE IF EXISTS servico;
+CREATE TABLE IF NOT EXISTS servico(
+	id SERIAL PRIMARY KEY,
+	descricao TEXT,
+	preco FLOAT NOT NULL,
+	id_cliente INTEGER REFERENCES cliente(id),
+	id_veiculo INTEGER REFERENCES veiculo(id),
+);
+
+
+
+
+-- ESTOQUE ->
+
+DROP TABLE IF EXISTS estante;
+CREATE TABLE IF NOT EXISTS estante(
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(20) NOT NULL UNIQUE,
+	qtd_colunas INT NOT NULL DEFAULT 0 CHECK (qtd_colunas >= 0),
+	qtd_linhas INT NOT NULL DEFAULT 0 CHECK (qtd_colunas >= 0),
+);
+
+
+DROP TABLE IF EXISTS prateleira;
+CREATE TABLE IF EXISTS prateleira(
+	id SERIAL PRIMARY KEY,
+	nome VARCHAR(20) NOT NULL UNIQUE,
+	comprimento INT DEFAULT 10,
+	largura INT DEFAULT 10,
+	altura INT DEFAULT 10
+);
+
+DROP TABLE IF EXISTS prateleira_estante;
+CREATE TABLE IF NOT EXISTS prateleira_estante(
+	id SERIAL PRIMARY KEY,
+	id_prateleira INTEGER NOT NULL REFERENCES prateleira(id),
+	id_estante INTEGER NOT NULL REFERENCES estante(id),
+	coluna INT NOT NULL 
+);
