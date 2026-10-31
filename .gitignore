@@ -1,0 +1,15 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# PostgreSQL local
+*.dump
+*.backup
+
+# Logs
+*.log
+
+# Node.js
+node_modules/
+dist/
