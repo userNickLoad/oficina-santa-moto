@@ -18,6 +18,10 @@ Clone o diretorio do github:
 ```bash
 git clone https://github.com/userNickLoad/oficina-santa-moto.git
 ```
+Mude para o diretorio do projeto:
+```bash
+cd oficina-santa-moto
+```
 Caso você esteja logado no git por ssh (aquele jeito que o andre ensinou):
 ```bash
 git remote add origin git@github.com:userNickLoad/oficina-santa-moto.git
@@ -25,10 +29,6 @@ git remote add origin git@github.com:userNickLoad/oficina-santa-moto.git
 Caso você esteja logado no git por http (quando aparece o chrome para vc logar):
 ```bash
 git remote add origin https://github.com/userNickLoad/oficina-santa-moto.git
-```
-Mude para o diretorio do projeto:
-```bash
-cd oficina-santa-moto
 ```
 
 ### Segundo
