@@ -47,6 +47,8 @@ BD_PASSWORD=123
 
 # Redis
 REDIS_PORT=6379
+# Senha de exemplo para ambiente local.
+REDIS_PASSWORD=123
 ```
 
 ### Três
@@ -59,9 +61,6 @@ Crie um arquivo `.gitignore` na pasta raiz do projeto com o seguinte conteúdo:
 .env.*
 !.env.example
 
-# Docker
-docker-compose.override.yaml
-
 # PostgreSQL local
 *.dump
 *.backup
@@ -72,6 +71,9 @@ docker-compose.override.yaml
 # Node.js
 node_modules/
 dist/
+
+#prisma
+/plataforma/generated
 ```
 
 ### Quatro

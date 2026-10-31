@@ -15,4 +15,4 @@ node_modules/
 dist/
 
 #prisma
-generated/
+/plataforma/generated
