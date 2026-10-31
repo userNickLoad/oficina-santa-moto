@@ -12,7 +12,7 @@ Projeto de faculdade criado para um comercio real. O sistema é um gerenciador d
 <details>
 <summary>Passo a passo para rodar em modo de desenvolvimento</summary>
 
-### Primeiro
+### Um
 
 Clone o diretorio do github:
 ```bash
@@ -31,7 +31,7 @@ Caso você esteja logado no git por http (quando aparece o chrome para vc logar)
 git remote add origin https://github.com/userNickLoad/oficina-santa-moto.git
 ```
 
-### Segundo
+### Dois
 
 Crie um arquivo `.env` na pasta raiz do projeto com o seguinte conteúdo:
 
@@ -49,7 +49,7 @@ BD_PASSWORD=123
 REDIS_PORT=6379
 ```
 
-### Terceiro
+### Três
 
 Crie um arquivo `.gitignore` na pasta raiz do projeto com o seguinte conteúdo:
 
@@ -74,7 +74,7 @@ node_modules/
 dist/
 ```
 
-### Quarto
+### Quatro
 
 Pelo terminal, acesse o WSL, inicie o Docker e os containers:
 
@@ -84,11 +84,24 @@ systemctl start docker
 docker compose up -d
 ```
 
-### Último
-Para rodar a palicação em modo de desenvolvedor:
+### Cinco
+Vai para o diretorio da plataforma e instala todas as dependencias:
 ```bash
+cd plataforma
 npm install
-npm run dev 
+```
+
+
+### Seis
+Gera os arquivos do prisma (para isso os passos Quatro e Cinco são essenciais):
+```bash
+npx npx prisma generate
+```
+
+### Ultimo
+Comando usado para rodar a plataforma em modo de desenvolvedor:
+```bash
+npm run dev
 ```
 Para descobrir outros modos de rodar a aplicação acesso o arquivo plataforma/packge.json
 
