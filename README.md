@@ -93,15 +93,20 @@ cd plataforma
 npm install
 ```
 
-
 ### Seis
 Gera os arquivos do prisma (para isso os passos Quatro e Cinco são essenciais):
 ```bash
-npx npx prisma generate
+npx prisma generate
+```
+
+### Sete
+Crie um novo terminal e sertifique-se que ele esteja na pasta da plataforma e rode o comando a baixo para poder utilizar o tailwind
+```bash
+npx @tailwindcss/cli -i ./src/public/css/input.css -o ./src/public/css/output.css --watch
 ```
 
 ### Ultimo
-Comando usado para rodar a plataforma em modo de desenvolvedor:
+Volte para o primeiro terminal e faça o comando usado para rodar a plataforma em modo de desenvolvedor:
 ```bash
 npm run dev
 ```
