@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/output.css">
-    <title>Oficina Santa Moto</title>
+    <title><%= title %> - Santa Moto</title>
 </head>
 <body>
-    <h1 class="font-bold text-purple-700">
-        Oficina Santa Moto
-    </h1>
-    <p>Minha primeira página renderizada com EJS!</p>
+    <%- include("partials/header") %>
+    <main class="min-h-[80vh] flex flex-col items-center justify-center">
+        
+        <p>Minha primeira página renderizada com EJS!</p>
+    </main>
+    
+
+    <%- include("partials/footer") %>
 </body>
 </html>

@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@iconify-json/basil": "^1.2.4",
     "@tailwindcss/cli": "^4.3.3",
     "@types/ejs": "^3.1.5",
     "@types/express": "^5.0.6",
@@ -41,6 +42,7 @@
     "typescript-eslint": "^8.72.1"
   },
   "allowScripts": {
-    "esbuild@0.28.2": true
+    "esbuild@0.28.2": true,
+    "@iconify-json/basil@1.2.4": true
   }
 }

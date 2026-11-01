@@ -23,8 +23,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req: Request, res: Response) => {
     res.render("index", {
-        title: "Oficina Santa Moto",
-        message: "Bem-vindo à nossa plataforma!"
+        title: "cadastro"
     });
 })
 
