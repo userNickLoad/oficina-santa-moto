@@ -52,6 +52,7 @@ export const cadastrar = async (req: Request, res: Response) => {
         return res.status(200).redirect("/entrar");
 
     }catch(e){
+        console.log(e)
         if(e instanceof UsuarioJaExiste){
             return res.status(403).json({"mensagem": e.message});
         }

@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import apiRouters from "./routes/apiRouters.js"
 import cookieParser from "cookie-parser";
+import paginasRoutes from './routes/paginasRoutes.js'
 
 const app = express();
 
@@ -23,12 +24,7 @@ app.use(cookieParser());
 // APLICANDO CONFIGURAÇÕES
 
 
-app.get("/", (req: Request, res: Response) => {
-    
-    res.render("index", {
-        title: "cadastro"
-    });
-})
+app.use("/", paginasRoutes);
 
 app.use("/api", apiRouters);
 

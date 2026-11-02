@@ -1,0 +1,20 @@
+<form action="" method="post"
+    class=" w-[90vw] flex flex-col justify-center align-middle items-center gap-[5vh]"
+>
+    <% form.items.forEach(item => {%>
+        <%- include("../partials/inputBox", { item })%>
+    <% }); %>
+
+    <div class="w-full h-[5vh] flex items-center">
+        <p id="error"></p>
+    </div>
+
+    <div class="w-full h-[8vh] flex justify-center">
+        <%- include("../partials/button", {
+            type: "submit",
+            name: "submit",
+            onclick: ""
+        }) %>
+
+    </div>
+</form>

@@ -121,7 +121,7 @@ export class UsuarioModel {
     }
 
     async singUsuarioUp(newUsuario: UsuarioCadastroDTO, permisoes: Permissao[]): Promise<Usuario> {
-
+        console.log(permisoes)
         //criptografa a senha do usuario
         newUsuario.senha = await hashPassword(newUsuario.senha);
         try {

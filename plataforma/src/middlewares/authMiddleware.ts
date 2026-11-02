@@ -6,7 +6,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         const token: string | null = req.cookies?.session_id
 
         if(token == null){
-            return; // res.status(403).redirect("/entrar")
+            return  res.status(403).redirect("/entrar");
         }
 
         const session = await getSession(token);

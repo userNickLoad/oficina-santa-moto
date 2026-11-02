@@ -3,5 +3,5 @@
     "ext": "ts,tsx,js,json,ejs",
     "ignore": ["dist"],
     "exec": "tsx src/app.ts",
-    "delay": "300"
+    "delay": "1000"
 }
