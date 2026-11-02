@@ -6,11 +6,23 @@ CREATE TABLE IF NOT EXISTS usuario (
 	telefone VARCHAR(14) 
 );
 
-
 CREATE TABLE IF NOT EXISTS permissao (
 	id SERIAL PRIMARY KEY,
 	nome VARCHAR(100) NOT NULL UNIQUE
 );
+
+CREATE TABLE IF NOT EXISTS caminho (
+	id SERIAL PRIMARY KEY,
+	path TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS permissao_caminho(
+	id_permissao INTEGER REFERENCES permissao(id),
+	id_caminho INTEGER REFERENCES caminho(id),
+	PRIMARY KEY(id_caminho, id_permissao)
+);
+
+CREATE INDEX IF NOT EXISTS idx_id_permissao ON permissao_caminho(id_permissao);
 
 
 CREATE TABLE IF NOT EXISTS usuario_permissao (
