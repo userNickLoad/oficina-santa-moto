@@ -6,7 +6,7 @@ DROP FUNCTION IF EXISTS validar_posicao_prateleira();
 -- =========================================
 -- 3. REMOVER TABELAS ASSOCIATIVAS E DEPENDENTES
 -- =========================================
-
+DROP TABLE IF EXISTS permissao_caminho;
 DROP TABLE IF EXISTS produto_prateleira;
 DROP TABLE IF EXISTS prateleira;
 DROP TABLE IF EXISTS estante;
@@ -49,6 +49,7 @@ DROP TABLE IF EXISTS fornecedor;
 DROP TABLE IF EXISTS cliente;
 DROP TABLE IF EXISTS usuario;
 DROP TABLE IF EXISTS permissao;
+DROP TABLE IF EXISTS caminho;
 DROP TABLE IF EXISTS atributo;
 DROP TABLE IF EXISTS categoria;
 DROP TABLE IF EXISTS marca;

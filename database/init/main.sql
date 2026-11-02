@@ -28,4 +28,5 @@
 \ir /database/02-esquerda.sql
 \ir /database/03-venda.sql
 \ir /database/04-estoque.sql
+\ir /database/05-inserts.sql
 
