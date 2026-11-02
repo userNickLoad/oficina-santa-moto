@@ -137,6 +137,7 @@ model modelo_prateleira_modelo_estante {
 model permissao {
   id                Int                 @id @default(autoincrement())
   nome              String              @unique @db.VarChar(100)
+  permissao_caminho permissao_caminho[]
   usuario_permissao usuario_permissao[]
 }
 
@@ -287,4 +288,20 @@ model venda_produto {
   venda      venda   @relation(fields: [id_venda], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([id_venda, id_produto])
+}
+
+model caminho {
+  id                Int                 @id @default(autoincrement())
+  path              String              @unique
+  permissao_caminho permissao_caminho[]
+}
+
+model permissao_caminho {
+  id_permissao Int
+  id_caminho   Int
+  caminho      caminho   @relation(fields: [id_caminho], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  permissao    permissao @relation(fields: [id_permissao], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([id_caminho, id_permissao])
+  @@index([id_permissao], map: "idx_id_permissao")
 }

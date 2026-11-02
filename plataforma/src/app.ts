@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import apiRouters from "./routes/apiRouters.js"
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -18,10 +19,12 @@ const __dirname = path.dirname(__filename);
 app.set('views', path.join(__dirname, './view'));
 
 app.use(express.static(path.join(__dirname, "public")));
+app.use(cookieParser());
 // APLICANDO CONFIGURAÇÕES
 
 
 app.get("/", (req: Request, res: Response) => {
+    
     res.render("index", {
         title: "cadastro"
     });
