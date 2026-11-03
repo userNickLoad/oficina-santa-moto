@@ -10,9 +10,9 @@ router.get("/", authMiddleware, (req: Request, res: Response) => {
         title: "inicio",
         userName,
         content: "../pages/inicio",
-        voltar: true
+        voltar: false
     });
-})
+});
 
 router.get("/entrar", (req: Request, res: Response) => {
     
@@ -21,6 +21,6 @@ router.get("/entrar", (req: Request, res: Response) => {
         content: "../pages/entrar",
         voltar: false
     });
-})
+});
 
 export default router;

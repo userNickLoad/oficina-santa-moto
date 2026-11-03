@@ -1,30 +1,24 @@
-<%
-    const ops = [
-        {href: "/", src: "/assets/estoque.png", name: "estoque"},
-        {href: "/", src: "/assets/servicos.png", name: "serviços"},
-        {href: "/", src: "/assets/cliente.png", name: "clientes"},
-        {href: "/", src: "/assets/funcionarios.png", name: "funcionarios"},
-        {href: "/", src: "/assets/configuracoes.png", name: "configurações"},
-    ]
-%>
-<section
-    class="w-full"
-    >
-    <div
-        class="flex mt-[2vh]"
-    >
-        <h1 class="border-b border-gray px-[1vw]">Bem vindo(a) <span class="text-primary"><%= userName %></span></h1>
-    </div>
-</section>
-<section
-    class="flex justify-center items-center mt-[5vh]"
-    >
-    <nav
-        class="grid lg:grid-cols-3 grid-cols-2 gap-[5vh]"
-        >
-        <% ops.forEach(item => {%>
-            <%- include("../partials/card", item)%>
-        <% }); %>
-    </nav>
-    
-</section>
+<% const ops=[ {href: "/" , src: "/assets/estoque.png" , name: "estoque" }, {href: "/" , src: "/assets/servicos.png" ,
+    name: "serviços" }, {href: "/" , src: "/assets/cliente.png" , name: "clientes" }, {href: "/" ,
+    src: "/assets/funcionarios.png" , name: "funcionarios" }, {href: "/" , src: "/assets/configuracoes.png" ,
+    name: "configurações" }, {href: "/" , src: "/assets/cadastrar_rpodutos.png" , name: "Cadastrar produtos" },
+    {href: "/" , src: "/assets/registrar_saida.png" , name: "Registrar saida" }, {href: "/" , src: "/assets/vender.png"
+    , name: "Registrar venda" }, ] %>
+
+    <section class="flex flex-col justify-center items-center">
+        <div class="flex mt-[2vh] w-full">
+            <h2 class="border-b border-gray px-[1vw]">
+                Bem vindo(a) <span class="text-primary">
+                    <%= userName %>
+                </span> </br>
+                Selecione uma funcionalidade para continuar
+
+            </h2>
+        </div>
+        <nav class="grid lg:grid-cols-5 grid-cols-2 gap-[2vw] my-[5vh]">
+            <% ops.forEach(item=> {%>
+                <%- include("../partials/card", item)%>
+                    <% }); %>
+        </nav>
+
+    </section>

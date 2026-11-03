@@ -1,13 +1,42 @@
-<a  
-    href=<%= href %>
-    class="flex flex-col justify-center items-center gap-[2vh]"
-    >
-    <div
-        class="xl:w-[20vh] xl:h-[20vh] w-[15vh] h-[15vh] flex justify-center items-center bg-primary rounded-4xl"
-        >
-        <img tabindex="-1" src=<%= src %> alt=<%= name %>  class="w-[90%] h-[90%]">
-    </div>
-    <h2 class="text-center lg:text-3xl">
-        <%= name %>
-    </h3>
-</a>
+<div class="
+    w-[clamp(140px,45vw,220px)]
+    aspect-[40/30]
+    lg:w-[clamp(160px,15vw,230px)]
+    lg:aspect-[25/30]
+">
+    <a href="<%=href %>"
+       class="
+        flex w-full h-full
+        p-[4%]
+        flex-col justify-center items-center
+        gap-[4%]
+        border border-gray-400 rounded-2xl
+        transition-transform duration-300 ease-out
+        hover:scale-105 hover:z-10 
+       ">
+
+        <div class="
+            w-[70%] max-h-[70%] aspect-square
+            shrink-0
+            flex justify-center items-center
+            bg-primary rounded-2xl lg:rounded-4xl
+        ">
+            <img
+                tabindex="-1"
+                src="<%=src %>"
+                alt="<%= name %>"
+                class="w-[60%] h-[60%] object-contain"
+            >
+        </div>
+
+        <p class="
+            text-center
+            text-[clamp(12px,1.5vw,24px)]
+            font-medium leading-tight
+            min-w-0 max-w-full
+            line-clamp-2
+        ">
+            <%= name %>
+    </p>
+    </a>
+</div>

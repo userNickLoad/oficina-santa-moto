@@ -1,15 +1,20 @@
+<%
+    const id = item.name.toLowerCase();
+%>
+
 <div class="xl:w-[50%] w-full flex flex-col">
     <label class="text-2xl" for="<%= item.name %>">
         <%= item.name %>
     </label>
 
     <input
-        class="w-full text-2xl border border-solid border-black mt-[1vh]"
+        class="w-full text-2xl border border-solid border-gray-400 mt-[1vh] lg:px-[1vw] px-[3vw] rounded-2xl"
         type="<%= item.type %>"
         id="<%= item.name %>"
-        name="<%= item.name %>"
+        name="<%= id %>"
         alt="escreva <%= item.name %>"
         maxlength=<%= item.maxlength %>
+        placeholder="<%= item.placeholder %>"
     >
     <p class="text-red-900 min-h-[3vh]" id="<%= item.name %>Output"></p>
 </div>

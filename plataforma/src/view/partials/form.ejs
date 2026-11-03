@@ -1,5 +1,5 @@
 <form action="<%= action %>" method="<%= method %>" id="<%= id %>"
-    class=" w-[90vw] flex flex-col justify-center align-middle items-center gap-[5vh]"
+    class=" lg:w-[90vw] w-full flex flex-col justify-center align-middle items-center gap-[2vh]"
 >
     <% items.forEach(item => {%>
         <%- include("../partials/inputBox", { item })%>
