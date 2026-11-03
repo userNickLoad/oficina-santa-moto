@@ -1,14 +1,15 @@
-<div class="w-[50%] flex flex-col gap-5">
-    <label text-2xl for="<%= item.name %>">
+<div class="xl:w-[50%] w-full flex flex-col">
+    <label class="text-2xl" for="<%= item.name %>">
         <%= item.name %>
     </label>
 
     <input
-        class="w-full text-2xl border border-solid border-black"
+        class="w-full text-2xl border border-solid border-black mt-[1vh]"
         type="<%= item.type %>"
         id="<%= item.name %>"
         name="<%= item.name %>"
         alt="escreva <%= item.name %>"
         maxlength=<%= item.maxlength %>
     >
+    <p class="text-red-900 min-h-[3vh]" id="<%= item.name %>Output"></p>
 </div>

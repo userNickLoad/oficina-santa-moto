@@ -1,12 +1,15 @@
-<%
-    const form = {
+
+<section class="w-[100%] h-[80vh] flex flex-col justify-center items-center">
+    <%- include("../partials/form", {
+        id: "entrar",
+        method: "POST",
+        action: "/api/usuario/entrar",
         submit: "entrar",
         items: [
             {name: "nome", type: "text", maxlength: 50},
             {name: "senha", type: "password", maxlength: 50}
         ]
-    };
-%>
-<section class="w-[100%] h-[80vh] flex flex-col justify-center items-center">
-    <%- include("../partials/form", { form } )%>
+    })%>
 </section>
+
+<script type="module" src="/js/login.js"></script>

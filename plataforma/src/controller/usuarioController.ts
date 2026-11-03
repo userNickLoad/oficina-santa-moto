@@ -33,10 +33,14 @@ export const entrar = async (req: Request, res: Response) => {
             sameSite: "lax",
             path: "/",
             maxAge: 60 * 60 * 1000
-        }).redirect("/");
+        }).json({
+            mensagem: "Login realizado com sucesso",
+            redirect: "/"
+        });
 
     }catch(e){
         if(e instanceof UsuarioIncorreto){
+            console.log(e);
             return res.status(403).json({"mensagem": e.message});
         }
 
