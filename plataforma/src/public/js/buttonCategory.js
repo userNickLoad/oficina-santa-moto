@@ -1,5 +1,6 @@
 "use strict";
 const MAX_MENU_HEIGHT = window.innerHeight * 0.65;
+// Calcula a altura necessária para expandir um painel.
 function getPanelHeight(panel) {
     const height = panel.scrollHeight;
     if (panel.id === "categories-panel") {
@@ -7,16 +8,21 @@ function getPanelHeight(panel) {
     }
     return height;
 }
+// Atualiza a altura dos painéis ancestrais que estão abertos.
 function updateAncestors(panel) {
     let ancestor = panel.parentElement?.closest(".filter-panel");
     while (ancestor) {
-        if (ancestor.style.maxHeight !== "0px") {
-            ancestor.style.maxHeight = `${getPanelHeight(ancestor)}px`;
+        const button = document.querySelector(`[data-target="${ancestor.id}"]`);
+        const isOpen = button?.getAttribute("aria-expanded") === "true";
+        if (isOpen) {
+            ancestor.style.maxHeight =
+                `${getPanelHeight(ancestor)}px`;
         }
         ancestor =
             ancestor.parentElement?.closest(".filter-panel");
     }
 }
+// Abre ou fecha um painel.
 function setPanelState(button, panel, open) {
     const image = button.querySelector("[data-chevron]");
     panel.style.maxHeight = open
@@ -26,6 +32,7 @@ function setPanelState(button, panel, open) {
     image?.classList.toggle("rotate-180", open);
     updateAncestors(panel);
 }
+// Alterna o estado de um painel.
 function togglePanel(button) {
     const targetId = button.dataset.target;
     if (!targetId) {
@@ -59,7 +66,7 @@ document.addEventListener("change", (event) => {
     if (!target.matches("[data-category-select]")) {
         return;
     }
-    // Ao selecionar uma categoria, abre seus atributos.
+    // Ao desmarcar, não fecha automaticamente o painel.
     if (!target.checked) {
         return;
     }
@@ -75,6 +82,7 @@ document.addEventListener("change", (event) => {
     if (!button) {
         throw new Error(`Botão da categoria ${panelId} não encontrado`);
     }
+    // Abre os atributos da categoria selecionada.
     setPanelState(button, panel, true);
 });
 //# sourceMappingURL=buttonCategory.js.map

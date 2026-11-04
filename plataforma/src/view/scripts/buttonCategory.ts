@@ -1,5 +1,7 @@
+
 const MAX_MENU_HEIGHT = window.innerHeight * 0.65;
 
+// Calcula a altura necessária para expandir um painel.
 function getPanelHeight(panel: HTMLElement): number {
     const height = panel.scrollHeight;
 
@@ -10,21 +12,33 @@ function getPanelHeight(panel: HTMLElement): number {
     return height;
 }
 
+// Atualiza a altura dos painéis ancestrais que estão abertos.
 function updateAncestors(panel: HTMLElement): void {
     let ancestor = panel.parentElement?.closest<HTMLElement>(
         ".filter-panel"
     );
 
     while (ancestor) {
-        if (ancestor.style.maxHeight !== "0px") {
-            ancestor.style.maxHeight = `${getPanelHeight(ancestor)}px`;
+        const button = document.querySelector<HTMLButtonElement>(
+            `[data-target="${ancestor.id}"]`
+        );
+
+        const isOpen =
+            button?.getAttribute("aria-expanded") === "true";
+
+        if (isOpen) {
+            ancestor.style.maxHeight =
+                `${getPanelHeight(ancestor)}px`;
         }
 
         ancestor =
-            ancestor.parentElement?.closest<HTMLElement>(".filter-panel");
+            ancestor.parentElement?.closest<HTMLElement>(
+                ".filter-panel"
+            );
     }
 }
 
+// Abre ou fecha um painel.
 function setPanelState(
     button: HTMLButtonElement,
     panel: HTMLElement,
@@ -43,11 +57,14 @@ function setPanelState(
     updateAncestors(panel);
 }
 
+// Alterna o estado de um painel.
 function togglePanel(button: HTMLButtonElement): void {
     const targetId = button.dataset.target;
 
     if (!targetId) {
-        throw new Error(`Botão ${button.id} não possui data-target`);
+        throw new Error(
+            `Botão ${button.id} não possui data-target`
+        );
     }
 
     const panel = document.getElementById(targetId);
@@ -56,7 +73,8 @@ function togglePanel(button: HTMLButtonElement): void {
         throw new Error(`Painel ${targetId} não encontrado`);
     }
 
-    const isOpen = button.getAttribute("aria-expanded") === "true";
+    const isOpen =
+        button.getAttribute("aria-expanded") === "true";
 
     setPanelState(button, panel, !isOpen);
 }
@@ -69,7 +87,9 @@ document.addEventListener("click", (event: MouseEvent) => {
         return;
     }
 
-    const button = target.closest<HTMLButtonElement>("[data-toggle]");
+    const button = target.closest<HTMLButtonElement>(
+        "[data-toggle]"
+    );
 
     if (!button) {
         return;
@@ -90,7 +110,7 @@ document.addEventListener("change", (event: Event) => {
         return;
     }
 
-    // Ao selecionar uma categoria, abre seus atributos.
+    // Ao desmarcar, não fecha automaticamente o painel.
     if (!target.checked) {
         return;
     }
@@ -112,8 +132,11 @@ document.addEventListener("change", (event: Event) => {
     );
 
     if (!button) {
-        throw new Error(`Botão da categoria ${panelId} não encontrado`);
+        throw new Error(
+            `Botão da categoria ${panelId} não encontrado`
+        );
     }
 
+    // Abre os atributos da categoria selecionada.
     setPanelState(button, panel, true);
 });

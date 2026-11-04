@@ -1,0 +1,8 @@
+
+<section class="relative mt-[2vh] flex flex-col gap-2">
+    <h3 class="font-bold">Filtros</h3>
+
+    <% filters.forEach(filter => { %>
+        <%- include("./filter", { filter }) %>
+    <% }); %>
+</section>

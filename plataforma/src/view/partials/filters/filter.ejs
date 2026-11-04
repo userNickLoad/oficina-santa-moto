@@ -1,0 +1,29 @@
+
+<div class="w-full">
+
+    <%- include("../categories/button", {
+        button: {
+            id: `filter-button-${filter.id}`,
+            text: filter.nome,
+            target: `filter-panel-${filter.id}`,
+            fullWidth: true
+        }
+    }) %>
+
+    <div
+        id="filter-panel-<%= filter.id %>"
+        class="filter-panel max-h-0 overflow-hidden w-full"
+    >
+        <div class="pl-4 py-2 border-l-2 border-gray-200">
+
+            <% filter.options.forEach(option => { %>
+                <%- include("./option", {
+                    option,
+                    filterId: filter.id
+                }) %>
+            <% }); %>
+
+        </div>
+    </div>
+
+</div>

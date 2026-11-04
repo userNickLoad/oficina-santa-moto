@@ -1,0 +1,18 @@
+
+<label
+    for="filter-<%= filterId %>-<%= option.id %>"
+    class="flex items-center gap-3 w-full p-2
+    rounded-lg cursor-pointer hover:bg-gray-100"
+>
+    <input
+        type="checkbox"
+        id="filter-<%= filterId %>-<%= option.id %>"
+        name="filtros[<%= filterId %>]"
+        value="<%= option.id %>"
+        class="w-4 h-4 accent-orange-600"
+    >
+
+    <span class="text-sm">
+        <%= option.nome %>
+    </span>
+</label>

@@ -1,29 +1,22 @@
 <section class="flex flex-col">
-    <%- include("../partials/searchBar", {
-        id: "SearchBar",
-        placeholder: "Pesquisar produtos..."
-    }) %>
-
     <form
         action="/estoque"
         method="GET"
         id="filters-form"
         class="flex flex-col"
-    >
+    >   
+        <%- include("../partials/searchBar", {
+            id: "SearchBar",
+            placeholder: "Pesquisar produtos...",
+            name: "nomeProduto"
+        }) %>
+        <!-- Categorias -->
         <%- include("../partials/categories/categories", {
             categories: [
                 {
                     id: 1,
                     nome: "Câmbio",
                     attributes: [
-                        {
-                            id: 3,
-                            nome: "Marca",
-                            values: [
-                                { id: 10, nome: "Shimano" },
-                                { id: 11, nome: "Sunrace" }
-                            ]
-                        },
                         {
                             id: 4,
                             nome: "Material",
@@ -51,12 +44,42 @@
             ]
         }) %>
 
-        <button
-            type="submit"
-            class="mt-4 rounded-xl bg-primary p-3 font-bold"
-        >
-            Aplicar filtros
-        </button>
+        <!-- Filtros independentes -->
+        <%- include("../partials/filters/filters", {
+            filters: [
+                {
+                    id: 1,
+                    nome: "Marcas",
+                    options: [
+                        { id: 10, nome: "Shimano" },
+                        { id: 11, nome: "Sunrace" },
+                        { id: 12, nome: "SRAM" }
+                    ]
+                },
+                {
+                    id: 2,
+                    nome: "Disponibilidade",
+                    options: [
+                        { id: 20, nome: "Em estoque" },
+                        { id: 21, nome: "Sem estoque" }
+                    ]
+                }
+            ]
+        }) %>
+
+        <div class="flex gap-[2vw]">
+            <a href="/estoque" class="mt-4 rounded-xl bg-primary p-3 font-bold flex-1 text-center">
+
+                Limpar filtros
+            </a>
+            <button
+                type="submit"
+                class="mt-4 rounded-xl bg-primary p-3 font-bold flex-1"
+            >
+                Aplicar filtros
+            </button>            
+        </div>
+
     </form>
 </section>
 
