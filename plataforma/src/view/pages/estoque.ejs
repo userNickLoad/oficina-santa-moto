@@ -1,11 +1,63 @@
-<section 
-    class="flex flex-col"    
->
+<section class="flex flex-col">
     <%- include("../partials/searchBar", {
         id: "SearchBar",
         placeholder: "Pesquisar produtos..."
-    })%>
+    }) %>
 
-    <%- include("../partials/categories")%>
+    <form
+        action="/estoque"
+        method="GET"
+        id="filters-form"
+        class="flex flex-col"
+    >
+        <%- include("../partials/categories/categories", {
+            categories: [
+                {
+                    id: 1,
+                    nome: "Câmbio",
+                    attributes: [
+                        {
+                            id: 3,
+                            nome: "Marca",
+                            values: [
+                                { id: 10, nome: "Shimano" },
+                                { id: 11, nome: "Sunrace" }
+                            ]
+                        },
+                        {
+                            id: 4,
+                            nome: "Material",
+                            values: [
+                                { id: 12, nome: "Alumínio" },
+                                { id: 13, nome: "Aço" }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    nome: "Embreagem",
+                    attributes: [
+                        {
+                            id: 5,
+                            nome: "Tipo",
+                            values: [
+                                { id: 14, nome: "Manual" },
+                                { id: 15, nome: "Automática" }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }) %>
 
+        <button
+            type="submit"
+            class="mt-4 rounded-xl bg-primary p-3 font-bold"
+        >
+            Aplicar filtros
+        </button>
+    </form>
 </section>
+
+<script type="module" src="/js/buttonCategory.js"></script>

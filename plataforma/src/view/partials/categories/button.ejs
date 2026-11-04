@@ -1,0 +1,26 @@
+<button
+    type="button"
+    id="<%= button.id %>"
+    data-toggle
+    data-target="<%= button.target %>"
+    aria-expanded="false"
+    aria-controls="<%= button.target %>"
+    class="flex justify-between items-center
+    <%= button.fullWidth ? 'w-full' : 'min-w-10' %>
+    bg-gray-200 rounded-xl min-h-10 p-2
+    hover:bg-gray-300
+    focus-visible:outline-2 focus-visible:outline-gray-500"
+>
+    <% if (button.text) { %>
+        <span class="mr-2 text-sm">
+            <%= button.text %>
+        </span>
+    <% } %>
+
+    <img
+        src="/assets/arrowDown.png"
+        data-chevron
+        class="w-4 h-4 transition-transform duration-300"
+        alt=""
+    >
+</button>

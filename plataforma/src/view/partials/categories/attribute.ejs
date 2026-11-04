@@ -1,0 +1,27 @@
+<div class="w-full">
+
+    <%- include("./button", {
+        button: {
+            id: `attribute-button-${attribute.id}`,
+            text: attribute.nome,
+            target: `attribute-panel-${attribute.id}`
+        }
+    }) %>
+
+    <div
+        id="attribute-panel-<%= attribute.id %>"
+        class="filter-panel max-h-0 overflow-hidden w-full"
+    >
+        <div class="pl-4 py-2 border-l-2 border-gray-200">
+
+            <% attribute.values.forEach(value => { %>
+                <%- include("./value", {
+                    value,
+                    attributeId: attribute.id
+                }) %>
+            <% }); %>
+
+        </div>
+    </div>
+
+</div>

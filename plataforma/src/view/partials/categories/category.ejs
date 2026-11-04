@@ -1,0 +1,51 @@
+<div class="w-full">
+
+    <div class="flex items-center gap-2">
+
+        <!-- Seleção da categoria -->
+        <label
+            for="category-select-<%= category.id %>"
+            class="flex items-center gap-2 flex-1 min-w-0
+            cursor-pointer rounded-lg p-2 hover:bg-gray-100"
+        >
+            <input
+                type="checkbox"
+                id="category-select-<%= category.id %>"
+                name="categorias"
+                value="<%= category.id %>"
+                data-category-select
+                data-category-panel="category-panel-<%= category.id %>"
+                class="w-4 h-4 accent-orange-600"
+            >
+
+            <span class="text-sm font-medium">
+                <%= category.nome %>
+            </span>
+        </label>
+
+        <!-- Expansão dos atributos -->
+        <%- include("./button", {
+            button: {
+                id: `category-button-${category.id}`,
+                text: "",
+                target: `category-panel-${category.id}`
+            }
+        }) %>
+
+    </div>
+
+    <!-- Atributos da categoria -->
+    <div
+        id="category-panel-<%= category.id %>"
+        class="filter-panel max-h-0 overflow-hidden w-full"
+    >
+        <div class="pl-4 py-2 border-l-2 border-gray-200">
+
+            <% category.attributes.forEach(attribute => { %>
+                <%- include("./attribute", { attribute }) %>
+            <% }); %>
+
+        </div>
+    </div>
+
+</div>
