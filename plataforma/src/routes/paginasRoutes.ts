@@ -23,4 +23,15 @@ router.get("/entrar", (req: Request, res: Response) => {
     });
 });
 
+
+router.get("/estoque", authMiddleware, (req: Request, res: Response) => {
+
+    res.render("./layouts/index", {
+        title: "estoque",
+        content: "../pages/estoque",
+        voltar: true
+    });
+})
+
+
 export default router;
