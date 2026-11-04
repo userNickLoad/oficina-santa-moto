@@ -1,0 +1,12 @@
+<form 
+    action="<%= form.action %>" 
+    method="<%= form.method %>" 
+    id="<%= form.id %>"
+    class="flex flex-col items-center w-full"
+>
+
+    <% form.elements.forEach(element => {%>
+        <%- include("./inputs", { element })%>
+    <% }); %>
+
+</form>

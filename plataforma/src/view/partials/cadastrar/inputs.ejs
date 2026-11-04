@@ -1,0 +1,10 @@
+
+<% if(element.type == "input") {%>
+    <% console.log(element.input, element.type == "input"); const item = element.input %>
+    <%- include("../inputBox", {
+        item
+    }) %>
+
+<% } else if(element.type == "container") {%>
+
+<% } %>

@@ -37,7 +37,7 @@ router.get("/estoque", authMiddleware, (req: Request, res: Response) => {
 router.get("/cadastrar-produto", authMiddleware, (req: Request, res: Response) => {
 
     res.render("./layouts/index", {
-        title: "estoque",
+        title: "Cadastrar produto",
         content: "../pages/cadastrar-produto",
         voltar: true
     });

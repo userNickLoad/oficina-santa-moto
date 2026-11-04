@@ -1,3 +1,16 @@
-<section class="flex flex-col">
-    
+<section class="flex flex-col w-full">
+    <h1 class="my-[2vh] text-lg">
+        Entrada no estoque
+    </h1>
+
+    <%- include("../partials/cadastrar/form", {
+        form: {
+            id: "form-cadastrar-produto",
+            action: "/api/produto",
+            method: "post",
+            elements: [
+                {type: "input", input: {name: "Nome do produto", type: "text", maxlength: 50, placeholder: "ex: Óleo de motor 10W-30", text_size: "text-md"}}
+            ]
+        }
+    }) %>
 </section>
