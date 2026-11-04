@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS categoria(
 
 CREATE TABLE IF NOT EXISTS atributo(
 	id SERIAL PRIMARY KEY,
-	id_categoria INTEGER REFERENCES categoria(id),
+	id_categoria INTEGER NOT NULL REFERENCES categoria(id),
 	nome VARCHAR(20) NOT NULL,
 	obrigatorio BOOLEAN NOT NULL,
 	numerico BOOLEAN NOT NULL DEFAULT FALSE
