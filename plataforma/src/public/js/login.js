@@ -1,4 +1,5 @@
 "use strict";
+console.log("LOGIN.TS CARREGADO");
 const form = document.querySelector("#entrar");
 if (!form) {
     throw new Error("Formulário não encontrado");
@@ -16,6 +17,7 @@ form.addEventListener("submit", async (event) => {
         element.textContent = "";
         const parent = element.parentNode;
         const input = parent?.querySelector("input");
+        console.log(input);
         if (input?.value.trim() == "") {
             element.textContent = "Preencha o campo";
             errors += 1;

@@ -1,15 +1,18 @@
 
 <section class="w-[100%] h-[80vh] flex flex-col justify-center items-center">
-    <%- include("../partials/form", {
+    <%- include("../partials/cadastrar/form", {form :{
         id: "entrar",
         method: "POST",
         action: "/api/usuario/entrar",
-        submit: "entrar",
-        items: [
-            {name: "Nome", type: "text", maxlength: 50, placeholder: "Coloque seu nome"},
-            {name: "Senha", type: "password", maxlength: 50, placeholder: "Coloque sua senha"}
+        size: "lg:w-[80%], w-full",
+        elements: [
+            {type: "input", input: {id:"nome", name: "nome", title: "Nome", type: "text", maxlength: 50, placeholder: "Coloque seu nome"}},
+            {type: "input", input: {id: "senha", name: "senha", title: "Senha", type: "password", maxlength: 50, placeholder: "Coloque sua senha"}}
+        ],
+        buttons: [
+            {id: "entrar", name: "entrar", content: "entrar", }
         ]
-    })%>
+    }})%>
 </section>
 
 <script type="module" src="/js/login.js"></script>

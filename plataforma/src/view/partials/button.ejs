@@ -6,17 +6,29 @@
         content = name,
         onclick = "",
         href = "#",
-        css
+        css,
+        svg = null
     } = button;
-%>
 
-<%
     const click = typeof onclick !== "undefined" ? onclick : "";
     const buttonType = typeof type !== "undefined" ? type : "";
     const csstail = typeof css !== "undefined" ? css : "";
 %>
 
-<%if(buttonType == "submit"){%>
+<%if(buttonType == "submit" && svg != null){%>
+    <button
+        onclick=<%= click %>
+        type=<%= (buttonType == "")? "submit": buttonType %>
+        id=<%= id %>
+        name=<%= name %>
+        alt=<%= content %>
+        class="flex h-auto w-full items-center justify-center gap-[1vw] bg-primary px-[2vw] py-[.5vh] rounded-full "
+    >
+    <%const svg_path = `../svgs/${svg.path}`%>
+    <%- include(svg_path, { svg }) %>
+    <p><%= content %></p>
+    </button>
+<%} else if(buttonType == "submit"){%>
     <button
         onclick=<%= click %>
         type=<%= (buttonType == "")? "submit": buttonType %>

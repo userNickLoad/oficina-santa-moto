@@ -1,4 +1,4 @@
-
+console.log("LOGIN.TS CARREGADO");
 
 const form = document.querySelector<HTMLFormElement>(
     "#entrar"
@@ -26,6 +26,8 @@ form.addEventListener("submit", async (event) => {
         const parent = element.parentNode;
 
         const input = parent?.querySelector("input");
+
+        console.log(input);
 
         if(input?.value.trim() == ""){
             element.textContent = "Preencha o campo"
