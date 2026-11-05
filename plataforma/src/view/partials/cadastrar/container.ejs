@@ -1,0 +1,33 @@
+<!-- 
+    type: container
+    flex_col: opcional -> direção do flex
+    gap: opcional -> gap 
+    class: opcional -> classes tailwind
+    name: opcional -> p com o nome da sessão
+    elements: obrigatorio -> elementos internos
+
+-->
+
+<% 
+    const flex = (container.flex_col)? "flex-col" : "";
+    const gap = (container.gap)? container.gap: ""
+    const classCss = (container.class)? container.class: `flex ${flex} w-full ${gap} justify-between items-center`;
+
+%>
+
+<%if(container.name){%>
+    <p class="text-lg ">
+        <%= container.name %>
+    </p>
+<% } %>
+
+<div
+    class="<%= classCss %>"
+    id="container-<%= container.id %>"
+    >
+    <% container.elements.forEach(element => {%>
+        <%- include("./inputs", { element }) %>
+    <% }); %>
+
+
+</div>

@@ -1,10 +1,57 @@
-<button
-    onclick=<%= onclick %>
-    type=<%= type %>
-    id=<%= name %>
-    name=<%= name %>
-    alt=<%= name %>
-    class="xl:px-[2vw] py-[1vh] px-[20vw] bg-primary rounded-2xl cursor-pointer hover:opacity-95 lg:text-3xl text-4xl"
->
-<%= name %>
-</button>
+<%
+    const {
+        type = "submit",
+        name = "",
+        id = name,
+        content = name,
+        onclick = "",
+        href = "#",
+        css
+    } = button;
+%>
+
+<%
+    const click = typeof onclick !== "undefined" ? onclick : "";
+    const buttonType = typeof type !== "undefined" ? type : "";
+    const csstail = typeof css !== "undefined" ? css : "";
+%>
+
+<%if(buttonType == "submit"){%>
+    <button
+        onclick=<%= click %>
+        type=<%= (buttonType == "")? "submit": buttonType %>
+        id=<%= id %>
+        name=<%= name %>
+        alt=<%= content %>
+        class="xl:px-[2vw] py-[1vh] px-[20vw] bg-primary rounded-2xl cursor-pointer hover:opacity-95 lg:text-3xl text-4xl"
+    >
+    <%= content %>
+    </button>
+<%} else if(type == "simple"){%>
+
+    <button 
+        onclick=<%= click %>
+        type=<%= buttonType %>
+        id=<%= id %>
+        name=<%= name %>
+        alt=<%= content %>
+        class="flex h-auto w-full items-center justify-center gap-[1vw] border border-gray-400 px-[2vw] py-[.5vh] rounded-full <%= csstail %>"
+    >
+        <p class="font-bold"><%= content %></p>
+    </button>
+
+<% } else if(type == "href"){%>
+
+    <a 
+        onclick=<%= click %>
+        type=<%= buttonType %>
+        id=<%= id %>
+        name=<%= name %>
+        alt=<%= content %>
+        href=<%= href %>
+        class="flex h-auto w-full items-center justify-center gap-[1vw] border border-gray-400 px-[2vw] py-[.5vh] rounded-full "
+    >
+        <p class="font-bold"><%= content %></p>
+    </a>
+
+<% } %>

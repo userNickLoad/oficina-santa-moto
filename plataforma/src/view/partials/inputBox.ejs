@@ -1,22 +1,29 @@
 <%
     const id = item.name.toLowerCase();
     const text_size = (item.text_size)? item.text_size: "text-2xl";
+    const column = (item.column != null)? (item.column)? "flex-col": "justify-center py-[1vh]" : "flex-col";
+    const size = (item.size != null)? item.size: "lg:w-[50%] w-full";
+    const name_input = id
 %>
 
-<div class="xl:w-[50%] w-full flex flex-col">
-    <label class="<%= text_size %>" for="<%= item.name %>">
+<div class="<%= size %> flex <%= column %> gap-[2vh]">
+    <label class="<%= text_size %> flex items-center" for="<%= item.name %>">
         <%= item.name %>
     </label>
 
     <input
        
-        class=" border  border-gray-200 mt-[1vh] lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
-        type="<%= item.type %>"
+        class=" border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
+        type="<%= item.type ?? "text" %>"
         id="<%= item.name %>"
-        name="<%= id %>"
+        name="<%= name_input %>"
         alt="escreva <%= item.name %>"
         maxlength=<%= item.maxlength %>
         placeholder="<%= item.placeholder %>"
+            <% if (item.mask === "currency") { %>
+                data-mask="currency"
+                inputmode="numeric"
+            <% } %>
     >
     <p class="text-red-900 min-h-[3vh]" id="<%= item.name %>Output"></p>
 </div>

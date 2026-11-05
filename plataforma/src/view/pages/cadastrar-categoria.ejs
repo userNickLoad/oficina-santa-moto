@@ -1,0 +1,46 @@
+<section class="flex flex-col w-full items-center">
+    <h1 class="my-[2vh] text-lg">
+        Entrada no estoque
+    </h1>
+
+    <%- include("../partials/cadastrar/form", {
+        form: {
+            id: "form-cadastrar-produto",
+            action: "/api/produto",
+            method: "post",
+            elements: [
+                {type: "input", input: {name: "Nome do produto", type: "text", maxlength: 50, placeholder: "ex: Óleo de motor 10W-30", text_size: "text-md", size: "w-full"}},
+                {
+                    type: "hidden_container", 
+                    container: {
+                        id: "categoria",
+                        elements: [
+                            {type: "input", input: {name: "Categoria", type: "text", maxlength: 50, placeholder: "ex: bateria, óleo, pneu, ect..", text_size: "text-md", size: "w-full"}}
+                        ]
+                    }
+                }, 
+                {
+                    type: "hidden_container", 
+                    container: {
+                        id: "marca",
+                        elements: [
+                            {type: "input", input: {name: "Marca", type: "text", maxlength: 50, placeholder: "ex: honda", text_size: "text-md", size: "w-full"}}
+                        ]
+                    }
+                },
+                {
+                    type: "container",
+                    container: {
+                        id: "row",
+                        elements: [
+                            {type: "input", input: {name: "Quantidade", type: "number", maxlength: 50, placeholder: "1", text_size: "text-md", size: "w-[40%]" /*, size: "lg:w-[25vw] w-[40vw]"*/}},
+                            {type: "input", input: {name: "Preço", maxlength: 50, placeholder: "R$ 0,00", text_size: "text-md", mask: "currency", size: "w-[40%]" /*, size: "lg:w-[25vw] w-[40vw]"*/}}
+                        ]
+                    }
+                }
+            ]
+        }
+    }) %>
+</section>
+
+<script src="/js/currencyMask.js"></script>

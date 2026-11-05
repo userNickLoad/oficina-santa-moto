@@ -6,14 +6,13 @@
     <% }); %>
 
     <p id="error" class="h-[2vh] text-red-900 min-h-[3vh]"></p>
-  
 
     <div class="w-full h-[8vh] flex justify-center">
-        <%- include("../partials/button", {
-            type: "submit",
-            name: submit,
-            onclick: ""
-        }) %>
+        <%- include("../partials/button", {button: {
+            name: "submit",
+            id: "",
+            content: "entrar"
+        }}) %>
 
     </div>
 </form>

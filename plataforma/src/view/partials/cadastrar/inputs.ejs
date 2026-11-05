@@ -5,6 +5,12 @@
         item
     }) %>
 
-<% } else if(element.type == "container") {%>
-
+<% } else if(element.type == "hidden_container") {%>
+    <%- include("./hidden_container", {container: element.container}) %>
+<% } else if(element.type == "container") { %>
+    <%- include("./container", {container: element.container}) %>
+<% } else if(element.type == "direct") { %>
+    <%- include("./container", {container: element.container}) %>
+<% } else if(element.type == "button") { %>
+    <%- include("../button", {button: element.button}) %>
 <% } %>

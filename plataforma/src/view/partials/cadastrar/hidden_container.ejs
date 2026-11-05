@@ -1,0 +1,25 @@
+<% const first = container.elements.shift(); %>
+
+<div
+    id="container-<%= container.id %>"
+    data-open="false"
+    class="flex flex-col w-full items-center"
+    >
+
+    <%if(container.name){%>
+        <p>
+            <%= container.name %>
+        </p>
+    <% } %>
+
+    <%- include("./inputs", {element: first }) %>
+    
+    <div
+        id="hidden-container-<%= container.id %>"
+        class="items-center h-0 overflow-y-hidden"
+        >
+        <% container.elements.forEach(element => { %>
+            <%- include("./inputs", {element: element }) %>
+        <% }); %>
+    </div>
+</div>
