@@ -6,13 +6,13 @@
         content = name,
         onclick = "",
         href = "#",
-        css,
+        css = "",
+        size = "w-full",
         svg = null
     } = button;
 
     const click = typeof onclick !== "undefined" ? onclick : "";
     const buttonType = typeof type !== "undefined" ? type : "";
-    const csstail = typeof css !== "undefined" ? css : "";
 %>
 
 <%if(buttonType == "submit" && svg != null){%>
@@ -22,9 +22,9 @@
         id=<%= id %>
         name=<%= name %>
         alt=<%= content %>
-        class="flex h-auto w-full items-center justify-center gap-[1vw] bg-primary px-[2vw] py-[.5vh] rounded-full "
+        class="flex h-auto w-full items-center justify-center gap-[1vw] bg-primary px-[2vw] py-[.5vh] rounded-full hover:scale-105 ease-in-out duration-75"
     >
-    <%const svg_path = `../svgs/${svg.path}`%>
+    <%const svg_path = `../svg/${svg.path}`%>
     <%- include(svg_path, { svg }) %>
     <p><%= content %></p>
     </button>
@@ -35,7 +35,7 @@
         id=<%= id %>
         name=<%= name %>
         alt=<%= content %>
-        class="xl:px-[2vw] py-[1vh] px-[20vw] bg-primary rounded-2xl cursor-pointer hover:opacity-95 lg:text-3xl text-4xl"
+        class="xl:px-[2vw] py-[1vh] px-[20vw] bg-primary rounded-2xl cursor-pointer hover:opacity-95 lg:text-3xl text-4xl hover:scale-105 ease-in-out duration-75""
     >
     <%= content %>
     </button>
@@ -47,7 +47,9 @@
         id=<%= id %>
         name=<%= name %>
         alt=<%= content %>
-        class="flex h-auto w-full items-center justify-center gap-[1vw] border border-gray-400 px-[2vw] py-[.5vh] rounded-full <%= csstail %>"
+        class="flex h-auto items-center justify-center gap-[1vw] 
+            border border-gray-400 px-[2vw] py-[.5vh] rounded-full <%= css %> <%= size %>
+            hover:scale-105 ease-in-out duration-75"
     >
         <p class="font-bold"><%= content %></p>
     </button>
@@ -61,7 +63,9 @@
         name=<%= name %>
         alt=<%= content %>
         href=<%= href %>
-        class="flex h-auto w-full items-center justify-center gap-[1vw] border border-gray-400 px-[2vw] py-[.5vh] rounded-full "
+        class="flex h-auto items-center justify-center gap-[1vw] 
+        border border-gray-400 px-[2vw] py-[.5vh] rounded-full <%= css %> <%= size %>
+        hover:scale-105 ease-in-out duration-75"
     >
         <p class="font-bold"><%= content %></p>
     </a>

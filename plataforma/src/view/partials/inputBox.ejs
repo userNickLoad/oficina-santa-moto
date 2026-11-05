@@ -1,22 +1,42 @@
 <%
-    const id = item.name.toLowerCase();
-    const text_size = (item.text_size)? item.text_size: "text-2xl";
-    const column = (item.column != null)? (item.column)? "flex-col": "justify-center py-[1vh]" : "flex-col";
-    const size = (item.size != null)? item.size: "lg:w-[50%] w-full";
-    const name_input = id;
+    const {
+        id,
+        title,
+        name = null,
+        text_size = "text-2xl",
+        column = false,
+        size = "w-full",
+        type = "text",
+        maxlength = "50",
+        placeholder = "",
+        mask = null,
+        rows = "5"
+    } = item;
+    const id_applay = name.toLowerCase();
+    const column_applay = (column)? "justify-center py-[1vh]": "flex-col";
+
+    const name_input = (name == null)? id: name;
 
 %>
 
-<div class="<%= size %> flex <%= column %> gap-[2vh]">
+<div class="<%= size %> flex <%= column_applay %> gap-[2vh]">
     <label class="<%= text_size %> flex items-center" for="<%= item.name %>">
-        <%= item.title %>
+        <%= title %>
     </label>
-
-    <% if (item.type == "image"){ %>
+    <% if(type == "textarea") { %>
+        <textarea 
+            name="<%= name %>" 
+            id="<%= id_applay %>"
+            placeholder="<%= placeholder %>",
+            rows="<%= rows %>"
+            maxlength="<%= maxlength %>"
+            class="border resize-none h-32 p-3 border-gray-200  rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
+            ></textarea>
+    <% } else if (type == "image"){ %>
         <input 
             type="file" 
-            name="<%= item.name %>" 
-            id="<%= item.id %>"
+            name="<%= name %>" 
+            id="<%= id_applay %>"
             accept="image/png, image/jpeg, image/webp"
             class=" border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
             >
@@ -25,13 +45,13 @@
             <input
             
                 class=" border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
-                type="<%= item.type ?? "text" %>"
-                id="<%= item.name %>"
+                type="<%= type%>"
+                id="<%= name %>"
                 name="<%= name_input %>"
-                alt="escreva <%= item.name %>"
-                maxlength=<%= item.maxlength %>
-                placeholder="<%= item.placeholder %>"
-                    <% if (item.mask === "currency") { %>
+                alt="escreva <%= name %>"
+                maxlength=<%= maxlength %>
+                placeholder="<%= placeholder %>"
+                    <% if (mask === "currency") { %>
                         data-mask="currency"
                         inputmode="numeric"
                     <% } %>

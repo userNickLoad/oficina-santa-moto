@@ -9,21 +9,28 @@
 -->
 
 <% 
-    const flex = (container.flex_col)? "flex-col" : "";
-    const gap = (container.gap)? container.gap: ""
-    const classCss = (container.class)? container.class: `flex ${flex} w-full ${gap} justify-between items-center`;
+    const {
+        id,
+        flex = "",
+        name = null,
+        gap = "",
+        css = null,
+        title = null
+    } = container;
+
+    const classCss = (css)? container.class: `flex ${flex} w-full ${gap} justify-around items-center`;
 
 %>
 
-<%if(container.name){%>
+<%if(name != null){%>
     <p class="text-lg ">
-        <%= container.name %>
+        <%= name %>
     </p>
 <% } %>
 
 <div
-    class="<%= classCss %>"
-    id="container-<%= container.id %>"
+    class="<%= classCss %> "
+    id="container-<%= id %>"
     >
     <% container.elements.forEach(element => {%>
         <%- include("./inputs", { element }) %>

@@ -1,6 +1,6 @@
 "use strict";
 console.log("LOGIN.TS CARREGADO");
-const form = document.querySelector("#entrar");
+const form = document.querySelector("form");
 if (!form) {
     throw new Error("Formulário não encontrado");
 }
@@ -42,7 +42,6 @@ form.addEventListener("submit", async (event) => {
             return;
         }
         window.location = resultado.redirect;
-        console.log("Login realizado com sucesso!");
         // Aqui você pode tratar o sucesso do login.
     }
     catch (error) {

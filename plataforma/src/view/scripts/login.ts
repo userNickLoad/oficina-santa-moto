@@ -1,7 +1,7 @@
 console.log("LOGIN.TS CARREGADO");
 
 const form = document.querySelector<HTMLFormElement>(
-    "#entrar"
+    "form"
 );
 
 if (!form) {
@@ -61,8 +61,6 @@ form.addEventListener("submit", async (event) => {
         }
 
         window.location = resultado.redirect;
-
-        console.log("Login realizado com sucesso!");
 
         // Aqui você pode tratar o sucesso do login.
 
