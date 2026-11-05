@@ -33,13 +33,31 @@
             class="border resize-none h-32 p-3 border-gray-200  rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
             ></textarea>
     <% } else if (type == "image"){ %>
-        <input 
-            type="file" 
-            name="<%= name %>" 
-            id="<%= id_applay %>"
-            accept="image/png, image/jpeg, image/webp"
-            class=" border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
-            >
+        <div
+            class="flex flex-col w-full"
+        >
+                <input 
+                type="file" 
+                name="<%= name %>" 
+                id="<%= id_applay %>"
+                accept="image/png, image/jpeg, image/webp"
+                placeholder=<%= placeholder %>
+                class=" border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
+                >
+
+                <div
+                    class="w-full flex justify-center mt-[1vh]"
+                >
+                    <%- include("./button", { button: {
+                        type: "simple",
+                        id: `cancel-${id}` ,
+                        name: `cancel-${name}`,
+                        content: "cancelar envio",
+                        size: "w-auto px-[2vw]"
+                    }}) %>
+                </div>
+        </div>
+
         <p class="text-red-900 min-h-[3vh]" id="<%= item.id %>Output"></p>
     <% } else { %>
             <input

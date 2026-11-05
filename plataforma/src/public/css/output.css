@@ -226,9 +226,6 @@
       max-width: 96rem;
     }
   }
-  .my-\[1vh\] {
-    margin-block: 1vh;
-  }
   .my-\[2vh\] {
     margin-block: 2vh;
   }
@@ -348,6 +345,9 @@
   }
   .w-\[70\%\] {
     width: 70%;
+  }
+  .w-\[80\%\] {
+    width: 80%;
   }
   .w-\[90vw\] {
     width: 90vw;
@@ -681,9 +681,6 @@
     }
     .lg\:w-\[25vw\] {
       width: 25vw;
-    }
-    .lg\:w-\[50\%\] {
-      width: 50%;
     }
     .lg\:w-\[50vw\] {
       width: 50vw;
