@@ -32,38 +32,54 @@
             maxlength="<%= maxlength %>"
             class="border resize-none h-32 p-3 border-gray-200  rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
             ></textarea>
-    <% } else if (type == "image"){ %>
-        <div
-            class="flex flex-col w-full"
-        >
-                <input 
-                type="file" 
-                name="<%= name %>" 
-                id="<%= id_applay %>"
-                accept="image/png, image/jpeg, image/webp"
-                placeholder=<%= placeholder %>
-                class=" border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
-                >
+    <% } else if (type == "image") { %>
 
-                <div
-                    class="w-full flex justify-center mt-[1vh]"
-                >
-                    <%- include("./button", { button: {
-                        type: "simple",
-                        id: `cancel-${id}` ,
-                        name: `cancel-${name}`,
-                        content: "cancelar envio",
-                        size: "w-auto px-[2vw]"
-                    }}) %>
-                </div>
+    <div class="flex flex-col w-full gap-[1vh]">
+
+        <input
+            type="file"
+            name="<%= name_input %>[]"
+            id="<%= id_applay %>"
+            accept="image/png, image/jpeg, image/webp"
+            multiple
+            class="hidden"
+        >
+
+        <!-- Botão personalizado -->
+        <label
+            for="<%= id_applay %>"
+            class="flex items-center justify-center w-full
+                bg-primary px-4 py-3 rounded-2xl
+                cursor-pointer hover:opacity-90
+                transition"
+        >
+            <span class="font-bold">
+                Selecionar imagens
+            </span>
+        </label>
+
+        <!-- Pré-visualização -->
+        <div
+            id="<%= id_applay %>-preview"
+            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+        ></div>
+
+        <div class="flex justify-center mt-[1vh]">
+            <%- include("./button", { button: {
+                type: "simple",
+                id: `cancel-${id_applay}`,
+                name: `cancel-${name_input}`,
+                content: "Cancelar envio",
+                size: "w-auto px-[2vw]"
+            }}) %>
         </div>
 
-        <p class="text-red-900 min-h-[3vh]" id="<%= item.id %>Output"></p>
+    </div>
     <% } else { %>
             <input
             
                 class=" border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
-                type="<%= type%>"
+                type="<%= type %>"
                 id="<%= name %>"
                 name="<%= name_input %>"
                 alt="escreva <%= name %>"
@@ -74,6 +90,10 @@
                         inputmode="numeric"
                     <% } %>
             >
-            <p class="text-red-900 min-h-[3vh]" id="<%= item.id %>Output"></p>
+
         <% } %>
+                <p
+            class="text-red-900 min-h-[3vh]"
+            id="output-<%= id_applay %>"
+        ></p>
 </div>

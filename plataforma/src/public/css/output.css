@@ -7,6 +7,7 @@
     --font-sans: "Poppins", sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
+    --color-red-600: oklch(57.7% 0.245 27.325);
     --color-red-900: oklch(39.6% 0.141 25.723);
     --color-orange-600: oklch(64.6% 0.222 41.116);
     --color-gray-100: oklch(96.7% 0.003 264.542);
@@ -199,8 +200,14 @@
   .relative {
     position: relative;
   }
+  .top-2 {
+    top: calc(var(--spacing) * 2);
+  }
   .top-\[-100px\] {
     top: -100px;
+  }
+  .right-2 {
+    right: calc(var(--spacing) * 2);
   }
   .z-2 {
     z-index: 2;
@@ -259,6 +266,9 @@
   .grid {
     display: grid;
   }
+  .hidden {
+    display: none;
+  }
   .table {
     display: table;
   }
@@ -276,6 +286,9 @@
   }
   .h-6 {
     height: calc(var(--spacing) * 6);
+  }
+  .h-7 {
+    height: calc(var(--spacing) * 7);
   }
   .h-32 {
     height: calc(var(--spacing) * 32);
@@ -307,6 +320,12 @@
   .h-\[100\%\] {
     height: 100%;
   }
+  .h-\[max-h\] {
+    height: max-h;
+  }
+  .h-\[max-height\] {
+    height: max-height;
+  }
   .h-auto {
     height: auto;
   }
@@ -334,6 +353,9 @@
   .w-6 {
     width: calc(var(--spacing) * 6);
   }
+  .w-7 {
+    width: calc(var(--spacing) * 7);
+  }
   .w-\[40\%\] {
     width: 40%;
   }
@@ -345,9 +367,6 @@
   }
   .w-\[70\%\] {
     width: 70%;
-  }
-  .w-\[80\%\] {
-    width: 80%;
   }
   .w-\[90vw\] {
     width: 90vw;
@@ -433,6 +452,9 @@
   .gap-3 {
     gap: calc(var(--spacing) * 3);
   }
+  .gap-\[1vh\] {
+    gap: 1vh;
+  }
   .gap-\[1vw\] {
     gap: 1vw;
   }
@@ -493,11 +515,17 @@
   .bg-primary {
     background-color: var(--color-primary);
   }
+  .bg-red-600 {
+    background-color: var(--color-red-600);
+  }
   .bg-white {
     background-color: var(--color-white);
   }
   .object-contain {
     object-fit: contain;
+  }
+  .object-cover {
+    object-fit: cover;
   }
   .p-2 {
     padding: calc(var(--spacing) * 2);
@@ -507,6 +535,9 @@
   }
   .p-\[4\%\] {
     padding: 4%;
+  }
+  .px-4 {
+    padding-inline: calc(var(--spacing) * 4);
   }
   .px-\[1vw\] {
     padding-inline: 1vw;
@@ -525,6 +556,9 @@
   }
   .py-2 {
     padding-block: calc(var(--spacing) * 2);
+  }
+  .py-3 {
+    padding-block: calc(var(--spacing) * 3);
   }
   .py-\[\.5vh\] {
     padding-block: .5vh;
@@ -588,6 +622,9 @@
   .text-secondary {
     color: var(--color-secondary);
   }
+  .text-white {
+    color: var(--color-white);
+  }
   .underline {
     text-decoration-line: underline;
   }
@@ -600,6 +637,11 @@
   }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .transition {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
   .transition-\[max-height\] {
     transition-property: max-height;
@@ -649,6 +691,9 @@
     .hover\:bg-gray-300:hover {
       background-color: var(--color-gray-300);
     }
+    .hover\:opacity-90:hover {
+      opacity: 90%;
+    }
     .hover\:opacity-95:hover {
       opacity: 95%;
     }
@@ -671,6 +716,9 @@
     outline-color: var(--color-gray-500);
   }
   @media (width >= 48rem) {
+    .md\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
     .md\:px-\[5vw\] {
       padding-inline: 5vw;
     }
@@ -693,6 +741,9 @@
     }
     .lg\:w-\[clamp\(160px\,15vw\,230px\)\] {
       width: clamp(160px, 15vw, 230px);
+    }
+    .lg\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
     .lg\:grid-cols-5 {
       grid-template-columns: repeat(5, minmax(0, 1fr));
