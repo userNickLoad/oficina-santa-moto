@@ -16,20 +16,20 @@
     >
 
     <div 
-        class="w-full"
+        class="flex flex-col w-full gap-[.5vh]"
     >
         <%if(title){%>
             <p
-                class="w-full text-center <%= (typeof title === "string")? "": title.text_size %>"
+                class="w-full text-center <%= (typeof title === "string")? "text-lg": title.text_size %>"
             >   
                 <%= (typeof title === "string")? title: title.text %>
             </p>
         <% } %>
         <% if(description) {%>
             <p
-                class="w-full"
+                class="w-full text-sm text-gray-400 text-center"
             >
-                description
+                <%= description %>
             </p>
         <% } %>
     </div>
@@ -39,11 +39,15 @@
     
     <div
         id="hidden-container-<%= container.id %>"
-        class="items-center h-0 overflow-y-hidden"
+        class="w-full overflow-y-hidden h-0 transition-[height] duration-300 ease-in-out"
         >
-        <% elements.forEach(element => { %>
-            <%- include("./inputs", {element: element }) %>
-        <% }); %>
+        <div
+            class="py-[1vh] w-full h-max px-[2vw] border border-gray-400 rounded-2xl mt-[1px]"
+            >
+            <% elements.forEach(element => { %>
+                <%- include("./inputs", {element: element }) %>
+            <% }); %>
+        </div>
     </div>
 
 

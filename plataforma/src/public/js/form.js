@@ -17,7 +17,9 @@ const setForm = (formId = null, verifyIssues = null) => {
         errorOutput.innerText = "";
         let errors = 0;
         form.querySelectorAll("input").forEach(input => {
-            const parent = input.parentElement;
+            if (input.disabled)
+                return;
+            const parent = (input.type != "file") ? input.parentElement : input.parentElement?.parentElement;
             if (!parent) {
                 throw new Error(`não foi possivel localizar o pai de ${input.id}`);
             }

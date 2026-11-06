@@ -31,8 +31,11 @@ const setForm = (formId: string | null = null, verifyIssues: ((inputElement: HTM
         let errors = 0;
 
 
-        form.querySelectorAll("input").forEach(input => {
-            const parent = input.parentElement;
+        form.querySelectorAll<HTMLInputElement>("input").forEach(input => {
+            if(input.disabled)
+                return;
+
+            const parent = (input.type != "file")? input.parentElement: input.parentElement?.parentElement;
             if(!parent){
                 throw new Error(`não foi possivel localizar o pai de ${input.id}`)
             }

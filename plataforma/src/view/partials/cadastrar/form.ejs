@@ -15,17 +15,16 @@
     action="<%= action %>" 
     method="<%= method %>" 
     id="<%= id %>"
-    class="flex flex-col items-center <%= size %> <%= gap %>"
+    class="flex flex-col items-center <%= size %> <%= gap %> my-[1vw]"
     enctype='multipart/form-data'
 >
-
     <% form.elements.forEach(element => {%>
         <%- include("./inputs", { element })%>
     <% }); %>
 
     <p id="error" class="h-[2vh] text-red-900 min-h-[3vh]"></p>
     
-    <div class="flex flex-col gap-[5vh] mt-[5vh]">
+    <div class="flex flex-col gap-[5vh]">
 
         <% buttons.forEach((element) => { %>
             <%- include('./inputs', { element: {type: "button", button: element} }) %>

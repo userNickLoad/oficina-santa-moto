@@ -12,7 +12,6 @@
     const {
         id,
         flex = "",
-        name = null,
         gap = "",
         css = null,
         title = null
@@ -22,9 +21,9 @@
 
 %>
 
-<%if(name != null){%>
+<%if(title != null){%>
     <p class="text-lg ">
-        <%= name %>
+        <%= title %>
     </p>
 <% } %>
 

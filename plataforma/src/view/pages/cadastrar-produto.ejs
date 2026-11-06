@@ -14,10 +14,8 @@
                     type: "hidden_container", 
                     container: {
                         id: "categoria",
-                        title: {
-                            text: "Categoria",
-                            text_size: "text-lg"
-                        },
+                        title: "Categoria",
+                        description: "Campo não obrigatorio, mas é importante pois pode ajudar em buscas futuras.",
                         elements: [
                             {   
                                 type: "container",
@@ -40,7 +38,7 @@
                                                 type: "href", 
                                                 name: "adicionar-categoria", 
                                                 id: "adicionar-categoria", 
-                                                content: "cadastrar novo",
+                                                content: "cadastrar nova",
                                                 href: "/cadastrar-categoria",
                                                 size: "w-[40%]"
                                             }
@@ -49,7 +47,7 @@
                                 }
         
                             },
-                            {type: "input", input: {name: "Categoria", type: "text", maxlength: 50, placeholder: "ex: bateria, óleo, pneu, ect..", text_size: "text-md", size: "w-full"}}
+                            {type: "input", input: {title: "Nome da categoria", name: "Categoria", type: "text", maxlength: 50, placeholder: "ex: bateria, óleo, pneu, ect..", text_size: "text-md", size: "w-full"}}
                         ]
                     }
                 },
@@ -57,10 +55,8 @@
                     type: "hidden_container", 
                     container: {
                         id: "marca",
-                        title: {
-                            text: "Marca",
-                            text_size: "text-lg"
-                        },
+                        title: "Marca",
+                        description: "Campo não obrigatorio, mas é importante pois pode ajudar em buscas futuras.",
                         elements: [
                             {   
                                 type: "container",
@@ -92,8 +88,8 @@
                                 }
         
                             },
-                            {type: "button", button: {type: "simple", name: "adicionar-marca", id: "adicionar-marca", content: "+ adicionar marca"}},
-                            {type: "input", input: {name: "Marca", type: "text", maxlength: 50, placeholder: "ex: honda", text_size: "text-md", size: "w-full"}}
+                            
+                            {type: "input", input: {title: "Nome da marca", name: "Marca", type: "text", maxlength: 50, placeholder: "ex: honda", text_size: "text-md", size: "w-full"}}
                         ]
                     }
                 },
@@ -123,6 +119,7 @@
                     id: "submit",
                     name: "submit",
                     content: "Cadastrar protudo",
+                    submit: true,
                     svg: { path: "save-icon"}
                 },
 

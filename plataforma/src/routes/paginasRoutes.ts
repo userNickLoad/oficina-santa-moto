@@ -37,10 +37,26 @@ router.get("/estoque", authMiddleware, (req: Request, res: Response) => {
 router.get("/cadastrar-produto", authMiddleware, (req: Request, res: Response) => {
 
     res.render("./layouts/index", {
-        title: "Cadastrar produto",
+        title: "Produto",
         content: "../pages/cadastrar-produto",
         voltar: true
     });
 })
 
+router.get("/cadastrar-categoria", authMiddleware, (req: Request, res: Response) => {
+    res.render("./layouts/index", {
+        title: "Categoria",
+        content: "../pages/cadastrar-categoria",
+        voltar: true
+    });
+})
+
+router.get("/cadastrar-marca", authMiddleware, (req: Request, res: Response) => {
+
+    res.render("./layouts/index", {
+        title: "Categoria",
+        content: "../pages/cadastrar-marca",
+        voltar: true
+    });
+})
 export default router;

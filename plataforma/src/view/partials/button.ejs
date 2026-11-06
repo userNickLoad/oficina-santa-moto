@@ -8,17 +8,17 @@
         href = "#",
         css = "",
         size = "w-full",
-        svg = null
+        svg = null,
+        submit = false
     } = button;
 
     const click = typeof onclick !== "undefined" ? onclick : "";
-    const buttonType = typeof type !== "undefined" ? type : "button";
 %>
 
-<%if(buttonType == "submit" && svg != null){%>
+<%if(type == "submit" && svg != null){%>
     <button
         onclick=<%= click %>
-        type=<%= (buttonType == "")? "submit": buttonType %>
+        type="<%= (submit)? "submit": "button" %>"
         id=<%= id %>
         name=<%= name %>
         alt=<%= content %>
@@ -28,10 +28,10 @@
     <%- include(svg_path, { svg }) %>
     <p><%= content %></p>
     </button>
-<%} else if(buttonType == "submit"){%>
+<%} else if(type == "submit"){%>
     <button
         onclick=<%= click %>
-        type=<%= (buttonType == "")? "submit": buttonType %>
+        type="<%= (submit)? "submit": "button" %>"
         id=<%= id %>
         name=<%= name %>
         alt=<%= content %>
@@ -43,7 +43,7 @@
 
     <button 
         onclick=<%= click %>
-        type=<%= buttonType %>
+        type="<%= (submit)? "submit": "button" %>"
         id=<%= id %>
         name=<%= name %>
         alt=<%= content %>
@@ -58,7 +58,7 @@
 
     <a 
         onclick=<%= click %>
-        type=<%= buttonType %>
+        type="<%= (submit)? "submit": "button" %>"
         id=<%= id %>
         name=<%= name %>
         alt=<%= content %>
