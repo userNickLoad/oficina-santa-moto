@@ -2,7 +2,22 @@ console.log("LOGIN.TS CARREGADO");
 const verifyEmpty = (input) => {
     return (input.value.trim() === "") ? "Campo vazio" : null;
 };
-const setForm = (formId = null, verifyIssues = null) => {
+const parseFormData = (formData) => {
+    const result = {};
+    for (const [key, value] of formData.entries()) {
+        const match = key.match(/^([^\[]+)\[(\d+)\]\[([^\]]+)\]$/);
+        if (match) {
+            const [, arrayName, index, property] = match;
+            result[arrayName] ??= [];
+            result[arrayName][Number(index)] ??= {};
+            result[arrayName][Number(index)][property] = value;
+            continue;
+        }
+        result[key] = value;
+    }
+    return result;
+};
+const setForm = (formId = null, verifyIssues = null, multi = false) => {
     const form = document.querySelector((formId) ? `#${formId}` : "form");
     if (!form) {
         throw new Error("Formulário não encontrado");
@@ -19,7 +34,7 @@ const setForm = (formId = null, verifyIssues = null) => {
         form.querySelectorAll("input").forEach(input => {
             if (input.disabled)
                 return;
-            const parent = (input.type != "file") ? input.parentElement : input.parentElement?.parentElement;
+            const parent = input.closest('[data-parent="inputbox"]');
             if (!parent) {
                 throw new Error(`não foi possivel localizar o pai de ${input.id}`);
             }
@@ -38,7 +53,12 @@ const setForm = (formId = null, verifyIssues = null) => {
             return;
         // Obtém os dados do formulário
         const formData = new FormData(form);
-        const dados = Object.fromEntries(formData.entries());
+        let dados;
+        if (!multi)
+            dados = Object.fromEntries(formData.entries());
+        else
+            dados = parseFormData(formData);
+        console.log(dados);
         try {
             const response = await fetch(form.action, {
                 method: form.method,

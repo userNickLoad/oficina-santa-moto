@@ -9,7 +9,7 @@
             action: "/api/categoria",
             method: "post",
             elements: [
-                {type: "input", input: {title: "Nome da categoria",  name: "nome", type: "text", maxlength: 50, placeholder: "ex: óleo, escapamento, capacete etc..."}},
+                {type: "input", input: {title: "Nome da categoria",  name: "atributo[nome]", type: "text", maxlength: 50, placeholder: "ex: óleo, escapamento, capacete etc..."}},
                 {
                     type: "addble_container",
                     container: {
@@ -34,7 +34,7 @@
                 },
                 {
                     type: "input", 
-                    input: {title: "Descricao", name: "descricao", id: "descricao", type: "textarea", maxlength: "250", placeholder: "Escreva a descrição da categoria (opcional)"}
+                    input: {title: "Descricao", name: "atributo[descricao]", type: "textarea", maxlength: "250", placeholder: "Escreva a descrição da categoria (opcional)"}
                 }
             ],
             buttons: [  
@@ -50,4 +50,5 @@
     }) %>
 </section>
 
+<script type="module" src="/js/cadastrarCategoria.js"></script>
 <script src="/js/currencyMask.js"></script>
