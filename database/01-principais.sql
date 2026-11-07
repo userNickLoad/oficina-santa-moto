@@ -27,7 +27,6 @@ CREATE TABLE IF NOT EXISTS produto(
 	preco_venda NUMERIC(10,2) NOT NULL CHECK (qtd_disponivel >= 0),
 	qtd_disponivel INT NOT NULL DEFAULT 0 CHECK (qtd_disponivel >= 0),
 	codigo_barras TEXT,
-	imagem TEXT,
 	descricao TEXT,
 	alerta_quantidade INT DEFAULT 0 CHECK (alerta_quantidade >= 0),
 	comprimento INT DEFAULT 10 CHECK (comprimento > 0),
@@ -35,6 +34,17 @@ CREATE TABLE IF NOT EXISTS produto(
 	altura INT DEFAULT 10 CHECK (altura > 0),
 	id_categoria INTEGER REFERENCES categoria(id),
 	id_marca INTEGER REFERENCES marca(id)
+);
+
+CREATE TABLE IF NOT EXISTS imagem (
+	id SERIAL PRIMARY KEY,
+	caminho TEXT
+);
+
+CREATE TABLE IF NOT EXISTS produto_imagem(
+	id_produto INTEGER REFERENCES produto(id),
+	id_imagem INTEGER UNIQUE REFERENCES imagem(id),
+	PRIMARY KEY(id_produto, id_imagem)
 );
 
 CREATE INDEX IF NOT EXISTS idx_produto_nome ON produto(nome);
