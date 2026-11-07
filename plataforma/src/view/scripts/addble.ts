@@ -1,0 +1,38 @@
+const buildClone = (clonable: HTMLElement, name: string,  iterator: number): HTMLElement => {
+    const clone = clonable.cloneNode(true) as HTMLElement;
+
+    const btn_rm = clone.querySelector('[id^="remove-"]');
+    if(!btn_rm)
+        throw new Error(`não foi possivel localizar o botão remove`)
+
+
+    btn_rm.id = `${name}[${iterator}][${btn_rm.id}]`;
+
+    clone.querySelectorAll("input").forEach(input => {
+        input.id = `${name}[${iterator}][${input.id}]`;
+        input.name = `${name}[${iterator}][${input.name}]`;
+    });
+
+    return clone;
+}
+
+const setAddble = (element: HTMLElement, name: string, iterator: number) => {
+    const btn_add = element.querySelector('[id^="add-new-"]');
+
+    if(!btn_add)
+        throw new Error(`Não foi possivel localizar o botão de adição do ${element.id}`);
+
+    const addble = element.querySelector<HTMLElement>('[id^="addble-element-"]');
+
+    if(!addble)
+        throw new Error(`não foi possivel localizar o elemento clonavel `);
+
+
+    btn_add.addEventListener("click", ()=>{
+        const clone = buildClone(addble, name, iterator);
+        element.appendChild(clone);
+    })
+
+}
+
+export {setAddble}

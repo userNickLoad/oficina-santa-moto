@@ -15,7 +15,21 @@
                     container: {
                         id: "atributos",
                         title: "Atributos",
-                        elements: []
+                        elements: [
+                            {type: "input", input: {title: "Nome do atributo", id: "nome-atributo", name: "nome atributo", maxlength: "20"}},
+                            {   
+                                type: "container",
+                                container: {
+                                    id: "inner-content",
+                                    class: "w-full flex flex-col justify-between",
+                                    elements: [
+                                        {type: "input", input: {type: "check", title: "Obrigatoriedade", id: "obrigatorio", name: "obrigatorio", size: "w-auto h-full"}},
+                                        {type: "input", input: {type: "radio", title: "Tipo de dado", id: "tipo", name: "tipo", radios: ["numerico", "texto"], size: "w-auto"}},
+                                    ]
+                            }
+                        }
+                        ]
+                        
                     }
                 },
                 {

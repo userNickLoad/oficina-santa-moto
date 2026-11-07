@@ -14,7 +14,8 @@
         flex = "",
         gap = "",
         css = null,
-        title = null
+        title = null,
+        elements = []
     } = container;
 
     const classCss = (css)? container.class: `flex ${flex} w-full ${gap} justify-around items-center`;
@@ -33,14 +34,16 @@
     >
 
     <div 
-        id="addble-<%= id %>"
-        class="w-full flex gap-[1vw]"
+        id="addble-element-<%= id %>"
+        class="w-full gap-[1vw] hidden"
         >
 
         <div
-            class="flex-1 border border-gray-400 p-[1vh] rounded-2xl"
+            class="flex flex-col flex-1 border border-gray-400 p-[1vh] rounded-2xl "
             >
-            <%- //include("./inputs", element ) %>  
+            <% elements.forEach((element) => { %>
+                    <%- include("./inputs", {element} ) %>  
+            <% }); %>
           
         </div> 
 
@@ -61,15 +64,12 @@
         </div>
 
     </div>
-
-    <!-- <% container.elements.forEach(element => {%>
-        <%- include("./inputs", { element }) %>
-    <% }); %> -->
     
     <div
         class="w-full flex justify-center"
     >
         <%- include("../button", {button: {
+            id: `add-new-${id}`,
             type: "simple",
             content: "adicionar",
             size: "w-auto px-[1vw]"

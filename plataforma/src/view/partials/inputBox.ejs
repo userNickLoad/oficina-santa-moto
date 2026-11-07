@@ -10,7 +10,8 @@
         maxlength = "50",
         placeholder = "",
         mask = null,
-        rows = "5"
+        rows = "5",
+        radios = []
     } = item;
     const id_applay = name.toLowerCase();
     const column_applay = (column)? "justify-center py-[1vh]": "flex-col";
@@ -23,6 +24,7 @@
     <label class="<%= text_size %> flex items-center" for="<%= item.name %>">
         <%= title %>
     </label>
+
     <% if(type == "textarea") { %>
         <textarea 
             name="<%= name %>" 
@@ -32,6 +34,46 @@
             maxlength="<%= maxlength %>"
             class="border resize-none h-32 p-3 border-gray-200  rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
             ></textarea>
+    <% } else if (type == "radio") { %>
+
+        <div
+            class="w-full flex flex-col items-center justify-center "
+            >
+            <% radios.forEach(function(radio) { %>
+                <div
+                    class="w-full flex gap-[3vw]"
+                    >
+                    
+                    <input 
+                        type="radio" 
+                        name="<%= name_input %>" 
+                        id="radio-<%= id_applay %>-<%= radio %>"
+                        class="w-[3vh] h-[3vh]"
+                        value="<%= radio %>"
+                    >
+
+                    <label 
+                        for="radio-<%= id_applay %>-<%= radio %>"
+                        class="text-left"
+                    ><%= radio %></label>
+                </div>
+                
+            <% }); %>
+            
+        </div>
+    <% } else if (type == "check") { %>
+
+        <div
+            class="w-full flex"
+            >
+            <input 
+                type="checkbox" 
+                name="<%= name_input %>" 
+                id="<%= id_applay %>"
+                class="w-[5vh] h-[5vh]"
+                >
+        </div>
+
     <% } else if (type == "image") { %>
 
     <div class="flex flex-col w-full gap-[1vh]">
