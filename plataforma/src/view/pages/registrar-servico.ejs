@@ -1,0 +1,85 @@
+
+<section class="flex flex-col items-center w-full py-6">
+
+    <h2 class="text-xl w-full max-w-[500px] mb-6">
+        Novo registro de ordem de serviço
+    </h2>
+
+    <p class="text-[16px] text-gray-500 font-normal leading-6">
+        Preencha as informações abaixo
+    </p>
+
+    <%- include("../partials/cadastrar/form", {
+        form: {
+            id: "form-registrar-servico",
+            action: "/api/servico",
+            method: "post",
+            size: "max-w-[500px] w-full",
+            elements: [
+                {
+                    type: "input",
+                    input: {
+                        id: "nome_cliente",
+                        name: "nome_cliente",
+                        title: "Nome do cliente",
+                        type: "text",
+                        placeholder: "Digite o nome do cliente",
+                        maxlength: 100
+                    }
+                },
+                {
+                    type: "input",
+                    input: {
+                        id: "telefone",
+                        name: "telefone",
+                        title: "Telefone",
+                        type: "tel",
+                        placeholder: "(11) 99999-9999",
+                        maxlength: 20
+                    }
+                },
+                {
+                    type: "input",
+                    input: {
+                        id: "modelo_moto",
+                        name: "modelo_moto",
+                        title: "Modelo da moto",
+                        type: "text",
+                        placeholder: "Ex: Honda CG 160",
+                        maxlength: 100
+                    }
+                },
+                {
+                    type: "input",
+                    input: {
+                        id: "descricao",
+                        name: "descricao",
+                        title: "Descrição do serviço",
+                        type: "textarea",
+                        placeholder: "Descreva o serviço a ser realizado",
+                        maxlength: 250
+                    }
+                },
+                {
+                    type: "input",
+                    input: {
+                        id: "data_entrada",
+                        name: "data_entrada",
+                        title: "Data de entrada",
+                        type: "date"
+                    }
+                }
+            ],
+            buttons: [
+                {
+                    type: "submit",
+                    id: "registrar",
+                    name: "registrar",
+                    content: "Registrar Serviço",
+                    submit: true
+                }
+            ]
+        }
+    }) %>
+
+</section>

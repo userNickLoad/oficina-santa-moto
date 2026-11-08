@@ -59,4 +59,30 @@ router.get("/cadastrar-marca", authMiddleware, (req: Request, res: Response) => 
         voltar: true
     });
 })
+
+router.get("/servicos", (req: Request, res: Response) => {
+
+    res.render("./layouts/index", {
+        title: "Serviços",
+        content: "../pages/servicos",
+        voltar: true
+    });
+})
+
+router.get("/registrar-servico", (req: Request, res: Response) => {
+    res.render("./layouts/index", {
+        title: "Registrar Serviço",
+        content: "../pages/registrar-servico",
+        voltar: true
+    });
+});
+
+router.get("/concluir-servico", (req: Request, res: Response) => {
+    res.render("./layouts/index", {
+        title: "Concluir Serviço",
+        content: "../pages/concluir-servico",
+        voltar: true
+    });
+});
+
 export default router;
