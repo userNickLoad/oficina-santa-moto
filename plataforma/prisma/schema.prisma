@@ -227,6 +227,7 @@ model servico {
   preco         Decimal         @db.Decimal(10, 2)
   id_cliente    Int?
   id_veiculo    Int?
+  status        String          @default("EM_ANDAMENTO")
   cliente       cliente?        @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction)
   veiculo       veiculo?        @relation(fields: [id_veiculo], references: [id], onDelete: NoAction, onUpdate: NoAction)
   servico_venda servico_venda[]
