@@ -60,7 +60,7 @@ router.get("/cadastrar-marca", authMiddleware, (req: Request, res: Response) => 
     });
 })
 
-router.get("/servicos", (req: Request, res: Response) => {
+router.get("/servicos", authMiddleware, (req: Request, res: Response) => {
 
     res.render("./layouts/index", {
         title: "Serviços",
@@ -69,7 +69,7 @@ router.get("/servicos", (req: Request, res: Response) => {
     });
 })
 
-router.get("/registrar-servico", (req: Request, res: Response) => {
+router.get("/registrar-servico", authMiddleware, (req: Request, res: Response) => {
     res.render("./layouts/index", {
         title: "Registrar Serviço",
         content: "../pages/registrar-servico",
@@ -77,7 +77,7 @@ router.get("/registrar-servico", (req: Request, res: Response) => {
     });
 });
 
-router.get("/concluir-servico", (req: Request, res: Response) => {
+router.get("/concluir-servico", authMiddleware, (req: Request, res: Response) => {
     res.render("./layouts/index", {
         title: "Concluir Serviço",
         content: "../pages/concluir-servico",

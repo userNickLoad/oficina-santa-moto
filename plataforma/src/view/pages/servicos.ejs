@@ -1,45 +1,35 @@
-<section class="w-full max-w-[500px] mx-auto px-3 pt-6 pb-12">
+<%
+const ops = [
+    {
+        href: "/registrar-servico",
+        src: "/assets/registro.png",
+        name: "Registrar Serviço"
+    },
+    {
+        href: "/concluir-servico",
+        src: "/assets/concluir-servico.png",
+        name: "Concluir Serviço"
+    }
+];
+%>
 
-    <div class="flex flex-col gap-1">
-        <h2 class="text-[21px] font-normal leading-7"> 
+<section class="flex flex-col justify-center items-center">
+
+    <div class="flex mt-[2vh] w-full">
+        <h2 class="border-b border-gray px-[1vw]">
             Gerenciamento de Serviços
+            <br>
+            Selecione uma funcionalidade para continuar
         </h2>
-
-        <p class="text-[16px] text-gray-500 font-normal leading-6">
-            Selecione a operação que deseja realizar
-        </p>
     </div>
-   
-    <nav aria-label="Opções de serviços" class="grid grid-cols-2 gap-4 mt-16 max-w-[460px] mx-auto">
-        <a href="/registrar-servico" class="flex flex-col items-center justify-center
-            gap-2 min-h-[202px] px-3 py-3 border border-[#E5E5E5] rounded-[20px]
-            hover:border-[#D1D1D1] transition-colors
-            hover:-translate-y-2 transition-transform duration-300">
 
-            <div class="w-[116px] h-[116px] max-w-full flex items-center justify-center
-                bg-primary rounded-[26px]">
-                
-                <img src="/assets/registro.png" 
-                    alt="Funcao registrar serviços" class="w-[84px] h-[84px]">
-            </div>
-
-            <span class="text-[20px] font-bold text-center leading-6">
-                Registrar<br>Serviço
-            </span>
-        </a>
-        <a href="/concluir-servico" class="flex flex-col items-center justify-center
-            gap-2 min-h-[202px] px-3 py-3 border border-[#E5E5E5] rounded-[20px]
-            hover:border-[#D1D1D1] transition-colors
-            hover:-translate-y-2 transition-transform duration-300">
-            <div class="w-[116px] h-[116px] max-w-full flex items-center justify-center
-                bg-primary rounded-[26px]">
-                <img src="/assets/concluir-servico.png" 
-                    alt="Funcao concluir-servico" class="w-[84px] h-[84px]">
-            </div>
-
-            <span class="text-[20px] font-bold text-center leading-6">
-                Concluir<br>Serviço
-            </span>
-        </a>
+    <nav
+        aria-label="Opções de serviços"
+        class="grid grid-cols-2 gap-[2vw] my-[5vh]"
+    >
+        <% ops.forEach(item => { %>
+            <%- include("../partials/card", item) %>
+        <% }); %>
     </nav>
+
 </section>
