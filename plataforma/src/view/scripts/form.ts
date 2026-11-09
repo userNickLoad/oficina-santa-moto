@@ -95,13 +95,23 @@ const setForm = (formId: string | null = null, verifyIssues: ((inputElement: HTM
 
         console.log(dados)
 
+        const contains_files = Array.from(form.querySelectorAll<HTMLInputElement>('input[type="file"]')).some((input => (input.files && input.files.length > 0)))
+
         try {
             const response = await fetch(form.action, {
                 method: form.method,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dados)
+                ...(
+                    (contains_files)? {
+                        body: formData
+                    }:
+                    {
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(dados)
+                    }
+                )
+
             });
 
             const resultado = await response.json();
