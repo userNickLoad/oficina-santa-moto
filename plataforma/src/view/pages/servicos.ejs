@@ -1,0 +1,35 @@
+<%
+const ops = [
+    {
+        href: "/registrar-servico",
+        src: "/assets/registro.png",
+        name: "Registrar Serviço"
+    },
+    {
+        href: "/concluir-servico",
+        src: "/assets/concluir-servico.png",
+        name: "Concluir Serviço"
+    }
+];
+%>
+
+<section class="flex flex-col justify-center items-center">
+
+    <div class="flex mt-[2vh] w-full">
+        <h2 class="border-b border-gray px-[1vw]">
+            Gerenciamento de Serviços
+            <br>
+            Selecione uma funcionalidade para continuar
+        </h2>
+    </div>
+
+    <nav
+        aria-label="Opções de serviços"
+        class="grid grid-cols-2 gap-[2vw] my-[5vh]"
+    >
+        <% ops.forEach(item => { %>
+            <%- include("../partials/card", item) %>
+        <% }); %>
+    </nav>
+
+</section>
