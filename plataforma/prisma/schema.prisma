@@ -9,18 +9,21 @@ datasource db {
 
 model atributo {
   id               Int                @id @default(autoincrement())
+  id_categoria     Int
   nome             String             @db.VarChar(20)
   obrigatorio      Boolean
   numerico         Boolean            @default(false)
+  categoria        categoria          @relation(fields: [id_categoria], references: [id], onDelete: NoAction, onUpdate: NoAction)
   produto_atributo produto_atributo[]
 
   @@index([nome], map: "idx_atributo_nome")
 }
 
 model categoria {
-  id        Int       @id @default(autoincrement())
-  nome      String    @unique @db.VarChar(50)
-  descricao String?   @db.VarChar(250)
+  id        Int        @id @default(autoincrement())
+  nome      String     @unique @db.VarChar(50)
+  descricao String?    @db.VarChar(250)
+  atributo  atributo[]
   produto   produto[]
 }
 
@@ -162,7 +165,6 @@ model produto {
   preco_venda        Decimal              @db.Decimal(10, 2)
   qtd_disponivel     Int                  @default(0)
   codigo_barras      String?
-  imagem             String?
   descricao          String?
   alerta_quantidade  Int?                 @default(0)
   comprimento        Int?                 @default(10)
@@ -174,6 +176,7 @@ model produto {
   marca              marca?               @relation(fields: [id_marca], references: [id], onDelete: NoAction, onUpdate: NoAction)
   produto_atributo   produto_atributo[]
   produto_compra     produto_compra[]
+  produto_imagem     produto_imagem[]
   produto_prateleira produto_prateleira[]
   venda_produto      venda_produto[]
 
@@ -305,4 +308,19 @@ model permissao_caminho {
 
   @@id([id_caminho, id_permissao])
   @@index([id_permissao], map: "idx_id_permissao")
+}
+
+model imagem {
+  id             Int             @id @default(autoincrement())
+  caminho        String?
+  produto_imagem produto_imagem?
+}
+
+model produto_imagem {
+  id_produto Int
+  id_imagem  Int     @unique
+  imagem     imagem  @relation(fields: [id_imagem], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  produto    produto @relation(fields: [id_produto], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([id_produto, id_imagem])
 }

@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import apiRouters from "./routes/apiRouters.js"
 import cookieParser from "cookie-parser";
 import paginasRoutes from './routes/paginasRoutes.js'
+import { authMiddleware } from "./middlewares/authMiddleware.js";
+import { upload } from "./middlewares/multerConfig.js";
 
 const app = express();
 
@@ -21,10 +23,13 @@ app.set('views', path.join(__dirname, './view'));
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
+
 // APLICANDO CONFIGURAÇÕES
 
 
 app.use("/", paginasRoutes);
+
+app.use("/files", authMiddleware, express.static("./images"))
 
 app.use("/api", apiRouters);
 

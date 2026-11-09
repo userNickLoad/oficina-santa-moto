@@ -1,0 +1,8 @@
+class UniqueError extends Error {
+    constructor(message: string){
+        super(message)
+        this.name = "UniqueError"
+    }
+}
+
+export {UniqueError}

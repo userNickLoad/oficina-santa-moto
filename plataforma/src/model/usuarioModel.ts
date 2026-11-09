@@ -107,7 +107,7 @@ export class UsuarioModel {
             permissoes: usuario.usuario_permissao.map(
                 ({ permissao }) => permissao
             )
-        };;
+        };
     }
 
     async singUsuarioIn(newUsuario: UsuarioEntraDTO): Promise<string> {
@@ -148,8 +148,6 @@ export class UsuarioModel {
 
             throw error;
         }
-
-
 
     }
 }
