@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS servico(
 	preco NUMERIC(10,2) NOT NULL 
         CHECK (preco >= 0),
 	id_cliente INTEGER REFERENCES cliente(id),
-	id_veiculo INTEGER REFERENCES veiculo(id)
+	id_veiculo INTEGER REFERENCES veiculo(id),
+	status VARCHAR(20) /*concluido/finalizado*/
 );
 
 

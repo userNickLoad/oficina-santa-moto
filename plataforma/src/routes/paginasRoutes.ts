@@ -1,5 +1,8 @@
 import { Router, Response, Request } from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { ClienteModel } from "../model/clienteModel.js";
+
+const clienteModel = new ClienteModel()
 
 const router = Router();
 
@@ -84,5 +87,21 @@ router.get("/concluir-servico", authMiddleware, (req: Request, res: Response) =>
         voltar: true
     });
 });
+
+router.get("/clientes", authMiddleware, async (req: Request, res: Response) => {
+    const nome = req.query.nome?.toString().toLowerCase().trim();
+
+    const clientes = await clienteModel.buscarPorNome((nome !== undefined)? nome: "");
+
+    return res.render("./layouts/index", {
+        title: "Clientes",
+        content: "../pages/clientes",
+        voltar: true,
+        innerContent: { clientes }
+    });
+    
+
+
+}) 
 
 export default router;

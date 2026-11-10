@@ -1,0 +1,52 @@
+<%
+    const {clientes = []} = innerContent
+
+%>
+
+<section class="flex flex-col w-full items-center">
+    <h1 class="my-[2vh] text-lg w-full">
+        Clientes
+    </h1>
+    <div
+        class="w-full flex flex-row justify-between gap-[1vw]"
+        >
+        <div
+            class="w-full"
+            >
+            <%- include("../partials/searchBar", {
+                search: {
+                    id: "client",
+                    name: "client",
+                    placeholder: "Coloque o nome do cliente"
+                }
+
+            }) %>
+        </div>
+
+        <div
+            class="flex justify-center items-center"
+            >
+            <button
+                class="h-[80%] aspect-square bg-green-400 text-5xl rounded-2xl text-white"
+                >
+                +
+            </button>
+        </div>
+
+    </div>
+
+    <div
+        class="w-full flex flex-col"
+        >
+
+        <% clientes.forEach(cliente => {%>
+            <p>
+            <%= cliente.nome %>
+            </p>
+        <% }); %>
+    
+    </div>
+
+</section>
+
+<script type="module" src="/js/clientes.js"></script>
