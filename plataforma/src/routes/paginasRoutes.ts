@@ -100,8 +100,16 @@ router.get("/clientes", authMiddleware, async (req: Request, res: Response) => {
         innerContent: { clientes }
     });
     
-
-
 }) 
+
+router.get("/clientes/cadastrar", authMiddleware, (req: Request, res: Response) => {
+    return res.render("./layouts/index", {
+        title: "Clientes",
+        content: "../pages/cadastrar-cliente",
+        voltar: true
+    });
+    
+}) 
+
 
 export default router;

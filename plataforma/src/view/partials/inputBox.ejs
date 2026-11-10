@@ -20,108 +20,74 @@
 
 %>
 
-<div class="<%= size %> flex <%= column_applay %> gap-[2vh]" data-parent = "inputbox">
-    <label class="<%= text_size %> flex items-center" for="<%= item.name %>">
-        <%= title %>
-    </label>
-
-    <% if(type == "textarea") { %>
-        <textarea 
-            name="<%= name %>" 
-            id="<%= id_applay %>"
-            placeholder="<%= placeholder %>",
-            rows="<%= rows %>"
-            maxlength="<%= maxlength %>"
-            class="border resize-none h-32 p-3 border-gray-200  rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
-            ></textarea>
-    <% } else if (type == "radio") { %>
-
-        <div
-            class="w-full flex flex-col items-center justify-center "
-            >
-            <% radios.forEach(function(radio) { %>
-                <div
-                    class="w-full flex gap-[3vw]"
-                    >
-                    
-                    <input 
-                        type="radio" 
-                        name="<%= name_input %>" 
-                        id="radio-<%= id_applay %>-<%= radio %>"
-                        class="w-[3vh] h-[3vh]"
-                        value="<%= radio %>"
-                    >
-
-                    <label 
-                        for="radio-<%= id_applay %>-<%= radio %>"
-                        class="text-left"
-                    ><%= radio %></label>
-                </div>
-                
-            <% }); %>
-            
-        </div>
-    <% } else if (type == "check") { %>
-
-        <div
-            class="w-full flex"
-            >
-            <input 
-                type="checkbox" 
-                name="<%= name_input %>" 
-                id="<%= id_applay %>"
-                class="w-[5vh] h-[5vh]"
-                >
-        </div>
-
-    <% } else if (type == "image") { %>
-
-    <div class="flex flex-col w-full gap-[1vh]">
-
-        <input
-            type="file"
-            name="<%= name_input %>[]"
-            id="<%= id_applay %>"
-            accept="image/png, image/jpeg, image/webp"
-            multiple
-            class="hidden"
+<% if(type === "hidden"){ %>
+    <input
+        id="<%= id %>"
+        name="<%= name %>"
+        type="text"
+        class="hidden"
         >
-
-        <!-- Botão personalizado -->
-        <label
-            for="<%= id_applay %>"
-            class="flex items-center justify-center w-full
-                bg-primary px-4 py-3 rounded-2xl
-                cursor-pointer hover:opacity-90
-                transition"
-        >
-            <span class="font-bold">
-                Selecionar imagens
-            </span>
+<% } else { %>
+    <div class="<%= size %> flex <%= column_applay %> gap-[2vh]" data-parent = "inputbox">
+        <label class="<%= text_size %> flex items-center" for="<%= item.name %>">
+            <%= title %>
         </label>
 
-        <!-- Pré-visualização -->
-        <div
-            id="<%= id_applay %>-preview"
-            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
-        ></div>
+        <% if(type == "textarea") { %>
+            <textarea 
+                name="<%= name %>" 
+                id="<%= id_applay %>"
+                placeholder="<%= placeholder %>",
+                rows="<%= rows %>"
+                maxlength="<%= maxlength %>"
+                class="border resize-none h-32 p-3 border-gray-200  rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
+                ></textarea>
+        <% } else if (type == "radio") { %>
 
-        <div class="flex justify-center mt-[1vh]">
-            <%- include("./button", { button: {
-                type: "simple",
-                id: `cancel-${id_applay}`,
-                name: `cancel-${name_input}`,
-                content: "Cancelar envio",
-                size: "w-auto px-[2vw]"
-            }}) %>
-        </div>
+            <div
+                class="w-full flex flex-col items-center justify-center "
+                >
+                <% radios.forEach(function(radio) { %>
+                    <div
+                        class="w-full flex gap-[3vw]"
+                        >
+                        
+                        <input 
+                            type="radio" 
+                            name="<%= name_input %>" 
+                            id="radio-<%= id_applay %>-<%= radio %>"
+                            class="w-[3vh] h-[3vh]"
+                            value="<%= radio %>"
+                        >
 
-    </div>
-    <% } else { %>
+                        <label 
+                            for="radio-<%= id_applay %>-<%= radio %>"
+                            class="text-left"
+                        ><%= radio %></label>
+                    </div>
+                    
+                <% }); %>
+                
+            </div>
+        <% } else if (type == "check") { %>
+
+            <div
+                class="w-full flex"
+                >
+                <input 
+                    type="checkbox" 
+                    name="<%= name_input %>" 
+                    id="<%= id_applay %>"
+                    class="w-[5vh] h-[5vh]"
+                    >
+            </div>
+
+        <% } else if (type == "email") { %>
+
             <input
             
                 class=" border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
-                type="<%= type %>"
+                type="email"
                 id="<%= name %>"
                 name="<%= name_input %>"
                 alt="escreva <%= name %>"
@@ -133,9 +99,117 @@
                     <% } %>
             >
 
-        <% } %>
-                <p
+        <% } else if (type == "image") { %>
+
+        <div class="flex flex-col w-full gap-[1vh]">
+
+            <input
+                type="file"
+                name="<%= name_input %>[]"
+                id="<%= id_applay %>"
+                accept="image/png, image/jpeg, image/webp"
+                multiple
+                class="hidden"
+            >
+
+            <!-- Botão personalizado -->
+            <label
+                for="<%= id_applay %>"
+                class="flex items-center justify-center w-full
+                    bg-primary px-4 py-3 rounded-2xl
+                    cursor-pointer hover:opacity-90
+                    transition"
+            >
+                <span class="font-bold">
+                    Selecionar imagens
+                </span>
+            </label>
+
+            <!-- Pré-visualização -->
+            <div
+                id="<%= id_applay %>-preview"
+                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+            ></div>
+
+            <div class="flex justify-center mt-[1vh]">
+                <%- include("./button", { button: {
+                    type: "simple",
+                    id: `cancel-${id_applay}`,
+                    name: `cancel-${name_input}`,
+                    content: "Cancelar envio",
+                    size: "w-auto px-[2vw]"
+                }}) %>
+            </div>
+
+        </div>
+        <%} else if(type === "search"){ %>
+            <div class="relative flex flex-col"
+                data-pai="searchBar"
+                data-input=""
+                id="search-<%= id %>"
+                >
+                <div
+                    class="w-full h-full relative text-2x z-10"
+                    >
+                    <button id="btn-search-<%= id %>" 
+                        class="absolute h-[100%] aspect-square flex justify-center items-center cursor-pointer hidden">
+                            <div 
+                                class="flex h-[80%] aspect-square rounded-full bg-white justify-center items-center 
+                                        transition-transform duration-300 ease-out
+                                        hover:scale-110 hover:z-10">
+                                <img src="/assets/searchIcon.png" alt="Icone de pesquisa"
+                                    class="h-[50%] aspect-square"
+                                >
+                            </div>
+
+                    </button>
+                    <input id="search-input-<%= id %>" type="text" placeholder="<%= placeholder %>" maxlength="50" name="<%= name %>"
+                        class="border w-full  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
+                        >
+                </div>
+                <div
+                    id="search-autocomplete-<%= id %>"
+                    class="w-full h-0 flex absolute overflow-y-hidden transition-transform duration-300 top-[2.5vh]"
+                    >
+                    <ul
+                        id="search-placement-<%= id %>"
+                        class="w-full flex flex-col bg-gray-400 z-9 rounded-2xl py-[2.5vh] divide-y divide-black " 
+                        >
+                        <li
+                            id="search-default-<%= id %>"
+                            class="w-full pl-[6vh] h-[5vh] flex items-center hover:bg-gray-500 hover:text-white cursor-pointer hover:outline-2 hover:outline-blue-400 hidden"
+                            >
+                            abacate
+                        </li>
+
+                    </ul>
+                </div>
+
+            </div>
+        <% } else { %>
+                <input
+                
+                    class="border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
+                    type="<%= type %>"
+                    id="<%= name %>"
+                    name="<%= name_input %>"
+                    alt="escreva <%= name %>"
+                    maxlength=<%= maxlength %>
+                    placeholder="<%= placeholder %>"
+                        <% if (mask === "currency") { %>
+                            data-mask="currency"
+                            inputmode="numeric"
+                        <% } else if(mask === "phone"){%>
+                            data-mask="phone"
+                            inputmode="numeric"
+                        <% } %>
+                >
+
+            <% } %>
+        <p
             class="text-red-900 min-h-[3vh]"
             id="output-<%= id_applay %>"
         ></p>
-</div>
+    </div>
+    
+<% } %>
