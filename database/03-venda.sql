@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS modelo(
 CREATE TABLE IF NOT EXISTS veiculo(
 	id SERIAL PRIMARY KEY,
 	ano INT NOT NULL,
-	id_modelo INTEGER NOT NULL REFERENCES modelo(id)
+	id_modelo INTEGER NOT NULL REFERENCES modelo(id),
+	id_cliente INTEGER NOT NULL REFERENCES cliente(id)
 );
 
 
@@ -37,6 +38,7 @@ CREATE TABLE IF NOT EXISTS venda_produto(
 	id_produto INTEGER NOT NULL REFERENCES produto(id),
 	quantidade INT NOT NULL CHECK (quantidade > 0),
 	preco NUMERIC(10,2) NOT NULL CHECK (preco >= 0.0),
+	preco_original NUMERIC(10, 2) NOT NULL CHECK (preco_original >= 0),
 	PRIMARY KEY(id_venda, id_produto)
 );
 
@@ -44,16 +46,12 @@ CREATE TABLE IF NOT EXISTS venda_produto(
 CREATE TABLE IF NOT EXISTS servico(
 	id SERIAL PRIMARY KEY,
 	descricao TEXT,
-	preco NUMERIC(10,2) NOT NULL 
-        CHECK (preco >= 0),
+	preco_mao_obra NUMERIC(10,2) NOT NULL 
+        CHECK (preco_mao_obra >= 0),
+	preco_total NUMERIC(10,2) NOT NULL 
+        CHECK (preco_total >= 0),
+	id_venda INTEGER REFERENCES venda(id), 
 	id_cliente INTEGER REFERENCES cliente(id),
 	id_veiculo INTEGER REFERENCES veiculo(id),
-	status VARCHAR(20) /*concluido/finalizado*/
-);
-
-
-CREATE TABLE IF NOT EXISTS servico_venda(
-	id_servico INTEGER REFERENCES servico(id),
-	id_venda INTEGER REFERENCES venda(id),
-	PRIMARY KEY(id_servico, id_venda)
+	status VARCHAR(30) DEFAULT 'EM_ANDAMENTO' CHECK (status in ('EM_ANDAMENTO', 'CONCLUIDO', 'CANCELADO')) 
 );

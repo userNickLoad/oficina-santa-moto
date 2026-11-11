@@ -9,7 +9,7 @@ const clone = (element: HTMLElement, iterator: number, value: string): HTMLEleme
     return clone;
 }
 
-const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: string)=>void) => {
+const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=>void) => {
     const input = root.querySelector<HTMLInputElement>("input");
 
     if (!input)
@@ -64,7 +64,6 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: strin
         if (!value)
             return;
 
-        onSearch(value);
     };
 
     button.addEventListener("click", executeSearch)
@@ -199,6 +198,9 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: strin
             }
 
             const content: { nome: string }[] = await result.json();
+
+            if(onSearch)
+                onSearch(content)
 
             for (let i = 0; i < content.length; i++) {
                 const newElement = clone(defaultElement, i, content[i].nome);

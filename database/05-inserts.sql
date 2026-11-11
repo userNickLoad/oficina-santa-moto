@@ -7,3 +7,14 @@ VALUES ('teste', '$argon2id$v=19$m=19456,p=1,t=2$8ZgUPaTytbRSEJTG1Erdjw$zFjVuKjm
 
 INSERT INTO usuario_permissao (id_usuario, id_permissao)
 VALUES (1, 1);
+
+INSERT INTO public.produto (
+    nome,
+    preco_venda,
+    qtd_disponivel
+)
+VALUES (
+    'Pastilha de freio',
+    80.00,
+    10
+)

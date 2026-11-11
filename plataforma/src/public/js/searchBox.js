@@ -38,7 +38,6 @@ const setSearchBox = (root, action, onSearch) => {
         const value = input.value.trim().toLowerCase();
         if (!value)
             return;
-        onSearch(value);
     };
     button.addEventListener("click", executeSearch);
     // Seleciona uma opção
@@ -135,6 +134,8 @@ const setSearchBox = (root, action, onSearch) => {
                 return;
             }
             const content = await result.json();
+            if (onSearch)
+                onSearch(content);
             for (let i = 0; i < content.length; i++) {
                 const newElement = clone(defaultElement, i, content[i].nome);
                 // Seleção pelo mouse

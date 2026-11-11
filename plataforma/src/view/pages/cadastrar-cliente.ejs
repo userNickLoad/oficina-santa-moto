@@ -39,6 +39,7 @@
 <script src="/js/phoneMask.js"></script>
 <script type="module">
     import { setAddble } from "/js/addble.js";
+    import {  } from "/js/searchBox.js"
     let it = 0;
 
     const addble = document.querySelector("#addble-container-veiculos")
@@ -47,7 +48,26 @@
         throw new Error("Nao foi possivel locailizar o addble container");
         
 
-    setAddble(addble, "veiculo", it, (clone: HTMLElement)=>{
-        //clone.
+    setAddble(addble, "veiculo", it, (clone)=>{
+        const modelo = clone.querySelector("#search-modelo")
+
+        if(!modelo)
+            throw new Error("Não foi possivel achar root do clone");
+            
+
+        setSearchBox(modelo, "http://localhost:3000/api/modelo?nome=", (value) => {
+            if(value.length != 1)
+                return;
+
+            const hidden = modelo.querySelector('input[id^="search-hidden-"]');
+            if(!hidden)
+                throw new Error("Não foi possivel achar o hidden de " + modelo.id);
+            
+            hidden.value = value[0].id;
+
+            const marca = value[0].marca;
+
+            console.log(marca)
+        })
     })
 </script>
