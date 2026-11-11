@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () =>{
 
             const numero = document.createElement("span");
             numero.className = "font-semibold";
-            numero.textContent = `OS #${String(servicoSelecionado.id).padStart(3, "0")}`;
+            numero.textContent = `OS #${String(servico.id).padStart(3, "0")}`;
             const status = document.createElement("span");
             status.className = "bg-orange-100 rounded-full px-3 py-1 text-sm";
             status.textContent = "em andamento";
@@ -51,17 +51,17 @@ document.addEventListener("DOMContentLoaded", () =>{
 
             [`Cliente: ${cliente}`, `Moto: ${moto}`, `Serviço: ${servico.descricao || "Não informado"}`
             ].forEach((informacao) =>{
-                const paragrafo = documento.createElement("p");
+                const paragrafo = document.createElement("p");
                 paragrafo.className = "text-sm mb-2";
                 paragrafo.textContent = informacao;
                 cartao.appendChild(paragrafo);
             });
 
             cartao.addEventListener("click", () => {
-                lista.querySelector("[data-servico-id]").forEach((item) => {
+                lista.querySelectorAll("[data-servico-id]").forEach((item) => {
                     item.classList.remove("border-yellow-500", "bg-yellow-50");
                     item.classList.add("border-gray-300");
-                    item.setAtribute("aria-pressed", "false");
+                    item.setAttribute("aria-pressed", "false");
                 });
 
                 cartao.classList.remove("border-gray-300");
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () =>{
                 throw new Error("Erro ao buscar serviços.");
             }
 
-            servico = await resposta.json();
+            servicos = await resposta.json();
             renderizarServicos(servicos);
         }catch(erro) {
             console.error(erro);
@@ -105,9 +105,9 @@ document.addEventListener("DOMContentLoaded", () =>{
     }
 
     pesquisa.addEventListener("input", () => {
-        const termo = pesquisa.ariaValueMax.toLocaleLowerCase("pt-BR").trim();
+        const termo = pesquisa.value.toLocaleLowerCase("pt-BR").trim();
 
-        const filtrados = servico.filter((servico) =>
+        const filtrados = servicos.filter((servico) =>
             (servico.cliente?.nome ?? "").toLocaleLowerCase("pt-BR").includes(termo)
         );
 
@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () =>{
                 throw new Error("Erro ao concluir serviço");
             }
 
-            await carregarServicos();
+            await carregarServico();
         }catch (erro){
             console.error(erro);
             alert("Não foi possível concluir o serviço");

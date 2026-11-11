@@ -1,4 +1,3 @@
-
 import { Request, Response } from "express";
 import { ServicoModel } from "../model/servicoModel.js";
 
@@ -56,3 +55,76 @@ export const concluirServico = async (
         });
     }
 };
+
+
+export const registrarServico = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const {
+            descricao,
+            preco,
+            id_cliente,
+            id_modelo,
+            ano,
+            produtos
+        } = req.body;
+
+        const idUsuario = Number(res.locals.usuario?.userId);
+        const clienteId = Number(id_cliente);
+        const modeloId = Number(id_modelo);
+        const anoMoto = Number(ano);
+        const valorServico = Number(preco);
+        if(!Number.isInteger(idUsuario) || idUsuario <= 0){
+            return res.status(401).json({
+                mensagem: "Usuario não identificado"
+            });
+        }
+        const produtosServico = produtos ??[];
+    if (!Array.isArray(produtosServico) || !produtosServico.every((produto) => Number.isInteger(produto.id_produto) &&
+        produto.id_produto > 0 && Number.isInteger(produto.quantidade) && produto.quantidade > 0 &&
+        typeof produto.preco === "string" && /^\d+(\.\d{1,2})?$/.test(produto.preco)) ||
+        new Set(produtosServico.map((produto) => produto.id_produto)).size !== produtosServico.length
+    ) {
+        return res.status(400).json({
+            mensagem: "Produtos, quantidades ou preços inválidos"
+        });
+    }
+
+        if (
+            !descricao?.trim() ||
+            !Number.isInteger(clienteId) || clienteId <= 0 ||
+            !Number.isInteger(modeloId) || modeloId <= 0 ||
+            !Number.isInteger(anoMoto) || anoMoto <= 0 ||
+            !Number.isFinite(valorServico) || valorServico < 0
+        ) {
+            return res.status(400).json({
+                mensagem: "Dados inválidos para registrar o serviço"
+            });
+        }
+
+        const servico = await servicoModel.registrarServico({
+            descricao: descricao.trim(),
+            preco: String(preco),
+            id_cliente: clienteId,
+            id_modelo: modeloId,
+            ano: anoMoto,
+            id_usuario: idUsuario,
+            produtos: produtosServico
+        });
+
+        return res.status(201).json({
+            mensagem: "Serviço registrado com sucesso",
+            servico
+        });
+
+    } catch (e) {
+        console.log(e);
+
+        return res.status(500).json({
+            mensagem: "Erro ao registrar serviço"
+        });
+    }
+};
+
