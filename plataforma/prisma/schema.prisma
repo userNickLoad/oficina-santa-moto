@@ -33,6 +33,7 @@ model cliente {
   telefone String?   @db.VarChar(14)
   email    String?   @db.VarChar(100)
   servico  servico[]
+  veiculo  veiculo[]
   venda    venda[]
 }
 
@@ -222,24 +223,17 @@ model produto_prateleira {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model servico {
-  id            Int             @id @default(autoincrement())
-  descricao     String?
-  preco         Decimal         @db.Decimal(10, 2)
-  id_cliente    Int?
-  id_veiculo    Int?
-  status        String          @default("EM_ANDAMENTO")
-  cliente       cliente?        @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  veiculo       veiculo?        @relation(fields: [id_veiculo], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  servico_venda servico_venda[]
-}
-
-model servico_venda {
-  id_servico Int
-  id_venda   Int
-  servico    servico @relation(fields: [id_servico], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  venda      venda   @relation(fields: [id_venda], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@id([id_servico, id_venda])
+  id             Int      @id @default(autoincrement())
+  descricao      String?
+  preco_mao_obra Decimal  @db.Decimal(10, 2)
+  preco_total    Decimal  @db.Decimal(10, 2)
+  id_venda       Int?
+  id_cliente     Int?
+  id_veiculo     Int?
+  status         String?  @default("EM_ANDAMENTO") @db.VarChar(30)
+  cliente        cliente? @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  veiculo        veiculo? @relation(fields: [id_veiculo], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  venda          venda?   @relation(fields: [id_venda], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model usuario {
@@ -263,11 +257,13 @@ model usuario_permissao {
 }
 
 model veiculo {
-  id        Int       @id @default(autoincrement())
-  ano       Int
-  id_modelo Int
-  servico   servico[]
-  modelo    modelo    @relation(fields: [id_modelo], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id         Int       @id @default(autoincrement())
+  ano        Int
+  id_modelo  Int
+  id_cliente Int
+  servico    servico[]
+  cliente    cliente   @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  modelo     modelo    @relation(fields: [id_modelo], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model venda {
@@ -276,7 +272,7 @@ model venda {
   preco_total   Decimal         @db.Decimal(10, 2)
   id_usuario    Int
   id_cliente    Int?
-  servico_venda servico_venda[]
+  servico       servico[]
   cliente       cliente?        @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction)
   usuario       usuario         @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
   venda_produto venda_produto[]
@@ -284,12 +280,13 @@ model venda {
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model venda_produto {
-  id_venda   Int
-  id_produto Int
-  quantidade Int
-  preco      Decimal @db.Decimal(10, 2)
-  produto    produto @relation(fields: [id_produto], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  venda      venda   @relation(fields: [id_venda], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id_venda       Int
+  id_produto     Int
+  quantidade     Int
+  preco          Decimal @db.Decimal(10, 2)
+  preco_original Decimal @db.Decimal(10, 2)
+  produto        produto @relation(fields: [id_produto], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  venda          venda   @relation(fields: [id_venda], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([id_venda, id_produto])
 }

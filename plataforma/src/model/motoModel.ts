@@ -1,4 +1,3 @@
-
 import db from "../database/prisma.js";
 
 export class MotoModel {
@@ -30,12 +29,13 @@ export class MotoModel {
         });
     }
 
-    async cadastrarVeiculo(ano: number, idModelo: number) {
-    return await db.veiculo.create({
-        data: {
-            ano: ano,
-            id_modelo: idModelo
-        }
-    });
+    async cadastrarVeiculo(ano: number, idModelo: number, idCliente: number) {
+        return await db.veiculo.create({
+            data: {
+                ano: ano,
+                id_modelo: idModelo,
+                id_cliente: idCliente
+            }
+        });
     }
 }

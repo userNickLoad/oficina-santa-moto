@@ -69,7 +69,8 @@ export class ServicoModel {
             const veiculo = await txt.veiculo.create({
                 data: {
                     ano: dados.ano,
-                    id_modelo: dados.id_modelo
+                    id_modelo: dados.id_modelo,
+                    id_cliente: dados.id_cliente
                 }
             });
 
@@ -109,10 +110,39 @@ export class ServicoModel {
 
             const valorTotal = Number(dados.preco) + totalProdutos;
 
+            const venda = await txt.venda.create({
+                data: {
+                    data: new Date(),
+                    preco_total: valorTotal,
+                    id_usuario: dados.id_usuario,
+                    id_cliente: dados.id_cliente
+                }
+            });
+
+            for(const item of dados.produtos){
+                const produto = await txt.produto.findUniqueOrThrow({
+                    where: {
+                        id: item.id_produto
+                    }
+                });
+
+                await txt.venda_produto.create({
+                    data: {
+                        id_venda: venda.id,
+                        id_produto: item.id_produto,
+                        quantidade: item.quantidade,
+                        preco: item.preco,
+                        preco_original: produto.preco_venda
+                    }
+                });
+            }
+
             const servico = await txt.servico.create({
                 data: {
                     descricao: dados.descricao,
-                    preco: dados.preco,
+                    preco_mao_obra: dados.preco,
+                    preco_total: valorTotal,
+                    id_venda: venda.id,
                     id_cliente: dados.id_cliente,
                     id_veiculo: veiculo.id,
                     status: "EM_ANDAMENTO"

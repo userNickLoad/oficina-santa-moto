@@ -1,12 +1,6 @@
-<section class="flex flex-col items-center w-full py-6">
-
-    <h2 class="text-xl w-full max-w-[500px] mb-6">
-        Novo registro de ordem de serviço
-    </h2>
-
-    <p class="text-[16px] text-gray-500 font-normal leading-6">
-        Preencha as informações abaixo
-    </p>
+<section class="flex flex-col items-center w-full px-4 py-6">
+    <h2 class="text-xl font-semibold text-center mb-4">Novo registro de ordem de serviço</h2>
+    <p class="text-base text-gray-500 text-center mb-5">Preencha as informações abaixo</p>
 
     <%- include("../partials/cadastrar/form", {
         form: {
@@ -14,567 +8,418 @@
             action: "/api/servico",
             method: "post",
             size: "max-w-[500px] w-full",
+            gap: "gap-3",
             elements: [
                 {
-                    type: "input",
-                    input: {
-                        id: "nome_cliente",
-                        name: "nome_cliente",
-                        title: "Nome do cliente",
-                        type: "text",
-                        placeholder: "Digite o nome do cliente",
-                        maxlength: 100
+                    type: "container",
+                    container: {
+                        id: "dados-cliente",
+                        title: "Dados do Cliente",
+                        flex: "flex-col",
+                        gap: "gap-3",
+                        elements: [
+                            { type: "input", input: { id: "nome_cliente", name: "nome_cliente", title: "Nome do cliente", type: "text", placeholder: "Digite o nome do cliente", maxlength: 100 } },
+                            { type: "input", input: { id: "telefone", name: "telefone", title: "Telefone", type: "tel", placeholder: "(11) 99999-9999", maxlength: 20 } }
+                        ]
                     }
                 },
                 {
-                    type: "input",
-                    input: {
-                        id: "telefone",
-                        name: "telefone",
-                        title: "Telefone",
-                        type: "tel",
-                        placeholder: "(11) 99999-9999",
-                        maxlength: 20
+                    type: "container",
+                    container: {
+                        id: "dados-moto",
+                        title: "Dados do Veículo",
+                        flex: "flex-col",
+                        gap: "gap-3",
+                        elements: [
+                            { type: "input", input: { id: "marca", name: "marca", title: "Marca da moto", type: "search", placeholder: "Ex: Honda, BMW, Yamaha", maxlength: 90 } },
+                            { type: "input", input: { id: "modelo", name: "modelo", title: "Modelo da moto", type: "search", placeholder: "Ex: CG 160, CB 300F Twister", maxlength: 20 } },
+                            { type: "input", input: { id: "ano_moto", name: "ano_moto", title: "Ano da moto", type: "number", placeholder: "Ex: 2024" } }
+                        ]
                     }
                 },
                 {
-                    type: "input",
-                    input: {
-                        id: "marca_moto",
-                        name: "marca_moto",
-                        title: "Marca da moto",
-                        type: "text",
-                        placeholder: "Selecione a marca",
-                        maxlength: 100
+                    type: "container",
+                    container: {
+                        id: "informacoes-servico",
+                        title: "Informações do serviço",
+                        flex: "flex-col",
+                        gap: "gap-3",
+                        elements: [
+                            { type: "input", input: { id: "descricao", name: "descricao", title: "Descrição do serviço", type: "text", placeholder: "Descreva o serviço realizado" } },
+                            { type: "input", input: { id: "preco", name: "preco", title: "Preço da mão de obra", type: "number", placeholder: "Ex: 120.00" } },
+                            { type: "input", input: { id: "data_entrada", name: "data_entrada", title: "Data de entrada", type: "date" } }
+                        ]
                     }
                 },
                 {
-                    type: "input",
-                    input: {
-                        id: "modelo_moto",
-                        name: "modelo_moto",
-                        title: "Modelo da moto",
-                        type: "text",
-                        placeholder: "Selecione o modelo",
-                        maxlength: 20
-                    }
-                },
-                {
-                    type: "input",
-                    input: {
-                        id: "ano_moto",
-                        name: "ano_moto",
-                        title: "Ano da moto",
-                        type: "number",
-                        placeholder: "Ex: 2024"
-                    }
-                },
-                {
-                    type: "input",
-                    input: {
-                        id: "descricao",
-                        name: "descricao",
-                        title: "Descrição do serviço",
-                        type: "textarea",
-                        placeholder: "Descreva o serviço a ser realizado",
-                        maxlength: 250
-                    }
-                },
-                {
-                    type: "input",
-                    input: {
-                        id: "preco",
-                        name: "preco",
-                        title: "Preço do serviço",
-                        type: "number",
-                        placeholder: "Ex: 150.00"
-                    }
-                },
-                {
-                    type: "input",
-                    input: {
-                        id: "data_entrada",
-                        name: "data_entrada",
-                        title: "Data de entrada",
-                        type: "date"
-                    }
-                },
-                {
-                    type: "input",
-                    input: {
-                        id: "produto_estoque",
-                        name: "produto_estoque",
-                        title: "Produto do estoque (opcional)",
-                        type: "text",
-                        placeholder: "Pesquisar produto do estoque",
-                        maxlength: 100
-                    }
-                },
-                {
-                    type: "input",
-                    input: {
-                        id: "quantidade_produto",
-                        name: "quantidade_produto",
-                        title: "Quantidade utilizada (opcional)",
-                        type: "number",
-                        placeholder: "Ex: 1"
-                    }
-                },
-                {
-                    type: "input",
-                    input: {
-                        id: "preco_produto",
-                        name: "preco_produto",
-                        title: "Preço unitário do produto (R$)",
-                        type: "number",
-                        placeholder: "Ex: 80.00"
+                    type: "container",
+                    container: {
+                        id: "produtos-utilizados",
+                        title: "Produtos utilizados",
+                        flex: "flex-col",
+                        gap: "gap-3",
+                        elements: [
+                            { type: "input", input: { id: "produto_estoque", name: "produto_estoque", title: "Produto do estoque (opcional)", type: "search", placeholder: "Pesquisar produto do estoque", maxlength: 100 } },
+                            { type: "input", input: { id: "quantidade_produto", name: "quantidade_produto", title: "Quantidade utilizada (opcional)", type: "number", placeholder: "Ex: 1" } },
+                            { type: "input", input: { id: "preco_produto", name: "preco_produto", title: "Preço unitário do produto (R$)", type: "number", placeholder: "Ex: 80.00" } }
+                        ]
                     }
                 }
             ],
             buttons: [
-                {
-                    type: "submit",
-                    id: "registrar",
-                    name: "registrar",
-                    content: "Registrar Serviço",
-                    submit: true
-                }
+                { type: "submit", id: "registrar", name: "registrar", content: "Registrar Serviço", submit: true }
             ]
         }
     }) %>
-
 </section>
 
-<div id="sugestoes-clientes" 
-    class="hidden bg-white border border-gray-200 rounded-xl shadow-sm max-h-48 overflow-y-auto">
-</div>
-
-<div class="w-full max-w-[550px] mx-auto px-3 mb-6">
-    <button type="button" id="adicionar-produto" class="text-sm font-medium cursor-pointer">
+<div id="bloco-produtos" class="w-full max-w-[500px] mx-auto px-3 mb-4">
+    <button type="button" id="adicionar-produto" class="text-sm font-medium cursor-pointer px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors">
         + Adicionar produto
     </button>
-    <div id="lista-produtos" class="flex flex-col gap-2 mt-4"></div>
-    <div class="mt-4 p-4 bg-gray-50 rounded-xl flex justify-between items-center">
-        <span class="font-medium text-gray-400">Valor total do serviço:</span>
-        <span id="valor-total-servico" class="font-semibold text-lg"> R$ 0,00</span>
+    <div id="lista-produtos" class="flex flex-col gap-2 mt-3"></div>
+    <div class="mt-4 p-4 bg-gray-50 rounded-xl flex justify-between items-center gap-3">
+        <span class="font-medium text-gray-500">Valor total do serviço:</span>
+        <span id="valor-total-servico" class="font-semibold text-lg">R$ 0,00</span>
     </div>
 </div>
 
-<script>
-    document.getElementById("form-registrar-servico").addEventListener("submit", async function(event) {
-    event.preventDefault();
+<style>
+    #form-registrar-servico { width: 100%; max-width: 500px; gap: 12px; }
+    #form-registrar-servico > p:not(#error) {
+        width: 100%; text-align: left; font-size: 17px; font-weight: 600;
+        margin: 20px 0 4px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb;
+    }
+    #form-registrar-servico [id^="container-"] {
+        display: flex; flex-direction: column; align-items: stretch;
+        justify-content: flex-start; width: 100%; gap: 12px;
+    }
+    #form-registrar-servico [id^="container-"] > * {
+        width: 100% !important; max-width: 100% !important; min-width: 0;
+        box-sizing: border-box;
+    }
+    #form-registrar-servico [id^="container-"] input:not([type="hidden"]) {
+        display: block; width: 100% !important; max-width: 100% !important;
+        min-width: 0; box-sizing: border-box;
+    }
+    #form-registrar-servico [id^="container-"] [data-pai="searchBar"] {
+        width: 100% !important; max-width: 100% !important;
+    }
+    #form-registrar-servico [id^="container-"] [data-pai="searchBar"] > div:first-child {
+        width: 100%;
+    }
+    #form-registrar-servico #bloco-produtos { width: 100%; max-width: 100%; padding: 0; margin: 4px 0 12px; }
+    #form-registrar-servico #registrar {
+        width: auto; min-width: 170px; height: 46px;
+        padding: 9px 24px; font-size: 16px; font-weight: 500; border-radius: 16px;
+    }
+    .sugestoes-registro {
+        position: relative; z-index: 30; width: 100%; max-height: 190px;
+        overflow-y: auto; background: white; border: 1px solid #e5e7eb;
+        border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.08);
+    }
+    .sugestoes-registro[hidden] { display: none; }
+    .sugestoes-registro button {
+        display: block; width: 100%; text-align: left; padding: 10px 12px;
+        cursor: pointer; background: white;
+    }
+    .sugestoes-registro button:hover { background: #f3f4f6; }
 
-    const campos = this.querySelectorAll(
-        "#nome_cliente, #telefone, #marca_moto, #modelo_moto, #ano_moto, #descricao, #preco, #data_entrada"
-    );
+    #search-hidden-marca, #search-hidden-modelo, #search-hidden-produto_estoque{
+        display: none !important;
+    }
+</style>
+
+<script>
+    const formularioServico = document.getElementById("form-registrar-servico");
+    const blocoProdutos = document.getElementById("bloco-produtos");
+    const botaoRegistrar = document.getElementById("registrar");
+
+    
+    if (formularioServico && blocoProdutos && botaoRegistrar) {
+        formularioServico.insertBefore(blocoProdutos, botaoRegistrar.parentElement);
+    }
 
     const mensagemErro = document.getElementById("error");
-    let possuiCampoVazio = false;
-
-    campos.forEach(campo => {
-        if (campo.value.trim() === "") {
-            console.log("Campo vazio", campo.id);
-            possuiCampoVazio = true;
-        }
-    });
-
-    if (possuiCampoVazio) {
-        mensagemErro.textContent = "Preencha todos os campos obrigatórios";
-        return;
-    }
-
-    if (!clienteSelecionado) {
-        mensagemErro.textContent = "Selecione um cliente já cadastrado";
-        return;
-    }
-
-    if (!idModeloSelecionado) {
-        mensagemErro.textContent = "Selecione um modelo de moto na lista";
-        return;
-    }
-
-    const dados = {
-        descricao: document.getElementById("descricao").value.trim(),
-        preco: document.getElementById("preco").value,
-        id_cliente: clienteSelecionado,
-        id_modelo: idModeloSelecionado,
-        ano: Number(document.getElementById("ano_moto").value),
-        produtos: produtosAdicionados
-    };
-
-    try {
-        mensagemErro.textContent = "";
-
-        const resposta = await fetch("/api/servico", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(dados)
-        });
-
-        const resultado = await resposta.json();
-
-        if (!resposta.ok) {
-            mensagemErro.textContent = resultado.mensagem || "Erro ao registrar serviço";
-            return;
-        }
-
-        alert("Serviço registrado com sucesso!");
-        window.location.href = "/servicos";
-
-    } catch (error) {
-        console.error(error);
-        mensagemErro.textContent = "Erro ao conectar com o servidor";
-    }
-    });
-    const campoProdutoEstoque = document.getElementById("produto_estoque");
+    const campoNomeCliente = document.getElementById("nome_cliente");
+    const campoTelefone = document.getElementById("telefone");
+    const campoMarcaMoto = document.getElementById("search-input-marca");
+    const campoModeloMoto = document.getElementById("search-input-modelo");
+    const campoProdutoEstoque = document.getElementById("search-input-produto_estoque");
     const campoPrecoProduto = document.getElementById("preco_produto");
+    const marcaHidden = document.getElementById("search-hidden-marca");
+    const modeloHidden = document.getElementById("search-hidden-modelo");
+    const produtoHidden = document.getElementById("search-hidden-produto_estoque");
 
+    let clienteSelecionado = null;
+    let idMarcaSelecionada = null;
+    let idModeloSelecionado = null;
     let produtoSelecionado = null;
-    const sugestoesProdutos = document.createElement("div");
-    sugestoesProdutos.className = "hidden bg-white border border-gray-200 rounded-xl shadow-sm max-h-48 overflow-y-auto";
-
-    campoProdutoEstoque.insertAdjacentElement("afterend", sugestoesProdutos);
-    campoProdutoEstoque.setAttribute("autocomplete", "off");
-    campoProdutoEstoque.addEventListener("input", async function () {
-        produtoSelecionado = null;
-        campoPrecoProduto.value = "";
-
-        const nome = this.value.trim();
-        sugestoesProdutos.innerHTML = "";
-
-        if(nome.length < 2) {
-            sugestoesProdutos.classList.add("hidden");
-            return;
-        }
-
-        sugestoesProdutos.classList.remove("hidden");
-        sugestoesProdutos.textContent = "Pesquisando produtos...";
-
-        try{
-            const resposta = await fetch(`/api/produto/buscar?nome=${encodeURIComponent(nome)}`);
-
-            if(!resposta.ok){
-                throw new Error("Erro ao pesquisar produtos");
-            }
-
-            const produtos = await resposta.json();
-
-            if(campoProdutoEstoque.value.trim() !== nome) return;
-
-            sugestoesProdutos.innerHTML = "";
-
-            if(produtos.length === 0){
-                sugestoesProdutos.textContent = "Produto não encontrado";
-                return;
-            }
-
-            produtos.forEach(produto => {
-                const opcao = document.createElement("button");
-
-                opcao.type = "button";
-                opcao.className = "block w-full text-left p-3 hover:bg-gray-100 cursor-pointer";
-
-                opcao.textContent = `${produto.nome} - Estoque: ${produto.qtd_disponivel}`;
-
-                opcao.addEventListener("click", () =>{
-                    produtoSelecionado = produto;
-                    campoProdutoEstoque.value = produto.nome;
-                    campoPrecoProduto.value = Number(produto.preco_venda).toFixed(2);
-
-                    sugestoesProdutos.classList.add("hidden");
-                });
-
-                sugestoesProdutos.appendChild(opcao);
-            });
-        }catch (error){
-            console.error(error);
-            sugestoesProdutos.textContent = "Erro ao pesquisar produtos";
-        }
-    });
-
     const produtosAdicionados = [];
 
-    function calcularValorTotal(){
-        const maoDeObra = Number(document.getElementById("preco").value) || 0;
-        const totalProdutos = produtosAdicionados.reduce((total, produto) => {
-            return total + Number(produto.preco) * produto.quantidade;
-        }, 0);
+    
+    function criarSugestoes(campo) {
+        const lista = document.createElement("div");
+        lista.className = "sugestoes-registro";
+        lista.hidden = true;
+        campo.insertAdjacentElement("afterend", lista);
+        campo.setAttribute("autocomplete", "off");
+        return lista;
+    }
 
+    function mostrarSugestoes(lista, itens, selecionar, mensagemVazia = "Nenhum resultado encontrado") {
+        lista.replaceChildren();
+        lista.hidden = false;
+        if (!itens.length) {
+            lista.textContent = mensagemVazia;
+            return;
+        }
+        itens.forEach(item => {
+            const opcao = document.createElement("button");
+            opcao.type = "button";
+            opcao.textContent = item.rotulo || item.nome;
+            opcao.addEventListener("click", () => {
+                selecionar(item);
+                lista.hidden = true;
+            });
+            lista.appendChild(opcao);
+        });
+    }
+
+    const sugestoesClientes = criarSugestoes(campoNomeCliente);
+    const sugestoesMarca = criarSugestoes(campoMarcaMoto);
+    const sugestoesModelos = criarSugestoes(campoModeloMoto);
+    const sugestoesProdutos = criarSugestoes(campoProdutoEstoque);
+
+    campoNomeCliente.addEventListener("input", async () => {
+        clienteSelecionado = null;
+        const nome = campoNomeCliente.value.trim();
+        sugestoesClientes.hidden = true;
+        if (nome.length < 2) return;
+        try {
+            const resposta = await fetch(`/api/cliente/buscar?nome=${encodeURIComponent(nome)}`);
+            if (!resposta.ok) throw new Error("Erro ao buscar clientes");
+            const clientes = await resposta.json();
+            if (campoNomeCliente.value.trim() !== nome) return;
+            mostrarSugestoes(sugestoesClientes, clientes, cliente => {
+                clienteSelecionado = cliente.id;
+                campoNomeCliente.value = cliente.nome;
+                campoTelefone.value = formatarTelefone(cliente.telefone??"");
+            }, "Cliente não encontrado. Necessário cadastrá-lo.");
+        } catch (erro) { console.error(erro); }
+    });
+
+    let marcasDisponiveis = [];
+    async function carregarMarcas() {
+        try {
+            const resposta = await fetch("/api/moto/marcas");
+            if (!resposta.ok) throw new Error("Erro ao carregar marcas");
+            marcasDisponiveis = await resposta.json();
+        } catch (erro) { console.error(erro); }
+    }
+    carregarMarcas();
+
+    function limparModelo() {
+        idModeloSelecionado = null;
+        modeloHidden.value = "";
+        campoModeloMoto.value = "";
+        sugestoesModelos.hidden = true;
+    }
+
+    campoMarcaMoto.addEventListener("input", () => {
+        idMarcaSelecionada = null;
+        marcaHidden.value = "";
+        limparModelo();
+        const pesquisa = campoMarcaMoto.value.trim().toLowerCase();
+        sugestoesMarca.hidden = true;
+        if (!pesquisa) return;
+        const encontradas = marcasDisponiveis.filter(marca => marca.nome.toLowerCase().includes(pesquisa));
+        mostrarSugestoes(sugestoesMarca, encontradas, marca => {
+            idMarcaSelecionada = marca.id;
+            marcaHidden.value = marca.id;
+            campoMarcaMoto.value = marca.nome;
+            limparModelo();
+        }, "Marca não encontrada");
+    });
+
+    campoModeloMoto.addEventListener("input", async () => {
+        idModeloSelecionado = null;
+        modeloHidden.value = "";
+        sugestoesModelos.hidden = true;
+        const pesquisa = campoModeloMoto.value.trim().toLowerCase();
+        if (!pesquisa) return;
+        if (!idMarcaSelecionada) {
+            mostrarSugestoes(sugestoesModelos, [], () => {}, "Selecione uma marca primeiro");
+            return;
+        }
+        const marcaConsultada = idMarcaSelecionada;
+        try {
+            const resposta = await fetch(`/api/moto/modelos?marca=${marcaConsultada}`);
+            if (!resposta.ok) throw new Error("Erro ao carregar modelos");
+            const modelos = await resposta.json();
+            if (marcaConsultada !== idMarcaSelecionada || campoModeloMoto.value.trim().toLowerCase() !== pesquisa) return;
+            const encontrados = modelos.filter(modelo => modelo.nome.toLowerCase().includes(pesquisa));
+            mostrarSugestoes(sugestoesModelos, encontrados, modelo => {
+                idModeloSelecionado = modelo.id;
+                modeloHidden.value = modelo.id;
+                campoModeloMoto.value = modelo.nome;
+            }, "Modelo não encontrado");
+        } catch (erro) { console.error(erro); }
+    });
+
+    campoProdutoEstoque.addEventListener("input", async () => {
+        produtoSelecionado = null;
+        produtoHidden.value = "";
+        campoPrecoProduto.value = "";
+        sugestoesProdutos.hidden = true;
+        const nome = campoProdutoEstoque.value.trim();
+        if (nome.length < 2) return;
+        try {
+            const resposta = await fetch(`/api/produto/buscar?nome=${encodeURIComponent(nome)}`);
+            if (!resposta.ok) throw new Error("Erro ao pesquisar produtos");
+            const produtos = await resposta.json();
+            if (campoProdutoEstoque.value.trim() !== nome) return;
+            mostrarSugestoes(sugestoesProdutos, produtos.map(produto => ({
+                ...produto,
+                rotulo: `${produto.nome} - Estoque: ${produto.qtd_disponivel}`
+            })), produto => {
+                produtoSelecionado = produto;
+                produtoHidden.value = produto.id;
+                campoProdutoEstoque.value = produto.nome;
+                campoPrecoProduto.value = Number(produto.preco_venda).toFixed(2);
+            }, "Produto não encontrado");
+        } catch (erro) { console.error(erro); }
+    });
+
+    function calcularValorTotal() {
+        const maoDeObra = Number(document.getElementById("preco").value) || 0;
+        const totalProdutos = produtosAdicionados.reduce((total, produto) => total + Number(produto.preco) * produto.quantidade, 0);
         return maoDeObra + totalProdutos;
     }
 
-    function atualizarValorTotal(){
-        const total = calcularValorTotal();
-        document.getElementById("valor-total-servico").textContent = total.toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
+    function atualizarValorTotal() {
+        document.getElementById("valor-total-servico").textContent = calcularValorTotal().toLocaleString("pt-BR", {
+            style: "currency", currency: "BRL"
         });
     }
     document.getElementById("preco").addEventListener("input", atualizarValorTotal);
     atualizarValorTotal();
 
-    const botaoAdicionar = document.getElementById("adicionar-produto");
-        const listaProdutos = document.getElementById("lista-produtos");
+    document.getElementById("adicionar-produto").addEventListener("click", () => {
+        const campoQuantidade = document.getElementById("quantidade_produto");
+        const quantidade = Number(campoQuantidade.value);
+        const preco = Number(campoPrecoProduto.value);
+        const precoEmCentavos = Math.round(preco * 100);
 
-        botaoAdicionar.addEventListener("click", function(){
-            const campoProduto = document.getElementById("produto_estoque");
-            const campoQuantidade = document.getElementById("quantidade_produto");
+        if (!produtoSelecionado || !Number.isInteger(quantidade) || quantidade <= 0 ||
+            quantidade > produtoSelecionado.qtd_disponivel || !Number.isFinite(preco) ||
+            preco < 0 || Math.abs(preco * 100 - precoEmCentavos) > 0.000001) {
+            alert("Selecione um produto e informe uma quantidade e um preço válidos.");
+            return;
+        }
+        if (produtosAdicionados.some(item => item.id_produto === produtoSelecionado.id)) {
+            alert("Este produto já foi adicionado ao serviço.");
+            return;
+        }
 
-            const produto = campoProduto.value.trim();
-            const quantidade = Number(campoQuantidade.value);
-            const preco = Number(document.getElementById("preco_produto").value);
-            const precoEmCentavos = Math.round(preco * 100);
+        const produtoAdicionado = {
+            id_produto: produtoSelecionado.id,
+            quantidade,
+            preco: (precoEmCentavos / 100).toFixed(2)
+        };
+        produtosAdicionados.push(produtoAdicionado);
+        atualizarValorTotal();
 
-            if (!produtoSelecionado || !Number.isInteger(quantidade) || quantidade <= 0 || quantidade > produtoSelecionado.qtd_disponivel ||
-                !Number.isFinite(preco) || preco < 0 || Math.abs(preco * 100 - precoEmCentavos) > 0.000001) {
-                alert("Selecione um produto e informe uma quantidade e um preço válidos.");
-                return;
-            }
-            const produtoDuplicado = produtosAdicionados.some(
-                item => item.id_produto === produtoSelecionado.id
-            );
-
-            if (produtoDuplicado) {
-                alert("Este produto já foi adicionado ao serviço.");
-                return;
-            }
-            const produtoAdicionado = {
-                id_produto: produtoSelecionado.id,
-                quantidade: quantidade,
-                preco: (precoEmCentavos/100).toFixed(2)
-            };
-            produtosAdicionados.push(produtoAdicionado);
+        const item = document.createElement("div");
+        item.className = "flex items-center justify-between gap-3 border border-gray-200 rounded-xl p-3";
+        const descricao = document.createElement("span");
+        descricao.textContent = `${produtoSelecionado.nome} - Quantidade: ${quantidade}`;
+        const remover = document.createElement("button");
+        remover.type = "button";
+        remover.className = "text-red-600 cursor-pointer";
+        remover.textContent = "Remover";
+        remover.addEventListener("click", () => {
+            const indice = produtosAdicionados.indexOf(produtoAdicionado);
+            if (indice !== -1) produtosAdicionados.splice(indice, 1);
+            item.remove();
             atualizarValorTotal();
-            const item = document.createElement("div");
-            item.className = "flex items-center justify-between gap-3 border border-gray-200 rounded-xl p-3";
-
-            const descricao = document.createElement("span");
-            descricao.textContent = `${produto} - Quantidade: ${quantidade}`;
-            const remover = document.createElement("button");
-            remover.type = "button";
-            remover.className = "text-red-600 cursor pointer";
-            remover.textContent = "Remover";
-
-            remover.addEventListener("click", () => { 
-                const indice = produtosAdicionados.indexOf(produtoAdicionado);
-                if (indice !== -1) {
-                    produtosAdicionados.splice(indice, 1);
-                }
-                item.remove();
-                atualizarValorTotal();
-            });
-            
-
-            item.append(descricao, remover);
-            listaProdutos.appendChild(item);
-
-            campoProduto.value = "";
-            campoQuantidade.value = "";
-            campoPrecoProduto.value = "";
-            produtoSelecionado = null;
         });
-    
-    const campoNomeCliente = document.getElementById("nome_cliente");
-    const sugestoesClientes = document.getElementById("sugestoes-clientes");
+        item.append(descricao, remover);
+        document.getElementById("lista-produtos").appendChild(item);
 
-    let clienteSelecionado = null;
-    campoNomeCliente.setAttribute("autocomplete", "off");
-    campoNomeCliente.addEventListener("input", async function() {
-        clienteSelecionado = null;
+        campoProdutoEstoque.value = "";
+        produtoHidden.value = "";
+        campoQuantidade.value = "";
+        campoPrecoProduto.value = "";
+        produtoSelecionado = null;
+        sugestoesProdutos.hidden = true;
+    });
 
-        const nome = this.value.trim();
-
-        sugestoesClientes.innerHTML = "";
-
-        if(nome.length < 2){
-            sugestoesClientes.classList.add("hidden");
+    formularioServico.addEventListener("submit", async event => {
+        event.preventDefault();
+        mensagemErro.textContent = "";
+        const obrigatorios = ["nome_cliente", "telefone", "ano_moto", "descricao", "preco", "data_entrada"];
+        if (obrigatorios.some(id => !document.getElementById(id).value.trim())) {
+            mensagemErro.textContent = "Preencha todos os campos obrigatórios";
+            return;
+        }
+        if (!clienteSelecionado) {
+            mensagemErro.textContent = "Selecione um cliente já cadastrado";
+            return;
+        }
+        if (!idModeloSelecionado) {
+            mensagemErro.textContent = "Selecione um modelo de moto na lista";
             return;
         }
 
-        sugestoesClientes.classList.remove("hidden");
-        sugestoesClientes.textContent = "Pesquisando clientes...";
-        try{
-            const resposta = await fetch(`/api/cliente/buscar?nome=${encodeURIComponent(nome)}`);
-
-            if(!resposta.ok){
-                throw new Error("Erro ao pesquisar clientes");
-            }
-
-            const clientes = await resposta.json();
-
-            if(campoNomeCliente.value.trim() !== nome) return;
-
-            sugestoesClientes.innerHTML = "";
-
-            if(clientes.length === 0){
-                sugestoesClientes.textContent = "Cliente não encontrado. Necessário cadastrá-lo.";
+        const dados = {
+            descricao: document.getElementById("descricao").value.trim(),
+            preco: document.getElementById("preco").value,
+            id_cliente: clienteSelecionado,
+            id_modelo: idModeloSelecionado,
+            ano: Number(document.getElementById("ano_moto").value),
+            produtos: produtosAdicionados
+        };
+        try {
+            const resposta = await fetch("/api/servico", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dados)
+            });
+            const resultado = await resposta.json();
+            if (!resposta.ok) {
+                mensagemErro.textContent = resultado.mensagem || "Erro ao registrar serviço";
                 return;
             }
-
-            clientes.forEach(cliente => {
-                const opcao = document.createElement("button");
-
-                opcao.type = "button";
-                opcao.className = "block w-full text-left p-3 hover:bg-gray-100 cursor-pointer";
-
-                opcao.textContent = cliente.nome;
-
-                opcao.addEventListener("click", () => {
-                    clienteSelecionado = cliente.id;
-                    campoNomeCliente.value = cliente.nome;
-
-                    document.getElementById("telefone").value = cliente.telefone ?? "";
-
-                    sugestoesClientes.classList.add("hidden");
-                });
-
-                sugestoesClientes.appendChild(opcao);
-            });
-        } catch(error){
-            console.error(error);
-            sugestoesClientes.textContent = "Não foi possível pesquisar clientes.";
+            alert("Serviço registrado com sucesso!");
+            window.location.href = "/servicos";
+        } catch (erro) {
+            console.error(erro);
+            mensagemErro.textContent = "Erro ao conectar com o servidor";
         }
     });
-    campoNomeCliente.insertAdjacentElement("afterend", sugestoesClientes);
+    
+    function formatarTelefone(valor) {
+        const numeros = String(valor).replace(/\D/g, "").slice(0, 11);
 
-    const campoMarcaMoto = document.getElementById("marca_moto");
-    const campoModeloMoto = document.getElementById("modelo_moto");
-
-    let idMarcaSelecionada = null;
-    let idModeloSelecionado = null;
-
-    const sugestoesMarca = document.createElement("div");
-    const sugestoesModelos = document.createElement("div");
-
-    const estiloSugestoes = "hidden bg-white border-gray-200 rounded-2xl shadow-sm max-h-48 overflow-y-auto";
-    sugestoesMarca.className = estiloSugestoes;
-    sugestoesModelos.className = estiloSugestoes;
-
-    campoMarcaMoto.insertAdjacentElement("afterend", sugestoesMarca);
-    campoModeloMoto.insertAdjacentElement("afterend", sugestoesModelos);
-
-    campoMarcaMoto.setAttribute("autocomplete", "off");
-    campoModeloMoto.setAttribute("autocomplete", "off");
-
-    let marcaDisponiveis = [];
-
-    async function carregarMarcas(){
-        try{
-            const resposta = await fetch("/api/moto/marcas");
-            if(!resposta.ok) {
-                throw new Error("Erro ao carregar marcas");
-            }
-            marcaDisponiveis = await resposta.json();
-        }catch (error){
-            console.error(error);
+        if (numeros.length <= 2) {
+            return numeros.length
+                ? `(${numeros}`
+                : "";
         }
+
+        if (numeros.length <= 6) {
+            return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
+        }
+
+        if (numeros.length <= 10) {
+            return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 6)}-${numeros.slice(6)}`;
+        }
+
+        return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
     }
-    
-    carregarMarcas();
 
-    campoMarcaMoto.addEventListener("input", function() {
-        idMarcaSelecionada = null;
-        idModeloSelecionado = null;
-
-        campoModeloMoto.value = "";
-        sugestoesModelos.classList.add("hidden");
-
-        const pesquisa = this.value.trim().toLowerCase();
-
-        sugestoesMarca.innerHTML = "";
-
-        if(!pesquisa){
-            sugestoesMarca.classList.add("hidden");
-            return;
-        }
-
-        const marcas = marcaDisponiveis.filter(marca =>
-            marca.nome.toLowerCase().includes(pesquisa)
-        );
-
-        sugestoesMarca.classList.remove("hidden");
-
-        if(marcas.length === 0){
-            sugestoesMarca.textContent = "Marca não encontrada";
-            return;
-        }
-
-        marcas.forEach(marca => {
-            const opcao = document.createElement("button");
-
-            opcao.type = "button";
-            opcao.className = "block w-full text-left p-3 hover:bg-gray-100 cursor-pointer";
-
-            opcao.textContent = marca.nome;
-
-            opcao.addEventListener("click", () => {
-                idMarcaSelecionada = marca.id;
-                campoMarcaMoto.value = marca.nome;
-                sugestoesMarca.classList.add("hidden");
-            });
-
-            sugestoesMarca.appendChild(opcao);
-        });
-    });
-
-    campoModeloMoto.addEventListener("input", async function (){
-        idModeloSelecionado = null;
-
-        const pesquisa = this.value.trim().toLowerCase();
-
-        sugestoesModelos.innerHTML = "";
-        if(!idMarcaSelecionada){
-            sugestoesModelos.textContent = "Selecione uma marca primeiro";
-            sugestoesModelos.classList.remove("hidden");
-            return;
-        }
-
-        if(!pesquisa){
-            sugestoesModelos.classList.add("hidden");
-            return;
-        }
-
-        try{
-            const resposta = await fetch(`/api/moto/modelos?marca=${idMarcaSelecionada}`);
-
-            if(!resposta.ok){
-                throw new Error("Error ao carregar modelos");
-            }
-
-            const modelos = await resposta.json();
-
-            const encontrados = modelos.filter(modelo =>
-                modelo.nome.toLowerCase().includes(pesquisa)
-            );
-
-            sugestoesModelos.classList.remove("hidden");
-
-            if(encontrados.length === 0){
-                sugestoesModelos.textContent = "Modelo não encontrado";
-                return;
-            }
-
-            encontrados.forEach(modelo =>{
-                const opcao = document.createElement("button");
-
-                opcao.type = "button";
-                opcao.className = "block w-full texte-left p-3 hover:bg-gray-100 cursor-pointer";
-                opcao.textContent = modelo.nome;
-
-                opcao.addEventListener("click", () => {
-                    idModeloSelecionado = modelo.id;
-                    campoModeloMoto.value = modelo.nome;
-                    sugestoesModelos.classList.add("hidden");
-                });
-
-                sugestoesModelos.appendChild(opcao);
-            });
-        }catch (error){
-            console.error(error);
-            sugestoesModelos.textContent = "Erro ao pesquisar modelos";
-            sugestoesModelos.classList.remove("hidden");
-        }
+    campoTelefone.addEventListener("input", () => {
+        campoTelefone.value = formatarTelefone(campoTelefone.value);
     });
 </script>
