@@ -154,6 +154,10 @@
         + Adicionar produto
     </button>
     <div id="lista-produtos" class="flex flex-col gap-2 mt-4"></div>
+    <div class="mt-4 p-4 bg-gray-50 rounded-xl flex justify-between items-center">
+        <span class="font-medium text-gray-400">Valor total do serviço:</span>
+        <span id="valor-total-servico" class="font-semibold text-lg"> R$ 0,00</span>
+    </div>
 </div>
 
 <script>
@@ -275,7 +279,7 @@
                 opcao.textContent = `${produto.nome} - Estoque: ${produto.qtd_disponivel}`;
 
                 opcao.addEventListener("click", () =>{
-                    produtosSelecionado = produto;
+                    produtoSelecionado = produto;
                     campoProdutoEstoque.value = produto.nome;
                     campoPrecoProduto.value = Number(produto.preco_venda).toFixed(2);
 
@@ -291,6 +295,26 @@
     });
 
     const produtosAdicionados = [];
+
+    function calcularValorTotal(){
+        const maoDeObra = Number(document.getElementById("preco").value) || 0;
+        const totalProdutos = produtosAdicionados.reduce((total, produto) => {
+            return total + Number(produto.preco) * produto.quantidade;
+        }, 0);
+
+        return maoDeObra + totalProdutos;
+    }
+
+    function atualizarValorTotal(){
+        const total = calcularValorTotal();
+        document.getElementById("valor-total-servico").textContent = total.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+    }
+    document.getElementById("preco").addEventListener("input", atualizarValorTotal);
+    atualizarValorTotal();
+
     const botaoAdicionar = document.getElementById("adicionar-produto");
         const listaProdutos = document.getElementById("lista-produtos");
 
@@ -300,7 +324,7 @@
 
             const produto = campoProduto.value.trim();
             const quantidade = Number(campoQuantidade.value);
-            const preco = Number(doument.getElementById("preco_produto").value);
+            const preco = Number(document.getElementById("preco_produto").value);
             const precoEmCentavos = Math.round(preco * 100);
 
             if (!produtoSelecionado || !Number.isInteger(quantidade) || quantidade <= 0 || quantidade > produtoSelecionado.qtd_disponivel ||
@@ -322,6 +346,7 @@
                 preco: (precoEmCentavos/100).toFixed(2)
             };
             produtosAdicionados.push(produtoAdicionado);
+            atualizarValorTotal();
             const item = document.createElement("div");
             item.className = "flex items-center justify-between gap-3 border border-gray-200 rounded-xl p-3";
 
@@ -338,7 +363,9 @@
                     produtosAdicionados.splice(indice, 1);
                 }
                 item.remove();
+                atualizarValorTotal();
             });
+            
 
             item.append(descricao, remover);
             listaProdutos.appendChild(item);
@@ -346,18 +373,12 @@
             campoProduto.value = "";
             campoQuantidade.value = "";
             campoPrecoProduto.value = "";
-            produtosSelecionado = null;
+            produtoSelecionado = null;
         });
-    const formulario = document.getElementById("form-registrar-servico");
-    const blocoProdutos = document.getElementById("adicionar-produto").parentElement;
-    const botaoRegistrar = document.getElementById("registrar");
-
-    if(formulario && blocoProdutos && botaoRegistrar){
-        botaoRegistrar.parentElement.before(blocoProdutos);
-    }
-
+    
     const campoNomeCliente = document.getElementById("nome_cliente");
     const sugestoesClientes = document.getElementById("sugestoes-clientes");
+
     let clienteSelecionado = null;
     campoNomeCliente.setAttribute("autocomplete", "off");
     campoNomeCliente.addEventListener("input", async function() {
