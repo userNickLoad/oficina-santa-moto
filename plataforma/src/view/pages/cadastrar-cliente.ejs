@@ -1,0 +1,73 @@
+<%
+
+%>
+
+<section class="flex flex-col w-full items-center">
+    <h1 class="my-[2vh] text-lg w-full">
+        Cadastrar cliente
+    </h1>
+
+    <%- include("../partials/cadastrar/form", {
+        form: {
+            id: "cliente",
+            name: "cliente",
+            action: "/api/cliente/cadastrar",
+            method: "post",
+            elements: [
+                {type: "input", input: {name: "nome", type: "text", title: "Nome do cliente", maxlength: 50, placeholder: "ex: João da Silva, Guihlerme Guimarães", text_size: "text-md", size: "w-full"}},
+                {type: "input", input: {name: "email", type: "email", title: "Email do cliente", maxlength: 50, placeholder: "ex: joao.silva@gmail.com", text_size: "text-md", size: "w-full"}},
+                {type: "input", input: {name: "telefone", mask: "phone", title: "Telefone do cliente", maxlength: 50, placeholder: "ex: (11) 4002-8922", text_size: "text-md", size: "w-full"}},
+                {type: "partial", partial: {path: "./addbleVeiculo"}}
+                
+
+            ],
+            buttons: [
+                {
+                    type: "submit",
+                    id: "submit",
+                    name: "submit",
+                    content: "Cadastrar cliente",
+                    submit: true,
+                    svg: { path: "save-icon"}
+                }
+            ]
+        }
+    }) %>
+
+</section>
+
+<script src="/js/phoneMask.js"></script>
+<script type="module">
+    import { setAddble } from "/js/addble.js";
+    import {  } from "/js/searchBox.js"
+    let it = 0;
+
+    const addble = document.querySelector("#addble-container-veiculos")
+
+    if(addble === undefined)
+        throw new Error("Nao foi possivel locailizar o addble container");
+        
+
+    setAddble(addble, "veiculo", it, (clone)=>{
+        const modelo = clone.querySelector("#search-modelo")
+
+        if(!modelo)
+            throw new Error("Não foi possivel achar root do clone");
+            
+
+        setSearchBox(modelo, "http://localhost:3000/api/modelo?nome=", (value) => {
+            if(value.length != 1)
+                return;
+
+            const hidden = modelo.querySelector('input[id^="search-hidden-"]');
+            if(!hidden)
+                throw new Error("Não foi possivel achar o hidden de " + modelo.id);
+            
+            hidden.value = value[0].id;
+
+            const marca = value[0].marca;
+
+            console.log(marca)
+        })
+    })
+</script>

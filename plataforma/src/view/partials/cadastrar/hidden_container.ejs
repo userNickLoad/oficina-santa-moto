@@ -1,5 +1,6 @@
 <% 
     const {
+        id,
         title = null,
         elements,
         gap = "gap-[2vh]",
@@ -10,7 +11,7 @@
 %>
 
 <div
-    id="container-h-<%= container.id %>"
+    id="container-h-<%= id %>"
     data-open="false"
     class="flex flex-col w-full items-center <%= gap %> "
     >

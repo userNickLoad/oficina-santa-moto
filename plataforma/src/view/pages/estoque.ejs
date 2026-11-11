@@ -6,9 +6,12 @@
         class="flex flex-col"
     >   
         <%- include("../partials/searchBar", {
-            id: "SearchBar",
-            placeholder: "Pesquisar produtos...",
-            name: "nomeProduto"
+            search: {
+                id: "SearchBar",
+                placeholder: "Pesquisar produtos...",
+                name: "nomeProduto"
+            }
+
         }) %>
         <!-- Categorias -->
         <%- include("../partials/categories/categories", {

@@ -7,12 +7,15 @@ const inputs = document.querySelectorAll<HTMLInputElement>(
     '[data-mask="currency"]'
 );
 
+const mark = (input: HTMLInputElement)=>{
+    const digits = input.value.replace(/\D/g, "");
+
+    const value = Number(digits) / 100;
+
+    input.value = currencyFormatter.format(value);
+}
+
 inputs.forEach(input => {
-    input.addEventListener("input", () => {
-        const digits = input.value.replace(/\D/g, "");
 
-        const value = Number(digits) / 100;
-
-        input.value = currencyFormatter.format(value);
-    });
+    input.addEventListener("input", () => mark(input));
 });

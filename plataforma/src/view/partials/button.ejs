@@ -17,11 +17,11 @@
 
 <%if(type == "submit" && svg != null){%>
     <button
-        onclick=<%= click %>
+        onclick="<%= click %>"
         type="<%= (submit)? "submit": "button" %>"
-        id=<%= id %>
-        name=<%= name %>
-        alt=<%= content %>
+        id="<%= id %>"
+        name="<%= name %>"
+        alt="<%= content %>"
         class="flex h-auto w-full items-center justify-center gap-[1vw] bg-primary px-[2vw] py-[.5vh] rounded-full hover:scale-105 ease-in-out duration-75"
     >
     <%const svg_path = `../svg/${svg.path}`%>
@@ -30,11 +30,11 @@
     </button>
 <%} else if(type == "submit"){%>
     <button
-        onclick=<%= click %>
+        onclick="<%= click %>"
         type="<%= (submit)? "submit": "button" %>"
-        id=<%= id %>
-        name=<%= name %>
-        alt=<%= content %>
+        id="<%= id %>"
+        name="<%= name %>"
+        alt="<%= content %>"
         class="xl:px-[2vw] py-[1vh] px-[20vw] bg-primary rounded-2xl cursor-pointer hover:opacity-95 lg:text-3xl text-4xl hover:scale-105 ease-in-out duration-75""
     >
     <%= content %>
@@ -42,11 +42,11 @@
 <%} else if(type == "simple"){%>
 
     <button 
-        onclick=<%= click %>
+        onclick="<%= click %>"
         type="<%= (submit)? "submit": "button" %>"
-        id=<%= id %>
-        name=<%= name %>
-        alt=<%= content %>
+        id="<%= id %>"
+        name="<%= name %>"
+        alt="<%= content %>"
         class="flex h-auto items-center justify-center gap-[1vw] 
             border border-gray-400 px-[2vw] py-[.5vh] rounded-full <%= css %> <%= size %>
             hover:scale-105 ease-in-out duration-75"
@@ -57,12 +57,12 @@
 <% } else if(type == "href"){%>
 
     <a 
-        onclick=<%= click %>
+        onclick="<%= click %>"
         type="<%= (submit)? "submit": "button" %>"
-        id=<%= id %>
-        name=<%= name %>
-        alt=<%= content %>
-        href=<%= href %>
+        id="<%= id %>"
+        name="<%= name %>"
+        alt="<%= content %>"
+        href="<%= href %>""
         class="flex h-auto items-center justify-center gap-[1vw] 
         border border-gray-400 px-[2vw] py-[.5vh] rounded-full <%= css %> <%= size %>
         hover:scale-105 ease-in-out duration-75"

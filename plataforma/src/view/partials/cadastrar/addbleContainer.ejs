@@ -15,6 +15,7 @@
         gap = "",
         css = null,
         title = null,
+        mask = "./addbleMask",
         elements = []
     } = container;
 
@@ -31,6 +32,7 @@
 <div
     id="addble-container-<%= id %>"
     class="flex flex-col gap-[2vh] <%= classCss %> "
+    data-parent="addblebox"
     >
     <div
         id="addble-placement-<%= id %>"
@@ -41,37 +43,10 @@
             class="w-full gap-[1vw] hidden"
             >
                 
+            <%- include(mask, {mask: {id, elements}}) %>
 
-            <div
-                class="flex flex-1 flex-col border border-gray-400 p-[1vh] rounded-2xl"
-            >
-                    <% elements.forEach((element) => { %>
-                            <%- include("./inputs", {element} ) %>  
-                    <% }); %>
-                
-            </div> 
-
-
-            <div
-                class="flex justify-end items-center "
-                >
-                <button
-                    id="remove-<%= id %>"
-                    type="button"
-                    class="w-[4vh] h-[4vh] rounded-lg bg-red-900 text-white
-                    hover:scale-105 transition-transform duration-300 hover:z-10
-                    hover:bg-red-500
-                    font-bold text-3xl flex justify-center items-center
-                    leading-none p-0"
-                >
-                    <span class="">−</span>
-                    </button>
-            </div>
         
         </div>
-
-
-        
 
     </div>
     

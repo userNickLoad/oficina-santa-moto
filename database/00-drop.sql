@@ -15,7 +15,6 @@ DROP TABLE IF EXISTS modelo_prateleira_modelo_estante;
 
 DROP TABLE IF EXISTS produto_compra;
 DROP TABLE IF EXISTS venda_produto;
-DROP TABLE IF EXISTS servico_venda;
 DROP TABLE IF EXISTS usuario_permissao;
 DROP TABLE IF EXISTS produto_atributo;
 

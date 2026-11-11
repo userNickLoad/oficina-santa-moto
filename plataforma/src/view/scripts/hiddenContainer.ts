@@ -1,6 +1,6 @@
 
 
-const setHiddenContainer = (containerId: string | HTMLElement, opened_message: string | null = null) => {
+const setHiddenContainer = (containerId: string | HTMLElement, opened_message: string | null = null, openFunc: ((()=>void)) | null = null) => {
 
     const container_root = (containerId instanceof HTMLElement)? containerId : document.querySelector<HTMLElement>(`#${containerId}`);
 
@@ -8,16 +8,6 @@ const setHiddenContainer = (containerId: string | HTMLElement, opened_message: s
         throw new Error(`não foi possivel localizar ${containerId}`);
 
     const btn_activation = container_root.querySelector<HTMLButtonElement>('[id^="activation-"]')
-
-    if(!btn_activation)
-        throw new Error(`não foi possivel localizar ${containerId}`);
-
-    const btnMessage = (btn_activation.querySelector("p"))? btn_activation.querySelector("p"): btn_activation;
-    if(!btnMessage)
-        throw new Error("Não foi possivel localizar a mensagem do botão");
-
-    const closed_message = btnMessage?.textContent;
-    opened_message = (opened_message)? opened_message: closed_message;
 
     const hidden = container_root.querySelector<HTMLElement>('[id^="hidden-container-"]');
 
@@ -28,33 +18,44 @@ const setHiddenContainer = (containerId: string | HTMLElement, opened_message: s
         input.disabled = true;
     });
 
-    btn_activation.addEventListener("click", ()=>{
-        if(container_root.dataset.open === "true"){
-            hidden.style.height = `${hidden.scrollHeight}px`;
+    if(btn_activation){
 
-            requestAnimationFrame(() => {
-                hidden.style.height = "0px";
-            });
+        const btnMessage = (btn_activation.querySelector("p"))? btn_activation.querySelector("p"): btn_activation;
+        if(!btnMessage)
+            throw new Error("Não foi possivel localizar a mensagem do botão");
 
-            hidden.querySelectorAll<HTMLInputElement>("input").forEach(input => {
-                input.disabled = true;
-            })
+        const closed_message = btnMessage?.textContent;
+        opened_message = (opened_message)? opened_message: closed_message;
 
-            btnMessage.textContent = closed_message;
+        btn_activation.addEventListener("click", ()=>{
+            if(container_root.dataset.open === "true"){
+                hidden.style.height = `${hidden.scrollHeight}px`;
+
+                requestAnimationFrame(() => {
+                    hidden.style.height = "0px";
+                });
+
+                hidden.querySelectorAll<HTMLInputElement>("input").forEach(input => {
+                    input.disabled = true;
+                })
+
+                btnMessage.textContent = closed_message;
+        
+                container_root.dataset.open = "false";
+            } else {
+                hidden.style.height = `${hidden.scrollHeight}px`;
+                
+                hidden.querySelectorAll<HTMLInputElement>("input").forEach(input => {
+                    input.disabled = false;
+                })
+
+                btnMessage.textContent = opened_message;
+
+                container_root.dataset.open = "true";
+            }
+        })
+    }
     
-            container_root.dataset.open = "false";
-        } else {
-            hidden.style.height = `${hidden.scrollHeight}px`;
-            
-            hidden.querySelectorAll<HTMLInputElement>("input").forEach(input => {
-                input.disabled = false;
-            })
-
-            btnMessage.textContent = opened_message;
-
-            container_root.dataset.open = "true";
-        }
-    })
 
 }
 

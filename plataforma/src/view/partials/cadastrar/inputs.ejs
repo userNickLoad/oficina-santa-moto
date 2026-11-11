@@ -15,6 +15,9 @@
     <%- include("./container", {container: element.container}) %>
 <% } else if(element.type == "button") { %>
     <%- include("../button", {button: element.button}) %>
+<% } else if(element.type == "partial") { %>
+    <% const {path, content = null} = element.partial %>
+    <%- include(path, {element: content}) %>
 <% } else { %>
     <% 
         throw new Error(`nenhum componente com o tipo ${element.type} encontrado`);

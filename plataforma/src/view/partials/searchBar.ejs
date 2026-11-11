@@ -1,18 +1,53 @@
 
-<div class="h-[5vh] w-full my-[2vh] relative text-2xl">
-    <button id="btn<%= id %>" 
-        class="absolute h-[100%] aspect-square flex justify-center items-center cursor-pointer">
-            <div 
-                class="flex h-[80%] aspect-square rounded-full bg-white justify-center items-center 
-                        transition-transform duration-300 ease-out
-                        hover:scale-110 hover:z-10">
-                <img src="/assets/searchIcon.png" alt="Icone de pesquisa"
-                    class="h-[50%] aspect-square"
-                >
-            </div>
+<%
+    const {
+        size = "w-full",
+        id,
+        placeholder,
+        name
+    } = search;
+%>
 
-    </button>
-    <input id="input<%= id %>" type="text" placeholder="<%= placeholder %>" maxlength="50" name="<%= name %>"
-        class="bg-gray-200 w-full rounded-2xl justify-center text-sm h-full pl-[6vh]  focus:outline-2 focus:outline-gray-400"
+<div class="h-[5vh] <%= size %> my-[2vh] relative flex flex-col"
+    data-pai="searchBar"
+    data-input=""
+    id="search-<%= id %>"
+    >
+    <div
+        class="w-full h-full relative text-2x z-10"
         >
+        <button id="btn-search-<%= id %>" 
+            class="absolute h-[100%] aspect-square flex justify-center items-center cursor-pointer">
+                <div 
+                    class="flex h-[80%] aspect-square rounded-full bg-white justify-center items-center 
+                            transition-transform duration-300 ease-out
+                            hover:scale-110 hover:z-10">
+                    <img src="/assets/searchIcon.png" alt="Icone de pesquisa"
+                        class="h-[50%] aspect-square"
+                    >
+                </div>
+
+        </button>
+        <input id="search-input-<%= id %>" type="text" placeholder="<%= placeholder %>" maxlength="50" name="<%= name %>"
+            class="bg-gray-200 w-full rounded-2xl justify-center text-sm h-full pl-[6vh]  focus:outline-2 focus:outline-blue-400"
+            >
+    </div>
+    <div
+        id="search-autocomplete-<%= id %>"
+        class="w-full h-0 flex absolute overflow-y-hidden transition-transform duration-300 top-[2.5vh]"
+        >
+        <ul
+            id="search-placement-<%= id %>"
+            class="w-full flex flex-col bg-gray-400 z-9 rounded-2xl py-[2.5vh] divide-y divide-black " 
+            >
+            <li
+                id="search-default-<%= id %>"
+                class="w-full pl-[6vh] h-[5vh] flex items-center hover:bg-gray-500 hover:text-white cursor-pointer hover:outline-2 hover:outline-blue-400 hidden"
+                >
+                abacate
+            </li>
+
+        </ul>
+    </div>
+
 </div>

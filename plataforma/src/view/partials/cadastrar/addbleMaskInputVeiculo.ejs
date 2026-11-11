@@ -1,0 +1,36 @@
+<%
+    const {id, elements = []} = mask
+
+    const first = elements.shift();
+%>
+
+<div
+    class="w-full flex gap-[5px] items-center"
+    >
+
+    <%- include("./inputs", {
+        element: first
+    })%>
+
+    <div
+        class="flex justify-end items-center "
+        >
+        <button
+            id="remove-<%= id %>"
+            type="button"
+            class="w-[4vh] h-[4vh] rounded-lg bg-red-900 text-white
+            hover:scale-105 transition-transform duration-300 hover:z-10
+            hover:bg-red-500
+            font-bold text-3xl flex justify-center items-center
+            leading-none p-0"
+        >
+            <span class="">−</span>
+        </button>
+    </div>
+</div>
+
+<% elements.forEach(element => {%>
+    <%- include("./inputs", {
+        element
+    })%>
+<% }) %>
