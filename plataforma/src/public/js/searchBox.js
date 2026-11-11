@@ -60,6 +60,8 @@ const setSearchBox = (root, action, onSearch) => {
         if (selectedIndex < 0 || selectedIndex >= options.length)
             return;
         input.value = options[selectedIndex].textContent?.trim() ?? "";
+        if (onSearch)
+            onSearch(input.value);
         autocompleteBox.classList.add("h-0");
         autocompleteBox.classList.remove("h-auto");
         clearSelection();
@@ -101,6 +103,8 @@ const setSearchBox = (root, action, onSearch) => {
                     confirmSelection();
                 }
                 else {
+                    if (onSearch)
+                        onSearch(input.value);
                     event.preventDefault();
                     executeSearch();
                 }
@@ -137,8 +141,6 @@ const setSearchBox = (root, action, onSearch) => {
                 return;
             }
             const content = await result.json();
-            if (onSearch)
-                onSearch(content);
             for (let i = 0; i < content.length; i++) {
                 const newElement = clone(defaultElement, i, content[i].nome);
                 // Seleção pelo mouse

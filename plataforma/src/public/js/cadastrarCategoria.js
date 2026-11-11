@@ -6,5 +6,5 @@ if (!add)
     throw new Error(`Não foi possivel localizar o botão de adicionar atributos`);
 let iterator = 0;
 setAddble(add, "atributo", iterator);
-setForm(null, null, true);
+setForm();
 //# sourceMappingURL=cadastrarCategoria.js.map

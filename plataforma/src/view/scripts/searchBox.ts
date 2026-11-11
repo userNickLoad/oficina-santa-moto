@@ -96,6 +96,9 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
 
         input.value = options[selectedIndex].textContent?.trim() ?? "";
 
+        if(onSearch)
+            onSearch(input.value)
+
         autocompleteBox.classList.add("h-0");
         autocompleteBox.classList.remove("h-auto");
 
@@ -150,7 +153,10 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
                 if (selectedIndex !== -1) {
                     event.preventDefault();
                     confirmSelection();
+
                 } else {
+                    if(onSearch)
+                        onSearch(input.value)
                     event.preventDefault();
                     executeSearch();
                 }
@@ -199,9 +205,6 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
             }
 
             const content: { nome: string }[] = await result.json();
-
-            if(onSearch)
-                onSearch(content)
 
             for (let i = 0; i < content.length; i++) {
                 const newElement = clone(defaultElement, i, content[i].nome);
