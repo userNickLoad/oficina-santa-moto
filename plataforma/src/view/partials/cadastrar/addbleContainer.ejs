@@ -31,16 +31,16 @@
 
 <div
     id="addble-container-<%= id %>"
-    class="flex flex-col gap-[2vh] <%= classCss %> "
+    class="flex flex-col gap-[2vh] w-full"
     data-parent="addblebox"
     >
     <div
         id="addble-placement-<%= id %>"
-        class="w-full flex flex-col"
+        class="w-full flex flex-col gap-[1vh] "
         >
         <div 
             id="addble-element-<%= id %>"
-            class="w-full gap-[1vw] hidden"
+            class="w-full hidden  <%= classCss %> "
             >
                 
             <%- include(mask, {mask: {id, elements}}) %>

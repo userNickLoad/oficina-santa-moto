@@ -1,8 +1,25 @@
 console.log("LOGIN.TS CARREGADO");
 
 
-const verifyEmpty = (input: HTMLInputElement) => {
-    return (input.value.trim() === "")? "Campo vazio": null;
+type verifier = (value: string)=> string | null;
+
+const verifyEmpty: verifier = (value) => {
+    return (value.trim() === "")? "Campo vazio": null;
+}
+
+const verifyTelefone: verifier = (value: string) => {
+    if(value.replace(/\D/g, "").length < 10){
+        return "O telefone deve ter pelo menos 10 caracteres ou nenhum";
+    } 
+
+    return null;
+}
+
+const verifyEmail: verifier = (value: string) => {
+    if(value.search(/@gmail.com/))
+        return `Use a extenção @gmail.com como ${value.split("@")[0]}@gmail.com`
+
+    return null
 }
 
 const parseFormData = (formData: FormData) => {
@@ -11,26 +28,26 @@ const parseFormData = (formData: FormData) => {
     for (const [key, value] of formData.entries()) {
         const match = key.match(/^([^\[]+)\[(\d+)\]\[([^\]]+)\]$/);
 
-        if (match) {
-            const [, arrayName, index, property] = match;
-
-            result[arrayName] ??= [];
-
-            result[arrayName][Number(index)] ??= {};
-
-            result[arrayName][Number(index)][property] = value;
-
+        if (!match) {
+            result[key] = value;
             continue;
         }
 
-        result[key] = value;
+        const [, arrayName, index, property] = match;
+
+        result[arrayName] ??= [];
+
+        result[arrayName][Number(index)] ??= {};
+
+        result[arrayName][Number(index)][property] = value;
     }
 
     return result;
 };
 
 
-const setForm = (formId: string | null = null, verifyIssues: ((inputElement: HTMLInputElement) => string | null) | null = null, multi: boolean = false) => {
+
+const setForm = (formId: string | null = null, verifyIssues: Record<string, verifier> | null = null) => {
     const form = document.querySelector<HTMLFormElement>(
     (formId)?`#${formId}` : "form"
     );
@@ -69,12 +86,29 @@ const setForm = (formId: string | null = null, verifyIssues: ((inputElement: HTM
                 throw new Error(`o errorOutput do ${input.id} não foi encontrado`)
             }
 
-            errorDisplay.textContent = "";
+            const reset = ()=>{
+                errorDisplay.textContent = "";
+                input.classList.remove("border-red-400")
+                input.classList.add("border-gray-400")
 
-            const issue = (verifyIssues)? verifyIssues(input): verifyEmpty(input);
+            }
+
+            if(errorDisplay.textContent != "")
+                reset()
+            
+            input.addEventListener("click", reset)
+
+            let issueVerifyier: verifier | undefined  = undefined;
+
+            if(verifyIssues)
+                issueVerifyier = verifyIssues[input.id.match(/\[([^\]]+)\]$/)?.[1] ?? input.id]
+
+            const issue = (issueVerifyier)? issueVerifyier(input.value): verifyEmpty(input.value);
 
             if(issue){
                 errorDisplay.textContent = issue;
+                input.classList.add("border-red-400")
+                input.classList.remove("border-gray-400")
                 errors += 1;
             }
 
@@ -86,14 +120,8 @@ const setForm = (formId: string | null = null, verifyIssues: ((inputElement: HTM
         // Obtém os dados do formulário
         const formData = new FormData(form);
         
-        let dados;
+        const dados = parseFormData(formData);
 
-        if(!multi)
-            dados = Object.fromEntries(formData.entries());
-        else 
-            dados = parseFormData(formData);
-
-        console.log(dados)
 
         const contains_files = Array.from(form.querySelectorAll<HTMLInputElement>('input[type="file"]')).some((input => (input.files && input.files.length > 0)))
 
@@ -132,4 +160,4 @@ const setForm = (formId: string | null = null, verifyIssues: ((inputElement: HTM
     });
 }
 
-export {setForm, verifyEmpty}
+export {setForm, verifyEmpty, verifyTelefone, verifyEmail}

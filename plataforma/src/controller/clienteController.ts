@@ -28,6 +28,7 @@ export const buscarClientes = async (req: Request, res: Response) => {
 
 export const cadastrarCliente = async(req: Request, res: Response) => {
     try{
+        console.log(req.body)
         const nome = String(req.body.nome ?? "").trim();
         const telefone = String(req.body.telefone ?? "").trim();
 

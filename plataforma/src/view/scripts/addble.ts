@@ -24,7 +24,7 @@ const setAddble = (element: HTMLElement, name: string, iterator: number, cloneEx
     const buildClone = (): HTMLElement => {
         const clone = addble.cloneNode(true) as HTMLElement;
 
-        clone.id += `-${iterator}`
+        //clone.id += `-${iterator}`
 
         clone.classList.remove("hidden");
         clone.classList.add("flex");
@@ -41,7 +41,7 @@ const setAddble = (element: HTMLElement, name: string, iterator: number, cloneEx
 
         clone.querySelectorAll("input").forEach(input => {
             input.disabled = false;
-            input.id = `${name}[${iterator}][${input.id}]`;
+            //input.id = `${name}[${iterator}][${input.id}]`;
             input.name = `${name}[${iterator}][${input.name}]`;
 
             const parent = input.closest('[data-parent="inputbox"]')

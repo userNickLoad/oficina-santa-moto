@@ -23,15 +23,15 @@ class MarcaController{
     }
 
     async getByStartsWithName(req: Request, res: Response){
-        const nome = req.params.nome;
+        const nome = req.query.nome;
 
         if(!(typeof nome === "string"))
             return res.status(400).json({message: "nome incorreto"});
 
         try{
-            const result = marcaModel.getByStartsWithName(nome);
+            const result = await marcaModel.getByStartsWithName(nome);
 
-            if((await result).length === 0){
+            if((result).length === 0){
                 return res.status(404).json({message: "Nenhuma marca foi encontrada."})
             }
 

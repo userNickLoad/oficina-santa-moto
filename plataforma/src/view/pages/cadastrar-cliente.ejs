@@ -1,5 +1,5 @@
 <%
-
+    const year = new Date().getFullYear(); 
 %>
 
 <section class="flex flex-col w-full items-center">
@@ -15,11 +15,22 @@
             method: "post",
             elements: [
                 {type: "input", input: {name: "nome", type: "text", title: "Nome do cliente", maxlength: 50, placeholder: "ex: João da Silva, Guihlerme Guimarães", text_size: "text-md", size: "w-full"}},
-                {type: "input", input: {name: "email", type: "email", title: "Email do cliente", maxlength: 50, placeholder: "ex: joao.silva@gmail.com", text_size: "text-md", size: "w-full"}},
+                {type: "input", input: {name: "email", title: "Email do cliente", maxlength: 50, placeholder: "ex: joao.silva@gmail.com", text_size: "text-md", size: "w-full"}},
                 {type: "input", input: {name: "telefone", mask: "phone", title: "Telefone do cliente", maxlength: 50, placeholder: "ex: (11) 4002-8922", text_size: "text-md", size: "w-full"}},
-                {type: "partial", partial: {path: "./addbleVeiculo"}}
-                
-
+                {
+                    type: "addble_container",     
+                    container: {
+                        id: "veiculos",
+                        title: "Veiculos",
+                        flex: "flex flex-col",
+                        mask: "./addbleMaskInputVeiculo",
+                        elements: [
+                            {type: "input", input: {type: "number", title: "Ano de fabricação", name: "ano", max_number: year}},
+                            {type: "input", input: {type: "search", name: "modelo", id: "modelo", title: "Nome do modelo do veiculo", placeholder: "Ex: CB 300F Twister, Sahara 300"}},
+                            {type: "input", input: {type: "search", name: "marca", id: "marca", title: "Nome da marca do veiculo", placeholder: "Ex: Honda, BMW, Yamaha, "}}
+                        ]
+                    }
+                }          
             ],
             buttons: [
                 {
@@ -39,8 +50,25 @@
 <script src="/js/phoneMask.js"></script>
 <script type="module">
     import { setAddble } from "/js/addble.js";
-    import {  } from "/js/searchBox.js"
+    import { setSearchBox } from "/js/searchBox.js"
+    import { setForm, verifyEmpty, verifyEmail, verifyTelefone } from "/js/form.js"
+
     let it = 0;
+
+    setForm(null, {
+        "telefone": (value)=>{
+            if(verifyEmpty(value))
+                return null;
+
+            return verifyTelefone(value);
+        },
+        "email": (value)=>{
+            if(verifyEmpty(value))
+                return null;
+
+            return verifyEmail(value);         
+        }
+    })
 
     const addble = document.querySelector("#addble-container-veiculos")
 
@@ -49,25 +77,54 @@
         
 
     setAddble(addble, "veiculo", it, (clone)=>{
+
+        //LOCALIZANDO OS ELEMENTOS 
         const modelo = clone.querySelector("#search-modelo")
 
         if(!modelo)
-            throw new Error("Não foi possivel achar root do clone");
-            
+            throw new Error("Não foi possivel achar moledo do clone");
 
-        setSearchBox(modelo, "http://localhost:3000/api/modelo?nome=", (value) => {
+        const modeloHidden = modelo.querySelector('input[id^="search-hidden-"]');
+
+        if(!modeloHidden)
+            throw new Error("Não foi possivel achar o hidden de " + modelo.id);
+        
+        const marca = clone.querySelector("#search-marca");
+
+        if(!marca)
+            throw new Error("Não foi possivel achar marca do clone");
+
+        const marcaHidden = marca.querySelector('input[id^="search-hidden-"]');
+
+        if(!marcaHidden)
+            throw new Error("Não foi possivel achar o hidden de " + marca.id);
+
+        const marcaInput = marca.querySelector('input[id^="search-input-"]');
+
+        if(!marcaInput)
+            throw new Error("Não foi possivel achar o search input de " + marca.id);
+        
+        //COLOCANDO OS SET SEARCHBOX NELES, PARA SE TRANSFORMAREM EM SEARCH BOX
+        setSearchBox(modelo, "/api/moto/modelo?nome=", (value) => {
+            // COMPORTAMENTO DE AUTO COMPLETE DE MODELO E MARCA
+            if(value.length != 1)
+                return;
+            
+            modeloHidden.value = value[0].id;
+
+            const marcaObj = value[0].marca;
+                
+            marcaHidden.value = marcaObj.id;
+            marcaInput.value = marcaObj.nome;
+
+        })
+
+        setSearchBox(marca, "/api/marca?nome=", (value) => {
+
             if(value.length != 1)
                 return;
 
-            const hidden = modelo.querySelector('input[id^="search-hidden-"]');
-            if(!hidden)
-                throw new Error("Não foi possivel achar o hidden de " + modelo.id);
-            
-            hidden.value = value[0].id;
-
-            const marca = value[0].marca;
-
-            console.log(marca)
+            marcaHidden.value = value.id
         })
     })
 </script>
