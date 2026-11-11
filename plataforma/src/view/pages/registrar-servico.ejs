@@ -119,6 +119,16 @@
                         type: "number",
                         placeholder: "Ex: 1"
                     }
+                },
+                {
+                    type: "input",
+                    input: {
+                        id: "preco_produto",
+                        name: "preco_produto",
+                        title: "Preço unitário do produto (R$)",
+                        type: "number",
+                        placeholder: "Ex: 80.00"
+                    }
                 }
             ],
             buttons: [
@@ -147,23 +157,140 @@
 </div>
 
 <script>
-    document.getElementById("form-registrar-servico").addEventListener("submit", function(event){
-        const campos = this.querySelectorAll(
-            "#nome_cliente, #telefone, #marca_moto, #modelo_moto, #ano_moto, #descricao, #preco, #data_entrada");
-        let possuiCampoVazio = false;
+    document.getElementById("form-registrar-servico").addEventListener("submit", async function(event) {
+    event.preventDefault();
 
-        campos.forEach((campo) => {
-            if(campo.value.trim() === ""){
-                possuiCampoVazio = true;
-            }
-        });
+    const campos = this.querySelectorAll(
+        "#nome_cliente, #telefone, #marca_moto, #modelo_moto, #ano_moto, #descricao, #preco, #data_entrada"
+    );
 
-        if(possuiCampoVazio){
-            event.preventDefault();
-            document.getElementById("error").textContent = "Preencha todos os campos obrigatórios";
+    const mensagemErro = document.getElementById("error");
+    let possuiCampoVazio = false;
+
+    campos.forEach(campo => {
+        if (campo.value.trim() === "") {
+            console.log("Campo vazio", campo.id);
+            possuiCampoVazio = true;
         }
     });
 
+    if (possuiCampoVazio) {
+        mensagemErro.textContent = "Preencha todos os campos obrigatórios";
+        return;
+    }
+
+    if (!clienteSelecionado) {
+        mensagemErro.textContent = "Selecione um cliente já cadastrado";
+        return;
+    }
+
+    if (!idModeloSelecionado) {
+        mensagemErro.textContent = "Selecione um modelo de moto na lista";
+        return;
+    }
+
+    const dados = {
+        descricao: document.getElementById("descricao").value.trim(),
+        preco: document.getElementById("preco").value,
+        id_cliente: clienteSelecionado,
+        id_modelo: idModeloSelecionado,
+        ano: Number(document.getElementById("ano_moto").value),
+        produtos: produtosAdicionados
+    };
+
+    try {
+        mensagemErro.textContent = "";
+
+        const resposta = await fetch("/api/servico", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)
+        });
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok) {
+            mensagemErro.textContent = resultado.mensagem || "Erro ao registrar serviço";
+            return;
+        }
+
+        alert("Serviço registrado com sucesso!");
+        window.location.href = "/servicos";
+
+    } catch (error) {
+        console.error(error);
+        mensagemErro.textContent = "Erro ao conectar com o servidor";
+    }
+    });
+    const campoProdutoEstoque = document.getElementById("produto_estoque");
+    const campoPrecoProduto = document.getElementById("preco_produto");
+
+    let produtoSelecionado = null;
+    const sugestoesProdutos = document.createElement("div");
+    sugestoesProdutos.className = "hidden bg-white border border-gray-200 rounded-xl shadow-sm max-h-48 overflow-y-auto";
+
+    campoProdutoEstoque.insertAdjacentElement("afterend", sugestoesProdutos);
+    campoProdutoEstoque.setAttribute("autocomplete", "off");
+    campoProdutoEstoque.addEventListener("input", async function () {
+        produtoSelecionado = null;
+        campoPrecoProduto.value = "";
+
+        const nome = this.value.trim();
+        sugestoesProdutos.innerHTML = "";
+
+        if(nome.length < 2) {
+            sugestoesProdutos.classList.add("hidden");
+            return;
+        }
+
+        sugestoesProdutos.classList.remove("hidden");
+        sugestoesProdutos.textContent = "Pesquisando produtos...";
+
+        try{
+            const resposta = await fetch(`/api/produto/buscar?nome=${encodeURIComponent(nome)}`);
+
+            if(!resposta.ok){
+                throw new Error("Erro ao pesquisar produtos");
+            }
+
+            const produtos = await resposta.json();
+
+            if(campoProdutoEstoque.value.trim() !== nome) return;
+
+            sugestoesProdutos.innerHTML = "";
+
+            if(produtos.length === 0){
+                sugestoesProdutos.textContent = "Produto não encontrado";
+                return;
+            }
+
+            produtos.forEach(produto => {
+                const opcao = document.createElement("button");
+
+                opcao.type = "button";
+                opcao.className = "block w-full text-left p-3 hover:bg-gray-100 cursor-pointer";
+
+                opcao.textContent = `${produto.nome} - Estoque: ${produto.qtd_disponivel}`;
+
+                opcao.addEventListener("click", () =>{
+                    produtosSelecionado = produto;
+                    campoProdutoEstoque.value = produto.nome;
+                    campoPrecoProduto.value = Number(produto.preco_venda).toFixed(2);
+
+                    sugestoesProdutos.classList.add("hidden");
+                });
+
+                sugestoesProdutos.appendChild(opcao);
+            });
+        }catch (error){
+            console.error(error);
+            sugestoesProdutos.textContent = "Erro ao pesquisar produtos";
+        }
+    });
+
+    const produtosAdicionados = [];
     const botaoAdicionar = document.getElementById("adicionar-produto");
         const listaProdutos = document.getElementById("lista-produtos");
 
@@ -173,12 +300,28 @@
 
             const produto = campoProduto.value.trim();
             const quantidade = Number(campoQuantidade.value);
+            const preco = Number(doument.getElementById("preco_produto").value);
+            const precoEmCentavos = Math.round(preco * 100);
 
-            if(!produto || !Number.isInteger(quantidade) || quantidade <= 0) {
-                alert("Informe o produto e uma quantidade válida.");
+            if (!produtoSelecionado || !Number.isInteger(quantidade) || quantidade <= 0 || quantidade > produtoSelecionado.qtd_disponivel ||
+                !Number.isFinite(preco) || preco < 0 || Math.abs(preco * 100 - precoEmCentavos) > 0.000001) {
+                alert("Selecione um produto e informe uma quantidade e um preço válidos.");
                 return;
             }
+            const produtoDuplicado = produtosAdicionados.some(
+                item => item.id_produto === produtoSelecionado.id
+            );
 
+            if (produtoDuplicado) {
+                alert("Este produto já foi adicionado ao serviço.");
+                return;
+            }
+            const produtoAdicionado = {
+                id_produto: produtoSelecionado.id,
+                quantidade: quantidade,
+                preco: (precoEmCentavos/100).toFixed(2)
+            };
+            produtosAdicionados.push(produtoAdicionado);
             const item = document.createElement("div");
             item.className = "flex items-center justify-between gap-3 border border-gray-200 rounded-xl p-3";
 
@@ -189,13 +332,21 @@
             remover.className = "text-red-600 cursor pointer";
             remover.textContent = "Remover";
 
-            remover.addEventListener("click", () => item.remove());
+            remover.addEventListener("click", () => { 
+                const indice = produtosAdicionados.indexOf(produtoAdicionado);
+                if (indice !== -1) {
+                    produtosAdicionados.splice(indice, 1);
+                }
+                item.remove();
+            });
 
             item.append(descricao, remover);
             listaProdutos.appendChild(item);
 
             campoProduto.value = "";
             campoQuantidade.value = "";
+            campoPrecoProduto.value = "";
+            produtosSelecionado = null;
         });
     const formulario = document.getElementById("form-registrar-servico");
     const blocoProdutos = document.getElementById("adicionar-produto").parentElement;

@@ -3,6 +3,7 @@ import usuarioRoutes from "./usuarioRoutes.js"
 import servicoRoutes from "./servicoRoutes.js";
 import clienteRoutes from "./clienteRoutes.js";
 import motoRoutes from "./motoRoutes.js";
+import { buscarProdutos } from "../controller/produtoController.js";
 
 const router = Router();
 
@@ -10,5 +11,6 @@ router.use("/usuario", usuarioRoutes);
 router.use("/servico", servicoRoutes);
 router.use("/cliente", clienteRoutes);
 router.use("/moto", motoRoutes);
+router.use("/produto/buscar", buscarProdutos);
 
 export default router;
