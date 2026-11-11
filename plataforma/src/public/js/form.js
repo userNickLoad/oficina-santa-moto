@@ -1,23 +1,34 @@
 console.log("LOGIN.TS CARREGADO");
-const verifyEmpty = (input) => {
-    return (input.value.trim() === "") ? "Campo vazio" : null;
+const verifyEmpty = (value) => {
+    return (value.trim() === "") ? "Campo vazio" : null;
+};
+const verifyTelefone = (value) => {
+    if (value.replace(/\D/g, "").length < 10) {
+        return "O telefone deve ter pelo menos 10 caracteres ou nenhum";
+    }
+    return null;
+};
+const verifyEmail = (value) => {
+    if (value.search(/@gmail.com/))
+        return `Use a extenção @gmail.com como ${value.split("@")[0]}@gmail.com`;
+    return null;
 };
 const parseFormData = (formData) => {
     const result = {};
     for (const [key, value] of formData.entries()) {
         const match = key.match(/^([^\[]+)\[(\d+)\]\[([^\]]+)\]$/);
-        if (match) {
-            const [, arrayName, index, property] = match;
-            result[arrayName] ??= [];
-            result[arrayName][Number(index)] ??= {};
-            result[arrayName][Number(index)][property] = value;
+        if (!match) {
+            result[key] = value;
             continue;
         }
-        result[key] = value;
+        const [, arrayName, index, property] = match;
+        result[arrayName] ??= [];
+        result[arrayName][Number(index)] ??= {};
+        result[arrayName][Number(index)][property] = value;
     }
     return result;
 };
-const setForm = (formId = null, verifyIssues = null, multi = false) => {
+const setForm = (formId = null, verifyIssues = null) => {
     const form = document.querySelector((formId) ? `#${formId}` : "form");
     if (!form) {
         throw new Error("Formulário não encontrado");
@@ -42,10 +53,22 @@ const setForm = (formId = null, verifyIssues = null, multi = false) => {
             if (!errorDisplay) {
                 throw new Error(`o errorOutput do ${input.id} não foi encontrado`);
             }
-            errorDisplay.textContent = "";
-            const issue = (verifyIssues) ? verifyIssues(input) : verifyEmpty(input);
+            const reset = () => {
+                errorDisplay.textContent = "";
+                input.classList.remove("border-red-400");
+                input.classList.add("border-gray-400");
+            };
+            if (errorDisplay.textContent != "")
+                reset();
+            input.addEventListener("click", reset);
+            let issueVerifyier = undefined;
+            if (verifyIssues)
+                issueVerifyier = verifyIssues[input.id.match(/\[([^\]]+)\]$/)?.[1] ?? input.id];
+            const issue = (issueVerifyier) ? issueVerifyier(input.value) : verifyEmpty(input.value);
             if (issue) {
                 errorDisplay.textContent = issue;
+                input.classList.add("border-red-400");
+                input.classList.remove("border-gray-400");
                 errors += 1;
             }
         });
@@ -53,12 +76,7 @@ const setForm = (formId = null, verifyIssues = null, multi = false) => {
             return;
         // Obtém os dados do formulário
         const formData = new FormData(form);
-        let dados;
-        if (!multi)
-            dados = Object.fromEntries(formData.entries());
-        else
-            dados = parseFormData(formData);
-        console.log(dados);
+        const dados = parseFormData(formData);
         const contains_files = Array.from(form.querySelectorAll('input[type="file"]')).some((input => (input.files && input.files.length > 0)));
         try {
             const response = await fetch(form.action, {
@@ -87,5 +105,5 @@ const setForm = (formId = null, verifyIssues = null, multi = false) => {
         }
     });
 };
-export { setForm, verifyEmpty };
+export { setForm, verifyEmpty, verifyTelefone, verifyEmail };
 //# sourceMappingURL=form.js.map

@@ -11,7 +11,8 @@
         placeholder = "",
         mask = null,
         rows = "5",
-        radios = []
+        radios = [],
+        max_number = ""
     } = item;
     const id_applay = name.toLowerCase();
     const column_applay = (column)? "justify-center py-[1vh]": "flex-col";
@@ -74,23 +75,6 @@
                 class="w-[5vh] h-[5vh]"
                 >
         </div>
-
-    <% } else if (type == "email") { %>
-
-        <input
-        
-            class=" border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
-            type="email"
-            id="<%= name %>"
-            name="<%= name_input %>"
-            alt="escreva <%= name %>"
-            maxlength=<%= maxlength %>
-            placeholder="<%= placeholder %>"
-                <% if (mask === "currency") { %>
-                    data-mask="currency"
-                    inputmode="numeric"
-                <% } %>
-        >
 
     <% } else if (type == "image") { %>
 
@@ -202,6 +186,9 @@
                         data-mask="phone"
                         inputmode="numeric"
                     <% } %>
+                <% if(type === "number") {%>
+                    max="<%= max_number %>"
+                <% } %>
             >
 
         <% } %>

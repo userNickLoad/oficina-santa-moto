@@ -13,7 +13,7 @@ const setAddble = (element, name, iterator, cloneExpecific = null) => {
         throw new Error("não foi possivel localizar o placement");
     const buildClone = () => {
         const clone = addble.cloneNode(true);
-        clone.id += `-${iterator}`;
+        //clone.id += `-${iterator}`
         clone.classList.remove("hidden");
         clone.classList.add("flex");
         const btn_rm = clone.querySelector('[id^="remove-"]');
@@ -25,7 +25,7 @@ const setAddble = (element, name, iterator, cloneExpecific = null) => {
         });
         clone.querySelectorAll("input").forEach(input => {
             input.disabled = false;
-            input.id = `${name}[${iterator}][${input.id}]`;
+            //input.id = `${name}[${iterator}][${input.id}]`;
             input.name = `${name}[${iterator}][${input.name}]`;
             const parent = input.closest('[data-parent="inputbox"]');
             if (!parent)
