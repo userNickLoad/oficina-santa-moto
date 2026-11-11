@@ -141,15 +141,38 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
                 )
 
             });
-
+            console.log("foi -1")
+            
             const resultado = await response.json();
+
+            console.log("foi")
 
             if (!response.ok) {
                 errorOutput.innerText = resultado.mensagem;
                 return;
             }
 
-            window.location = resultado.redirect;
+            console.log("foi 2")
+            
+            if(resultado.redirect){
+                window.location = resultado.redirect;
+            }
+
+            if (resultado.confirm) {
+                const confirm = document.querySelector<HTMLElement>("#confirm");
+                console.log(confirm)
+                if (!confirm)
+                    throw new Error("Não foi possível encontrar o #confirm");
+
+                confirm.innerText = resultado.confirm;
+
+                confirm.classList.remove("hidden");
+
+                confirm.classList.remove("animate-confirm");
+                void confirm.offsetWidth;
+                confirm.classList.add("animate-confirm");
+            }
+            
 
             // Aqui você pode tratar o sucesso do login.
 

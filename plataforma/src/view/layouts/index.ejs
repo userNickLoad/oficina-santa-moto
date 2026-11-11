@@ -2,6 +2,7 @@
     const contentData = typeof innerContent !== "undefined"
         ? innerContent
         : {};
+
 %>
 
 <!DOCTYPE html>
@@ -13,6 +14,9 @@
     <title><%= title %> - Santa Moto</title>
 </head>
 <body class="w-[100vw] overflow-x-hidden">
+
+    <%- include("../partials/confirm") %>
+
     <a href="#principal" class="w-screen text-center absolute focus:top-0 top-[-100px]">
         <p class="py-[1vh] px-[1vw] bg-white">
             Enter para conteúdo principal da página
@@ -26,5 +30,6 @@
     
 
     <%- include("../partials/footer") %>
+
 </body>
 </html>

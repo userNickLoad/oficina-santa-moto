@@ -31,6 +31,7 @@ export const cadastrarCliente = async(req: Request, res: Response) => {
         console.log(req.body)
         const nome = String(req.body.nome ?? "").trim();
         const telefone = String(req.body.telefone ?? "").trim();
+        const email = String(req.body.email ?? "").trim();
 
         if(!nome) {
             return res.status(400).json({
@@ -44,12 +45,14 @@ export const cadastrarCliente = async(req: Request, res: Response) => {
             });
         }
 
-        const cliente = await clienteModel.cadastrarCliente({
-            nome,
-            telefone: telefone || null
-        });
+        
 
-        return res.status(201).json(cliente);
+
+        const cliente = await clienteModel.cadastrarCliente();
+
+        console.log(cliente);
+
+        return res.status(200).json({confirm: "usuario cadastrado"})
     }catch (error){
         console.error(error);
         return res.status(500).json({

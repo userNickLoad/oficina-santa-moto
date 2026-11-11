@@ -1,4 +1,20 @@
+import { cliente, marca, modelo, veiculo } from "../../generated/prisma/client.js";
 import db from "../database/prisma.js";
+
+type Cliente = cliente;
+type MarcaCreateDTO = Omit<marca, "id">;
+
+type ModeloCreateDTO = Omit<modelo, "id" | "id_marca"> & {
+    marca: MarcaCreateDTO;
+};
+
+type VeiculoCreateDTO = Omit<veiculo, "id" | "id_modelo"> & {
+    modelo: ModeloCreateDTO;
+};
+
+type ClienteCreateDTO = Omit<Cliente, "id"> & {
+    veiculos: VeiculoCreateDTO[];
+};
 
 export class ClienteModel {
 
@@ -22,15 +38,50 @@ export class ClienteModel {
         });
     }
 
-    async cadastrarCliente(dados: {
-    nome: string;
-    telefone: string | null;
-    }) {
-        return await db.cliente.create({
-            data: {
-                nome: dados.nome,
-                telefone: dados.telefone
+    
+async cadastrarCliente(dados: ClienteCreateDTO) {
+    const { veiculos, ...cliente } = dados;
+
+    
+    const result =  await db.cliente.create({
+        data: {
+            ...cliente,
+
+            veiculos: {
+                create: veiculos.map(({ modelo, ...veiculo }) => {
+                    const { marca, ...modeloData } = modelo;
+
+                    return {
+                        ...veiculo,
+
+                        modelo: {
+                            connectOrCreate: {
+                                where: {
+                                    nome: modeloData.nome
+                                },
+
+                                create: {
+                                    ...modeloData,
+
+                                    marca: {
+                                        connectOrCreate: {
+                                            where: {
+                                                nome: marca.nome
+                                            },
+
+                                            create: {
+                                                ...marca
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
+                })
             }
-        });
-    }
+        }
+    });
+}
+
 }
