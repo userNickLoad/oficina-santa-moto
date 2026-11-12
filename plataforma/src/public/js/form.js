@@ -43,7 +43,7 @@ const setForm = (formId = null, verifyIssues = null) => {
         errorOutput.innerText = "";
         let errors = 0;
         form.querySelectorAll("input").forEach(input => {
-            if (input.disabled)
+            if (input.disabled || input.classList.contains("hidden"))
                 return;
             const parent = input.closest('[data-parent="inputbox"]');
             if (!parent) {

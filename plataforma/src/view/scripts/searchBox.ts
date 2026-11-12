@@ -9,7 +9,7 @@ const clone = (element: HTMLElement, iterator: number, value: string): HTMLEleme
 
 const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=>void) => {
     const input = root.querySelector<HTMLInputElement>('input[id^="search-input"]');
-    console.log(root)
+  
 
     if (!input)
         throw new Error("não foi possivel achar o input da caixa de pesquisa");
@@ -155,8 +155,6 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
                     confirmSelection();
 
                 } else {
-                    if(onSearch)
-                        onSearch(input.value)
                     event.preventDefault();
                     executeSearch();
                 }
@@ -178,8 +176,6 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
     input.addEventListener("input", async () => {
         const value = input.value.trim().toLowerCase();
 
-        console.log(value)
-
         if (value === input.dataset.input)
             return;
 
@@ -193,7 +189,7 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
 
         try {
             const result = await fetch(`${action}${encodeURIComponent(value)}`);
-            console.log(result)
+            
             if (!result.ok && result.status !== 404) {
                 window.alert("Erro ao tentar pesquisar o input na searchbox");
                 return;
@@ -223,6 +219,9 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
 
                 placement.appendChild(newElement);
             }
+
+            if(onSearch)
+                onSearch(content)
 
         } catch (error) {
             console.log(error);

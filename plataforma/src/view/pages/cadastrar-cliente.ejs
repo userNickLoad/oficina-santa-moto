@@ -14,7 +14,7 @@
             action: "/api/cliente/cadastrar",
             method: "post",
             elements: [
-                {type: "input", input: {name: "nome", type: "text", title: "Nome do cliente", maxlength: 50, placeholder: "ex: João da Silva, Guihlerme Guimarães", text_size: "text-md", size: "w-full"}},
+                {type: "input", input: {name: "nome", type: "text", title: "Nome do cliente (obrigatório)", maxlength: 50, placeholder: "ex: João da Silva, Guihlerme Guimarães", text_size: "text-md", size: "w-full"}},
                 {type: "input", input: {name: "email", title: "Email do cliente", maxlength: 50, placeholder: "ex: joao.silva@gmail.com", text_size: "text-md", size: "w-full"}},
                 {type: "input", input: {name: "telefone", mask: "phone", title: "Telefone do cliente", maxlength: 50, placeholder: "ex: (11) 4002-8922", text_size: "text-md", size: "w-full"}},
                 {
@@ -25,9 +25,9 @@
                         flex: "flex flex-col",
                         mask: "./addbleMaskInputVeiculo",
                         elements: [
-                            {type: "input", input: {type: "number", title: "Ano de fabricação", name: "ano", max_number: year}},
-                            {type: "input", input: {type: "search", name: "modelo", id: "modelo", title: "Nome do modelo do veiculo", placeholder: "Ex: CB 300F Twister, Sahara 300"}},
-                            {type: "input", input: {type: "search", name: "marca", id: "marca", title: "Nome da marca do veiculo", placeholder: "Ex: Honda, BMW, Yamaha, "}}
+                            {type: "input", input: {type: "number", title: "Ano de fabricação (obrigatório)", name: "ano", max_number: year}},
+                            {type: "input", input: {type: "search", name: "modelo", id: "modelo", title: "Nome do modelo do veiculo (obrigatório)", placeholder: "Ex: CB 300F Twister, Sahara 300"}},
+                            {type: "input", input: {type: "search", name: "marca", id: "marca", title: "Nome da marca do veiculo (obrigatório)", placeholder: "Ex: Honda, BMW, Yamaha, "}}
                         ]
                     }
                 }          
@@ -104,6 +104,8 @@
         
         //COLOCANDO OS SET SEARCHBOX NELES, PARA SE TRANSFORMAREM EM SEARCH BOX
         setSearchBox(modelo, "/api/moto/modelo?nome=", (value) => {
+            console.log(value)
+
             // COMPORTAMENTO DE AUTO COMPLETE DE MODELO E MARCA
             if(value.length != 1)
                 return;

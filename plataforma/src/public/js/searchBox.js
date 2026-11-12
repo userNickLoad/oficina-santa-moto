@@ -8,7 +8,6 @@ const clone = (element, iterator, value) => {
 };
 const setSearchBox = (root, action, onSearch) => {
     const input = root.querySelector('input[id^="search-input"]');
-    console.log(root);
     if (!input)
         throw new Error("não foi possivel achar o input da caixa de pesquisa");
     const autocompleteBox = root.querySelector('div[id^="search-autocomplete-"]');
@@ -103,8 +102,6 @@ const setSearchBox = (root, action, onSearch) => {
                     confirmSelection();
                 }
                 else {
-                    if (onSearch)
-                        onSearch(input.value);
                     event.preventDefault();
                     executeSearch();
                 }
@@ -121,7 +118,6 @@ const setSearchBox = (root, action, onSearch) => {
     // Pesquisa dinâmica
     input.addEventListener("input", async () => {
         const value = input.value.trim().toLowerCase();
-        console.log(value);
         if (value === input.dataset.input)
             return;
         input.dataset.input = value;
@@ -131,7 +127,6 @@ const setSearchBox = (root, action, onSearch) => {
             return;
         try {
             const result = await fetch(`${action}${encodeURIComponent(value)}`);
-            console.log(result);
             if (!result.ok && result.status !== 404) {
                 window.alert("Erro ao tentar pesquisar o input na searchbox");
                 return;
@@ -153,6 +148,8 @@ const setSearchBox = (root, action, onSearch) => {
                 });
                 placement.appendChild(newElement);
             }
+            if (onSearch)
+                onSearch(content);
         }
         catch (error) {
             console.log(error);

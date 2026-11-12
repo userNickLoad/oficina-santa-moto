@@ -73,7 +73,7 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
 
 
         form.querySelectorAll<HTMLInputElement>("input").forEach(input => {
-            if(input.disabled)
+            if(input.disabled || input.classList.contains("hidden"))
                 return;
 
             const parent = input.closest('[data-parent="inputbox"]');
@@ -122,10 +122,11 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
         
         const dados = parseFormData(formData);
 
-
         const contains_files = Array.from(form.querySelectorAll<HTMLInputElement>('input[type="file"]')).some((input => (input.files && input.files.length > 0)))
 
         try {
+
+
             const response = await fetch(form.action, {
                 method: form.method,
                 ...(
