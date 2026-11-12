@@ -3,10 +3,7 @@ import { ServicoModel } from "../model/servicoModel.js";
 
 const servicoModel = new ServicoModel();
 
-export const getServicosEmAndamento = async (
-    req: Request,
-    res: Response
-) => {
+export const getServicosEmAndamento = async (req: Request, res: Response) => {
     try {
         const servicos = await servicoModel.getServicosEmAndamento();
 
@@ -21,10 +18,19 @@ export const getServicosEmAndamento = async (
     }
 };
 
-export const concluirServico = async (
-    req: Request,
-    res: Response
-) => {
+export const getTodosServicos = async (req: Request, res: Response) => {
+    try{
+        const servicos = await servicoModel.getTodosServicos();
+        return res.status(200).json(servicos);
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({
+            mensagem: "Erro ao buscar todas as ordens de serviço"
+        });
+    }
+};
+
+export const concluirServico = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
 
@@ -56,48 +62,87 @@ export const concluirServico = async (
     }
 };
 
+export const cancelarServico = async (req: Request, res: Response) => {
+    try{
+        const id = Number(req.params.id);
 
-export const registrarServico = async (
-    req: Request,
-    res: Response
-) => {
+        if(!Number.isInteger(id) || id <= 0){
+            return res.status(400).json({
+                mensagem: "ID do serviço inválido"
+            });
+        }
+
+        const servico = await servicoModel.cancelarServico(id);
+
+        if(servico === null){
+            return res.status(404).json({
+                mensagem: "Serviço não encontrado ou não está em andamento"
+            });
+        }
+
+        return res.status(200).json({
+            mensagem: "Serviço cancelado com sucesso",
+            servico: servico
+        })
+    }catch (e){
+        console.log(e);
+
+        return res.status(500).json({
+            mensagem: "Erro ao cancelar serviço"
+        });
+    }
+};
+
+export const registrarServico = async (req: Request, res: Response) => {
     try {
         const {
             descricao,
             preco,
             id_cliente,
-            id_modelo,
-            ano,
+            id_veiculo,
             produtos
         } = req.body;
 
         const idUsuario = Number(res.locals.usuario?.userId);
         const clienteId = Number(id_cliente);
-        const modeloId = Number(id_modelo);
-        const anoMoto = Number(ano);
+        const veiculoId = Number(id_veiculo);
         const valorServico = Number(preco);
-        if(!Number.isInteger(idUsuario) || idUsuario <= 0){
+
+        if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
             return res.status(401).json({
                 mensagem: "Usuario não identificado"
             });
         }
-        const produtosServico = produtos ??[];
-    if (!Array.isArray(produtosServico) || !produtosServico.every((produto) => Number.isInteger(produto.id_produto) &&
-        produto.id_produto > 0 && Number.isInteger(produto.quantidade) && produto.quantidade > 0 &&
-        typeof produto.preco === "string" && /^\d+(\.\d{1,2})?$/.test(produto.preco)) ||
-        new Set(produtosServico.map((produto) => produto.id_produto)).size !== produtosServico.length
-    ) {
-        return res.status(400).json({
-            mensagem: "Produtos, quantidades ou preços inválidos"
-        });
-    }
+
+        const produtosServico = produtos ?? [];
+
+        if (
+            !Array.isArray(produtosServico) ||
+            !produtosServico.every((produto) =>
+                Number.isInteger(produto.id_produto) &&
+                produto.id_produto > 0 &&
+                Number.isInteger(produto.quantidade) &&
+                produto.quantidade > 0 &&
+                typeof produto.preco === "string" &&
+                /^\d+(\.\d{1,2})?$/.test(produto.preco)
+            ) ||
+            new Set(
+                produtosServico.map((produto) => produto.id_produto)
+            ).size !== produtosServico.length
+        ) {
+            return res.status(400).json({
+                mensagem: "Produtos, quantidades ou preços inválidos"
+            });
+        }
 
         if (
             !descricao?.trim() ||
-            !Number.isInteger(clienteId) || clienteId <= 0 ||
-            !Number.isInteger(modeloId) || modeloId <= 0 ||
-            !Number.isInteger(anoMoto) || anoMoto <= 0 ||
-            !Number.isFinite(valorServico) || valorServico < 0
+            !Number.isInteger(clienteId) ||
+            clienteId <= 0 ||
+            !Number.isInteger(veiculoId) ||
+            veiculoId <= 0 ||
+            !Number.isFinite(valorServico) ||
+            valorServico < 0
         ) {
             return res.status(400).json({
                 mensagem: "Dados inválidos para registrar o serviço"
@@ -108,8 +153,7 @@ export const registrarServico = async (
             descricao: descricao.trim(),
             preco: String(preco),
             id_cliente: clienteId,
-            id_modelo: modeloId,
-            ano: anoMoto,
+            id_veiculo: veiculoId,
             id_usuario: idUsuario,
             produtos: produtosServico
         });
@@ -127,4 +171,3 @@ export const registrarServico = async (
         });
     }
 };
-

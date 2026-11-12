@@ -2,9 +2,24 @@ document.addEventListener("DOMContentLoaded", () =>{
     const lista = document.getElementById("lista-servicos");
     const pesquisa = document.getElementById("pesquisar-servico");
     const botaoConcluir = document.getElementById("btn-concluir");
+    const botaoCancelar = document.getElementById("btn-cancelar");
 
     let servicos = [];
     let servicoSelecionado = null;
+    let tempoToast;
+
+    function mostrarSucesso(mensagem){
+        const toast = document.getElementById("toast-sucesso");
+        const texto = document.getElementById("mensagem-sucesso");
+
+        texto.textContent = mensagem;
+        toast.classList.remove("hidden");
+        clearTimeout(tempoToast);
+
+        tempoToast = setTimeout(() => {
+            toast.classList.add("hidden");
+        }, 3000);
+    }
 
     function mostrarMensagem(mensagem) {
         lista.replaceChildren();
@@ -21,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () =>{
         lista.replaceChildren();
         servicoSelecionado = null;
         botaoConcluir.disabled = true;
+        botaoCancelar.disabled = true;
 
         if(dados.length === 0){
             mostrarMensagem("Nenhum serviço em andamento encontrado");
@@ -70,6 +86,7 @@ document.addEventListener("DOMContentLoaded", () =>{
 
                 servicoSelecionado = servico.id;
                 botaoConcluir.disabled = false;
+                botaoCancelar.disabled = false;
             });
 
             cartao.dataset.servicoId = servico.id;
@@ -131,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () =>{
             }
 
             await carregarServico();
+            mostrarSucesso("✓ Ordem de serviço concluída com sucesso");
         }catch (erro){
             console.error(erro);
             alert("Não foi possível concluir o serviço");
@@ -138,5 +156,32 @@ document.addEventListener("DOMContentLoaded", () =>{
         }
     });
 
+    botaoCancelar.addEventListener("click", async() => {
+        if(servicoSelecionado === null) return;
+
+        const confirmado = window.confirm("Deseja cancelar esta ordem de serviço?");
+
+        if(!confirmado) return;
+
+        botaoCancelar.disabled = true;
+        botaoConcluir.disabled = true;
+
+        try{
+            const resposta = await fetch(`/api/servico/${servicoSelecionado}/cancelar`,{method: "PATCH"});
+
+            if(!resposta.ok){
+                throw new Error("Erro ao cancelar serviço");
+            }
+
+            await carregarServico();
+            mostrarSucesso("✓ Ordem de serviço cancelada com sucesso");
+        }catch (erro){
+            console.error(erro);
+            alert("Não foi possível cancelar o serviço");
+
+            botaoCancelar.disabled = false;
+            botaoConcluir.disabled = false;
+        }
+    });
     carregarServico();
 });
