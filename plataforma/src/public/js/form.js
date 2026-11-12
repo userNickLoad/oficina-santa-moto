@@ -15,17 +15,28 @@ const verifyEmail = (value) => {
 };
 const parseFormData = (formData) => {
     const result = {};
+    const setArrays = new Set();
     for (const [key, value] of formData.entries()) {
+        console.log(key, value);
         const match = key.match(/^([^\[]+)\[(\d+)\]\[([^\]]+)\]$/);
+        console.log(match);
         if (!match) {
             result[key] = value;
             continue;
         }
         const [, arrayName, index, property] = match;
-        result[arrayName] ??= [];
+        setArrays.add(arrayName);
+        if (result[arrayName] === undefined) {
+            console.log(result);
+            result[arrayName] ??= [];
+        }
         result[arrayName][Number(index)] ??= {};
         result[arrayName][Number(index)][property] = value;
     }
+    setArrays.forEach((arrayName) => {
+        result[arrayName] = result[arrayName].filter((l) => (l != null));
+    });
+    console.log(result);
     return result;
 };
 const setForm = (formId = null, verifyIssues = null) => {
@@ -45,6 +56,7 @@ const setForm = (formId = null, verifyIssues = null) => {
         form.querySelectorAll("input").forEach(input => {
             if (input.disabled || input.classList.contains("hidden"))
                 return;
+            console.log(input.name);
             const parent = input.closest('[data-parent="inputbox"]');
             if (!parent) {
                 throw new Error(`não foi possivel localizar o pai de ${input.id}`);
@@ -66,6 +78,7 @@ const setForm = (formId = null, verifyIssues = null) => {
                 issueVerifyier = verifyIssues[input.id.match(/\[([^\]]+)\]$/)?.[1] ?? input.id];
             const issue = (issueVerifyier) ? issueVerifyier(input.value) : verifyEmpty(input.value);
             if (issue) {
+                console.log(issue, input.name);
                 errorDisplay.textContent = issue;
                 input.classList.add("border-red-400");
                 input.classList.remove("border-gray-400");

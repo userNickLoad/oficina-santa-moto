@@ -260,9 +260,9 @@ model veiculo {
   id         Int       @id @default(autoincrement())
   ano        Int
   id_modelo  Int
-  id_cliente Int
+  id_cliente Int?
   servico    servico[]
-  cliente    cliente   @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  cliente    cliente?  @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction)
   modelo     modelo    @relation(fields: [id_modelo], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
