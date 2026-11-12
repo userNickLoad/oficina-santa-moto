@@ -19,6 +19,30 @@
 
     --color-text: #1e293b;
     --color-muted: #64748b;
+
+    --animate-confirm: confirm 5s ease-in-out forwards;
+
+    @keyframes confirm {
+        0% {
+            transform: translateX(calc(100% + 2vw));
+            opacity: 0;
+        }
+
+        10% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        85% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        100% {
+            transform: translateX(calc(100% + 2vw));
+            opacity: 0;
+        }
+    }
 }
 
 body {

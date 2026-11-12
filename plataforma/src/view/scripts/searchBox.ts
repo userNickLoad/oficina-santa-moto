@@ -9,7 +9,7 @@ const clone = (element: HTMLElement, iterator: number, value: string): HTMLEleme
 
 const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=>void) => {
     const input = root.querySelector<HTMLInputElement>('input[id^="search-input"]');
-    console.log(root)
+  
 
     if (!input)
         throw new Error("não foi possivel achar o input da caixa de pesquisa");
@@ -96,6 +96,9 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
 
         input.value = options[selectedIndex].textContent?.trim() ?? "";
 
+        if(onSearch)
+            onSearch(input.value)
+
         autocompleteBox.classList.add("h-0");
         autocompleteBox.classList.remove("h-auto");
 
@@ -150,6 +153,7 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
                 if (selectedIndex !== -1) {
                     event.preventDefault();
                     confirmSelection();
+
                 } else {
                     event.preventDefault();
                     executeSearch();
@@ -172,8 +176,6 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
     input.addEventListener("input", async () => {
         const value = input.value.trim().toLowerCase();
 
-        console.log(value)
-
         if (value === input.dataset.input)
             return;
 
@@ -187,7 +189,7 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
 
         try {
             const result = await fetch(`${action}${encodeURIComponent(value)}`);
-            console.log(result)
+            
             if (!result.ok && result.status !== 404) {
                 window.alert("Erro ao tentar pesquisar o input na searchbox");
                 return;
@@ -199,9 +201,6 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
             }
 
             const content: { nome: string }[] = await result.json();
-
-            if(onSearch)
-                onSearch(content)
 
             for (let i = 0; i < content.length; i++) {
                 const newElement = clone(defaultElement, i, content[i].nome);
@@ -220,6 +219,9 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
 
                 placement.appendChild(newElement);
             }
+
+            if(onSearch)
+                onSearch(content)
 
         } catch (error) {
             console.log(error);

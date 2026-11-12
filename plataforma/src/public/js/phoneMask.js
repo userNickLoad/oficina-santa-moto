@@ -24,7 +24,6 @@ const mask = (input) => {
     input.value = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 };
 phoneInputs.forEach(input => {
-    input.value = "11 9";
     mask(input);
     input.addEventListener("input", () => mask(input));
 });

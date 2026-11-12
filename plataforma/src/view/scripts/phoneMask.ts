@@ -35,8 +35,6 @@ const mask = (input: HTMLInputElement) => {
 }
 
 phoneInputs.forEach(input => {
-    input.value = "11 9"
-
     mask(input);
 
     input.addEventListener("input", () => mask(input));

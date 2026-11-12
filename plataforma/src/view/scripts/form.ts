@@ -73,7 +73,7 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
 
 
         form.querySelectorAll<HTMLInputElement>("input").forEach(input => {
-            if(input.disabled)
+            if(input.disabled || input.classList.contains("hidden"))
                 return;
 
             const parent = input.closest('[data-parent="inputbox"]');
@@ -122,10 +122,11 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
         
         const dados = parseFormData(formData);
 
-
         const contains_files = Array.from(form.querySelectorAll<HTMLInputElement>('input[type="file"]')).some((input => (input.files && input.files.length > 0)))
 
         try {
+
+
             const response = await fetch(form.action, {
                 method: form.method,
                 ...(
@@ -141,15 +142,38 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
                 )
 
             });
-
+            console.log("foi -1")
+            
             const resultado = await response.json();
+
+            console.log("foi")
 
             if (!response.ok) {
                 errorOutput.innerText = resultado.mensagem;
                 return;
             }
 
-            window.location = resultado.redirect;
+            console.log("foi 2")
+            
+            if(resultado.redirect){
+                window.location = resultado.redirect;
+            }
+
+            if (resultado.confirm) {
+                const confirm = document.querySelector<HTMLElement>("#confirm");
+                console.log(confirm)
+                if (!confirm)
+                    throw new Error("Não foi possível encontrar o #confirm");
+
+                confirm.innerText = resultado.confirm;
+
+                confirm.classList.remove("hidden");
+
+                confirm.classList.remove("animate-confirm");
+                void confirm.offsetWidth;
+                confirm.classList.add("animate-confirm");
+            }
+            
 
             // Aqui você pode tratar o sucesso do login.
 
