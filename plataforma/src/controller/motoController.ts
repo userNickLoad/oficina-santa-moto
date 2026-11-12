@@ -1,4 +1,3 @@
-
 import { Request, Response } from "express";
 import { MotoModel } from "../model/motoModel.js";
 
@@ -39,3 +38,46 @@ export const listarModelos = async (req: Request, res: Response) => {
         });
     }
 };
+
+
+export const cadastrarVeiculo = async (req: Request, res: Response) => {
+    try {
+        const marca = String(req.body.marca ?? "").trim();
+        const modelo = String(req.body.modelo ?? "").trim();
+        const ano = Number(req.body.ano);
+        const idCliente = Number(req.body.id_cliente);
+
+        if (
+            !marca ||
+            !modelo ||
+            marca.length > 100 ||
+            modelo.length > 20 ||
+            !Number.isInteger(ano) ||
+            ano < 1900 ||
+            ano > new Date().getFullYear() + 1 ||
+            !Number.isInteger(idCliente) ||
+            idCliente <= 0
+        ) {
+            return res.status(400).json({
+                mensagem: "Informe os dados válidos do veículo."
+            });
+        }
+
+        const veiculo = await motoModel.cadastrarVeiculoCompleto(
+            marca,
+            modelo,
+            ano,
+            idCliente
+        );
+
+        return res.status(201).json(veiculo);
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            mensagem: "Erro ao cadastrar veículo."
+        });
+    }
+};
+

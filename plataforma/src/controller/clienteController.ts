@@ -199,3 +199,32 @@ export const updateCliente = async (req: Request, res: Response) => {
         });
     }
 }
+export const cadastrarClienteServico = async (req: Request, res: Response) => {
+    try{
+        const nome = String(req.body.nome ?? "").trim();
+        const telefone = req.body.telefone ? "+55" + String(req.body.telefone).replace(/\D/g, "") : null;
+
+        if(!nome || nome.length > 100){
+            return res.status(400).json({
+                mensagem: "Informe um nome válido"
+            });
+        }
+
+        const cliente = await clienteModel.cadastrarCliente({
+            nome, telefone, email: null, veiculos: []
+        });
+
+        return res.status(201).json(cliente);
+    }catch(error){
+        if(error instanceof UniqueError){
+            return res.status(400).json({
+                mensagem: error.message
+            });
+        }
+
+        console.error(error);
+        return res.status(500).json({
+            mensagem: "Erro ao cadastrar cliente"
+        });
+    }
+};

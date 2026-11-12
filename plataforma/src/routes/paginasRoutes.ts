@@ -68,15 +68,17 @@ router.get("/servicos", authMiddleware, (req: Request, res: Response) => {
     res.render("./layouts/index", {
         title: "Serviços",
         content: "../pages/servicos",
-        voltar: true
+        voltar: true,
+        voltarPara: "/"
     });
-})
+});
 
 router.get("/registrar-servico", authMiddleware, (req: Request, res: Response) => {
     res.render("./layouts/index", {
         title: "Registrar Serviço",
         content: "../pages/registrar-servico",
-        voltar: true
+        voltar: true,
+        voltarPara: "/servicos"
     });
 });
 
@@ -84,7 +86,8 @@ router.get("/concluir-servico", authMiddleware, (req: Request, res: Response) =>
     res.render("./layouts/index", {
         title: "Concluir Serviço",
         content: "../pages/concluir-servico",
-        voltar: true
+        voltar: true,
+        voltarPara: "/servicos"
     });
 });
 

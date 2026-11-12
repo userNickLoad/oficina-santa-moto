@@ -13,7 +13,8 @@
         rows = "5",
         radios = [],
         max_number = "",
-        value = null
+        value = null,
+        step = "1"
     } = item;
     const id_applay = name.toLowerCase();
     const column_applay = (column)? "justify-center py-[1vh]": "flex-col";
@@ -153,7 +154,7 @@
                         </div>
 
                 </button>
-                <input id="search-input-<%= id %>" type="text" placeholder="<%= placeholder %>" maxlength="50" name="<%= name %>"
+                <input id="search-input-<%= id %>" type="text" placeholder="<%= placeholder %>" maxlength="<%= maxlength %>" name="<%= name %>"
                     class="border w-full  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
                     >
             </div>
@@ -193,12 +194,10 @@
                         data-mask="phone"
                         inputmode="numeric"
                     <% } %>
-                    <% if(type === "number") {%>
-                        max="<%= max_number %>"
-                    <% } %>
-                    <% if(value) {%>
-                        value="<%= value %>"
-                    <% } %>
+                <% if(type === "number") {%>
+                    max="<%= max_number %>"
+                    step="<%= step %>"
+                <% } %>
             >
 
         <% } %>

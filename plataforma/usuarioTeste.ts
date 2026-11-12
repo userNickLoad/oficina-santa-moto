@@ -1,4 +1,3 @@
-
 import { UsuarioModel } from "./src/model/usuarioModel.js";
 
 const usuarioModel = new UsuarioModel();
