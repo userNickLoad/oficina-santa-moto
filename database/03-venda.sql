@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS veiculo(
 	id SERIAL PRIMARY KEY,
 	ano INT NOT NULL,
 	id_modelo INTEGER NOT NULL REFERENCES modelo(id),
-	id_cliente INTEGER NOT NULL REFERENCES cliente(id)
+	id_cliente INTEGER REFERENCES cliente(id)
 );
 
 

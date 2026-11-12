@@ -12,7 +12,8 @@
         mask = null,
         rows = "5",
         radios = [],
-        max_number = ""
+        max_number = "",
+        value = null
     } = item;
     const id_applay = name.toLowerCase();
     const column_applay = (column)? "justify-center py-[1vh]": "flex-col";
@@ -35,6 +36,9 @@
             rows="<%= rows %>"
             maxlength="<%= maxlength %>"
             class="border resize-none h-32 p-3 border-gray-200  rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
+            <% if(value) {%>
+                value="<%value%>"
+            <% } %>
             ></textarea>
     <% } else if (type == "radio") { %>
 
@@ -133,6 +137,9 @@
                     name="<%= name %>Id"
                     type="text"
                     class="hidden"
+                        <% if(value) {%>
+                            value="<%= value %>"
+                        <% } %>
                     >
                 <button id="btn-search-<%= id %>" 
                     class="absolute h-[100%] aspect-square flex justify-center items-center cursor-pointer hidden">
@@ -186,9 +193,12 @@
                         data-mask="phone"
                         inputmode="numeric"
                     <% } %>
-                <% if(type === "number") {%>
-                    max="<%= max_number %>"
-                <% } %>
+                    <% if(type === "number") {%>
+                        max="<%= max_number %>"
+                    <% } %>
+                    <% if(value) {%>
+                        value="<%= value %>"
+                    <% } %>
             >
 
         <% } %>

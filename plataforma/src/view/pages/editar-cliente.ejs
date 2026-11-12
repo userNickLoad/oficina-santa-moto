@@ -1,0 +1,160 @@
+<%
+    const year = new Date().getFullYear(); 
+
+    const cliente = innerContent;
+    const {id, nome, telefone, email, veiculo} = cliente;
+    const vaiculos = JSON.stringify(veiculo);
+    console.log(cliente)
+%>
+
+<section class="flex flex-col w-full items-center">
+    <h1 class="my-[2vh] text-lg w-full">
+        Cadastrar cliente
+    </h1>
+
+    <%- include("../partials/cadastrar/form", {
+        form: {
+            id: "cliente",
+            name: "cliente",
+            action: `/api/cliente/editar/${id}`,
+            method: "post",
+            elements: [
+                {type: "input", input: {type: "number", size: "hidden", name: "userId", value: id}},
+                {type: "input", input: {size: "hidden", name: "descart", value: vaiculos}},
+                {type: "input", input: {name: "nome", type: "text", title: "Nome do cliente", maxlength: 50, placeholder: "ex: João da Silva, Guihlerme Guimarães", text_size: "text-md", size: "w-full", value: nome}},
+                {type: "input", input: {name: "email", title: "Email do cliente", maxlength: 50, placeholder: "ex: joao.silva@gmail.com", text_size: "text-md", size: "w-full", value: email}},
+                {type: "input", input: {name: "telefone", mask: "phone", title: "Telefone do cliente", maxlength: 50, placeholder: "ex: (11) 4002-8922", text_size: "text-md", size: "w-full", value: telefone}},
+                {
+                    type: "addble_container",     
+                    container: {
+                        id: "veiculos",
+                        title: "Veiculos",
+                        flex: "flex flex-col",
+                        mask: "./addbleMaskInputVeiculo",
+                        elements: [
+                            {type: "input", input: {size: "hidden", id: "veiculoId", name: "veiculoId", id: "veiculoId"}},
+                            {type: "input", input: {type: "number", title: "Ano de fabricação (obrigatório)", name: "ano", max_number: year}},
+                            {type: "input", input: {type: "search", name: "modelo", id: "modelo", title: "Nome do modelo do veiculo (obrigatório)", placeholder: "Ex: CB 300F Twister, Sahara 300"}},
+                            {type: "input", input: {type: "search", name: "marca", id: "marca", title: "Nome da marca do veiculo (obrigatório)", placeholder: "Ex: Honda, BMW, Yamaha, "}}
+                        ]
+                    }
+                }          
+            ],
+            buttons: [
+                {
+                    type: "submit",
+                    id: "submit",
+                    name: "submit",
+                    content: "Cadastrar cliente",
+                    submit: true,
+                    svg: { path: "save-icon"}
+                }
+            ]
+        }
+    }) %>
+
+</section>
+
+<script src="/js/phoneMask.js"></script>
+<script type="module">
+    import { setAddble } from "/js/addble.js";
+    import { setSearchBox } from "/js/searchBox.js"
+    import { setForm, verifyEmpty, verifyEmail, verifyTelefone } from "/js/form.js"
+
+    setForm(null, {
+        "telefone": (value)=>{
+            if(verifyEmpty(value))
+                return null;
+
+            return verifyTelefone(value);
+        },
+        "email": (value)=>{
+            if(verifyEmpty(value))
+                return null;     
+        },
+        "veiculoId": (value)=>{return null}
+    })
+
+    let it = 0;
+
+    const addble = document.querySelector("#addble-container-veiculos")
+
+    if(addble === undefined)
+        throw new Error("Nao foi possivel locailizar o addble container");
+
+    const { addELement } = setAddble(addble, "veiculo", it, (clone)=>{
+
+        //LOCALIZANDO OS ELEMENTOS 
+        const modelo = clone.querySelector("#search-modelo")
+
+        if(!modelo)
+            throw new Error("Não foi possivel achar moledo do clone");
+
+        const modeloHidden = modelo.querySelector('input[id^="search-hidden-"]');
+
+        if(!modeloHidden)
+            throw new Error("Não foi possivel achar o hidden de " + modelo.id);
+        
+        const marca = clone.querySelector("#search-marca");
+
+        if(!marca)
+            throw new Error("Não foi possivel achar marca do clone");
+
+        const marcaHidden = marca.querySelector('input[id^="search-hidden-"]');
+
+        if(!marcaHidden)
+            throw new Error("Não foi possivel achar o hidden de " + marca.id);
+
+        const marcaInput = marca.querySelector('input[id^="search-input-"]');
+
+        if(!marcaInput)
+            throw new Error("Não foi possivel achar o search input de " + marca.id);
+        
+        //COLOCANDO OS SET SEARCHBOX NELES, PARA SE TRANSFORMAREM EM SEARCH BOX
+        setSearchBox(modelo, "/api/moto/modelo?nome=", (value) => {
+            console.log(value)
+
+            // COMPORTAMENTO DE AUTO COMPLETE DE MODELO E MARCA
+            if(value.length != 1)
+                return;
+            
+            modeloHidden.value = value[0].id;
+
+            const marcaObj = value[0].marca;
+                
+            marcaHidden.value = marcaObj.id;
+            marcaInput.value = marcaObj.nome;
+
+        })
+
+        setSearchBox(marca, "/api/marca?nome=", (value) => {
+
+            if(value.length != 1)
+                return;
+
+            marcaHidden.value = value.id
+        })
+    })
+
+    const descart = document.querySelector('input[name="descart"]')
+
+    if(!descart)
+        throw new Error("informações de veiculos n encontradas");
+    
+    const veiculos = (descart.value != "")? 
+        JSON.parse(descart.value).map(v => {
+            console.log(v)
+            const {ano, id, modelo} = v;
+
+            return {"ano": ano, "veiculoId": id, "search-input-modelo": modelo.nome, "search-input-marca": modelo.marca.nome}
+        })
+        : [];
+
+    veiculos.forEach(veiculo => {
+        console.log(veiculo)
+        addELement(veiculo)
+    })
+
+    
+
+</script>

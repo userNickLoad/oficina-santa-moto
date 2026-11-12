@@ -1,0 +1,47 @@
+<%
+    const {
+        id,
+        nome,
+        telefone = null,
+        email = null,
+        veiculo = []
+    } = element;
+    console.log(veiculo)
+%>
+
+<div
+    id="cliente-<%= id %>"
+    class="bg-gray-200 w-[90%] h-[15vh] rounded-2xl p-[1vh] flex text-sm"
+    >
+    <div
+        class="flex-1"
+        >
+        <img src="/assets/cliente.png" alt="" class="w-full h-auto lg:w-auto lg:h-[50%] aspect-square">
+    </div>
+    <div
+        class="flex-8 flex flex-col justify-between pl-[2vw]"
+        >
+        
+        <div
+            class="w-full flex flex-col"
+            >
+            <p><%= nome %></p>
+            <% if(telefone) {%>
+                <p><%= `(${telefone.slice(3, 5)}) ${telefone.slice(5, 10)}-${telefone.slice(10, 14)}` %></p>
+            <% } %>
+            <% if(email) {%>
+                <p><%= email %></p>
+            <% } %>
+        </div>
+
+        <div
+            class="w-full flex justify-between"
+            >
+            <%- include('./button', { button: {type: "squary", id: `ver-detahles-cliente-${id}`, content: "Ver detalhes", onClick: `seeMore(${id})`, text_size: "text-xs", size: "w-[15vh]"} }) %>
+        
+            <%- include('./button', { button: {type: "squary", id: `ver-editar-cliente-${id}`, content: "Editar", onClick: `edit(${id})`, text_size: "text-xs", size: "w-[15vh]", href: `/clientes/editar/${id}`} }) %>
+
+        </div>
+
+    </div>
+</div>

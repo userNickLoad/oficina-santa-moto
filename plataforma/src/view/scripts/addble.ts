@@ -1,6 +1,8 @@
+type prop = {
+    addELement: (values: Record<string, any>)=>void
+}
 
-
-const setAddble = (element: HTMLElement, name: string, iterator: number, cloneExpecific: ((clone: HTMLElement) => void) | null = null) => {
+const setAddble = function (element: HTMLElement, name: string, iterator: number, cloneExpecific: ((clone: HTMLElement) => void) | null = null): prop  {
     const btn_add = element.querySelector('button[id^="add-new-"]');
 
     if(!btn_add)
@@ -24,8 +26,6 @@ const setAddble = (element: HTMLElement, name: string, iterator: number, cloneEx
     const buildClone = (): HTMLElement => {
         const clone = addble.cloneNode(true) as HTMLElement;
 
-        //clone.id += `-${iterator}`
-
         clone.classList.remove("hidden");
         clone.classList.add("flex");
 
@@ -41,7 +41,6 @@ const setAddble = (element: HTMLElement, name: string, iterator: number, cloneEx
 
         clone.querySelectorAll("input").forEach(input => {
             input.disabled = false;
-            //input.id = `${name}[${iterator}][${input.id}]`;
             input.name = `${name}[${iterator}][${input.name}]`;
 
             const parent = input.closest('[data-parent="inputbox"]')
@@ -52,7 +51,7 @@ const setAddble = (element: HTMLElement, name: string, iterator: number, cloneEx
             const output = parent.querySelector('[id^="output"]');
 
             if(!output)
-                throw new Error("não foi possivel localizar o output error de " + + input.id)
+                throw new Error("não foi possivel localizar o output error de " + input.id)
         });
 
         if(cloneExpecific)
@@ -65,7 +64,20 @@ const setAddble = (element: HTMLElement, name: string, iterator: number, cloneEx
     btn_add.addEventListener("click", ()=>{
         const clone = buildClone();
         place.appendChild(clone);
+        iterator++;
+
     })
+
+    const addELement = (values: Record<string, any>): void => {
+        const clone = buildClone();
+        place.appendChild(clone);
+        iterator++
+        clone.querySelectorAll("input").forEach(input => {
+            input.value = values[input.id] ?? "";
+        })
+    }
+
+    return {addELement}
 
 }
 

@@ -108,6 +108,36 @@ router.get("/clientes/cadastrar", authMiddleware, (req: Request, res: Response) 
         content: "../pages/cadastrar-cliente",
         voltar: true
     });
+}) 
+
+router.get("/clientes/editar/:id", authMiddleware, async(req: Request, res: Response) => {
+    try{
+        const id = Number(req.params.id ?? "")
+
+        if(id < 1)
+            throw new Error("O id n pode ser menor que 1");
+
+        const cliente = await clienteModel.getClienteById(id);
+
+        if(!cliente)
+            return res.render("./layouts/index", {
+                title: "Cliente",
+                content: "../pages/error",
+                innerContent: "404 cliente não encontrado",
+                voltar: true
+            });
+
+        return res.render("./layouts/index", {
+            title: "Cliente",
+            content: "../pages/editar-cliente",
+            innerContent: cliente,
+            voltar: true
+        });
+    }catch(error){
+        console.log(error)
+        res.status(500).json({mensagem: "Erro de servidor."})
+    }
+
     
 }) 
 

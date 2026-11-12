@@ -1,0 +1,8 @@
+<%
+    const contentData = typeof innerContent !== "undefined"
+        ? innerContent
+        : {};
+%>
+<section class="w-full h-[80vh] flex justify-center items-center">
+    <h1 class="text-5xl"><%= contentData %></h1>
+</section>
