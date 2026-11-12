@@ -4,8 +4,6 @@ import type { servico } from "../../generated/prisma/client.js";
 export type Servico = servico;
 
 export class ServicoModel {
-
-    
     async getServicosEmAndamento() {
         return await db.servico.findMany({
             where: {
@@ -28,8 +26,25 @@ export class ServicoModel {
             }
         });
     }
-
-
+    async getTodosServicos(){
+        return await db.servico.findMany({
+            include: {
+                cliente: true,
+                veiculo: {
+                    include: {
+                        modelo: {
+                            include: {
+                                marca: true
+                            }
+                        }
+                    }
+                }
+            },
+            orderBy: {
+                id: "desc"
+            }
+        });
+    }
     async concluirServico(id: number): Promise<Servico | null> {
         const resultado = await db.servico.updateMany({
             where: {
@@ -51,7 +66,53 @@ export class ServicoModel {
             }
         });
     }
+    async cancelarServico(id: number): Promise<Servico | null> {
+        return await db.$transaction(async (txt) => {
 
+            const resultado = await txt.servico.updateMany({
+                where: {
+                    id: id,
+                    status: "EM_ANDAMENTO"
+                },
+                data: {
+                    status: "CANCELADO"
+                }
+            });
+
+            if (resultado.count === 0) {
+                return null;
+            }
+
+            const servico = await txt.servico.findUniqueOrThrow({
+                where: {
+                    id: id
+                }
+            });
+
+            if (servico.id_venda !== null) {
+                const produtos = await txt.venda_produto.findMany({
+                    where: {
+                        id_venda: servico.id_venda
+                    }
+                });
+
+                for (const item of produtos) {
+                    await txt.produto.update({
+                        where: {
+                            id: item.id_produto
+                        },
+                        data: {
+                            qtd_disponivel: {
+                                increment: item.quantidade
+                            }
+                        }
+                    });
+                }
+            }
+
+            return servico;
+        });
+    }
     async registrarServico(dados: {
         descricao: string;
         preco: string;
@@ -109,9 +170,7 @@ export class ServicoModel {
 
                 totalProdutos += Number(item.preco) * item.quantidade;
             }
-
             const valorTotal = Number(dados.preco) + totalProdutos;
-
             const venda = await txt.venda.create({
                 data: {
                     data: new Date(),
@@ -120,14 +179,12 @@ export class ServicoModel {
                     id_cliente: dados.id_cliente
                 }
             });
-
             for(const item of dados.produtos){
                 const produto = await txt.produto.findUniqueOrThrow({
                     where: {
                         id: item.id_produto
                     }
                 });
-
                 await txt.venda_produto.create({
                     data: {
                         id_venda: venda.id,
@@ -138,7 +195,6 @@ export class ServicoModel {
                     }
                 });
             }
-
             const servico = await txt.servico.create({
                 data: {
                     descricao: dados.descricao,

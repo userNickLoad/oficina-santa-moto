@@ -18,6 +18,18 @@ export const getServicosEmAndamento = async (req: Request, res: Response) => {
     }
 };
 
+export const getTodosServicos = async (req: Request, res: Response) => {
+    try{
+        const servicos = await servicoModel.getTodosServicos();
+        return res.status(200).json(servicos);
+    }catch(e){
+        console.log(e);
+        return res.status(500).json({
+            mensagem: "Erro ao buscar todas as ordens de serviço"
+        });
+    }
+};
+
 export const concluirServico = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -50,7 +62,36 @@ export const concluirServico = async (req: Request, res: Response) => {
     }
 };
 
+export const cancelarServico = async (req: Request, res: Response) => {
+    try{
+        const id = Number(req.params.id);
 
+        if(!Number.isInteger(id) || id <= 0){
+            return res.status(400).json({
+                mensagem: "ID do serviço inválido"
+            });
+        }
+
+        const servico = await servicoModel.cancelarServico(id);
+
+        if(servico === null){
+            return res.status(404).json({
+                mensagem: "Serviço não encontrado ou não está em andamento"
+            });
+        }
+
+        return res.status(200).json({
+            mensagem: "Serviço cancelado com sucesso",
+            servico: servico
+        })
+    }catch (e){
+        console.log(e);
+
+        return res.status(500).json({
+            mensagem: "Erro ao cancelar serviço"
+        });
+    }
+};
 
 export const registrarServico = async (req: Request, res: Response) => {
     try {
