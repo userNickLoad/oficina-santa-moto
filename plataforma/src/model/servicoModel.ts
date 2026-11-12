@@ -56,8 +56,7 @@ export class ServicoModel {
         descricao: string;
         preco: string;
         id_cliente: number;
-        id_modelo: number;
-        ano: number;
+        id_veiculo: number;
         id_usuario: number;
         produtos: {
             id_produto: number;
@@ -66,13 +65,16 @@ export class ServicoModel {
         }[];
     }): Promise<Servico> {
         return await db.$transaction(async (txt) => {
-            const veiculo = await txt.veiculo.create({
-                data: {
-                    ano: dados.ano,
-                    id_modelo: dados.id_modelo,
+            const veiculo = await txt.veiculo.findFirst({
+                where: {
+                    id: dados.id_veiculo,
                     id_cliente: dados.id_cliente
                 }
             });
+
+            if (!veiculo) {
+                throw new Error("Veículo não encontrado para o cliente informado");
+            }
 
             let totalProdutos = 0;
 

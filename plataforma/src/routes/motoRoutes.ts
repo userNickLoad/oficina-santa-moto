@@ -1,6 +1,6 @@
 
 import { Router } from "express";
-import { listarMarcas, listarModelos } from "../controller/motoController.js";
+import { listarMarcas, listarModelos, cadastrarVeiculo } from "../controller/motoController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { ModeloController } from "../controller/modeloController.js";
 
@@ -13,5 +13,7 @@ router.get("/marcas", authMiddleware, listarMarcas);
 router.get("/modelos", authMiddleware, listarModelos);
 
 router.get("/modelo", authMiddleware, modeloController.getModeloByNome);
+
+router.post("/veiculo/cadastrar", authMiddleware, cadastrarVeiculo);
 
 export default router;

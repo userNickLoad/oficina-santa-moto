@@ -12,7 +12,8 @@
         mask = null,
         rows = "5",
         radios = [],
-        max_number = ""
+        max_number = "",
+        step = "1"
     } = item;
     const id_applay = name.toLowerCase();
     const column_applay = (column)? "justify-center py-[1vh]": "flex-col";
@@ -188,6 +189,7 @@
                     <% } %>
                 <% if(type === "number") {%>
                     max="<%= max_number %>"
+                    step="<%= step %>"
                 <% } %>
             >
 

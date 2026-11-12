@@ -46,7 +46,7 @@
                         gap: "gap-3",
                         elements: [
                             { type: "input", input: { id: "descricao", name: "descricao", title: "Descrição do serviço", type: "text", placeholder: "Descreva o serviço realizado" } },
-                            { type: "input", input: { id: "preco", name: "preco", title: "Preço da mão de obra", type: "number", placeholder: "Ex: 120.00" } },
+                            { type: "input", input: { id: "preco", name: "preco", title: "Preço da mão de obra", type: "number", step: "0.01", placeholder: "Ex: 120.00" }},
                             { type: "input", input: { id: "data_entrada", name: "data_entrada", title: "Data de entrada", type: "date" } }
                         ]
                     }
@@ -71,6 +71,18 @@
             ]
         }
     }) %>
+    <div class="w-full max-w-[500px] mt-3">
+        <button type="button" id="novo-cliente" 
+            class="text-sm font-medium cursor-pointer px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors">
+            + Novo cliente
+        </button>
+    </div>
+    <div class="w-full max-w-[500px] mt-3">
+        <button type="button" id="novo-veiculo" class="text-sm font-medium 
+            cursor-pointer px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors">
+            + Adicionar veículo
+        </button>
+    </div>
 </section>
 
 <div id="bloco-produtos" class="w-full max-w-[500px] mx-auto px-3 mb-4">
@@ -84,51 +96,182 @@
     </div>
 </div>
 
+
 <style>
-    #form-registrar-servico { width: 100%; max-width: 500px; gap: 12px; }
+
+    #form-registrar-servico {
+        width: 100%;
+        max-width: 500px;
+        gap: 12px;
+    }
+
     #form-registrar-servico > p:not(#error) {
-        width: 100%; text-align: left; font-size: 17px; font-weight: 600;
-        margin: 20px 0 4px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb;
+        width: 100%;
+        text-align: left;
+        font-size: 17px;
+        font-weight: 600;
+        margin: 20px 0 4px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e5e7eb;
     }
+
     #form-registrar-servico [id^="container-"] {
-        display: flex; flex-direction: column; align-items: stretch;
-        justify-content: flex-start; width: 100%; gap: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 12px;
     }
+
     #form-registrar-servico [id^="container-"] > * {
-        width: 100% !important; max-width: 100% !important; min-width: 0;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0;
         box-sizing: border-box;
     }
+
     #form-registrar-servico [id^="container-"] input:not([type="hidden"]) {
-        display: block; width: 100% !important; max-width: 100% !important;
-        min-width: 0; box-sizing: border-box;
+        display: block;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0;
+        box-sizing: border-box;
     }
-    #form-registrar-servico [id^="container-"] [data-pai="searchBar"] {
-        width: 100% !important; max-width: 100% !important;
+
+    #form-registrar-servico [data-pai="searchBar"] {
+        width: 100% !important;
+        max-width: 100% !important;
     }
-    #form-registrar-servico [id^="container-"] [data-pai="searchBar"] > div:first-child {
+
+    #form-registrar-servico [data-pai="searchBar"] > div:first-child {
         width: 100%;
     }
-    #form-registrar-servico #bloco-produtos { width: 100%; max-width: 100%; padding: 0; margin: 4px 0 12px; }
-    #form-registrar-servico #registrar {
-        width: auto; min-width: 170px; height: 46px;
-        padding: 9px 24px; font-size: 16px; font-weight: 500; border-radius: 16px;
-    }
-    .sugestoes-registro {
-        position: relative; z-index: 30; width: 100%; max-height: 190px;
-        overflow-y: auto; background: white; border: 1px solid #e5e7eb;
-        border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.08);
-    }
-    .sugestoes-registro[hidden] { display: none; }
-    .sugestoes-registro button {
-        display: block; width: 100%; text-align: left; padding: 10px 12px;
-        cursor: pointer; background: white;
-    }
-    .sugestoes-registro button:hover { background: #f3f4f6; }
 
-    #search-hidden-marca, #search-hidden-modelo, #search-hidden-produto_estoque{
+    .sugestoes-registro {
+        position: relative;
+        z-index: 30;
+        width: 100%;
+        max-height: 190px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .sugestoes-registro[hidden] {
+        display: none;
+    }
+
+    .sugestoes-registro button {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 10px 12px;
+        cursor: pointer;
+        background: white;
+    }
+
+    .sugestoes-registro button:hover {
+        background: #f3f4f6;
+    }
+
+    #search-hidden-marca,
+    #search-hidden-modelo,
+    #search-hidden-produto_estoque {
         display: none !important;
     }
+
+    #form-registrar-servico #container-dados-moto {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        align-items: start;
+    }
+
+    #form-registrar-servico #container-dados-moto > :last-child {
+        grid-column: 1 / -1;
+    }
+
+    #form-registrar-servico #container-produtos-utilizados {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        align-items: start;
+    }
+
+    #form-registrar-servico #container-produtos-utilizados > :first-child {
+        grid-column: 1 / -1;
+    }
+
+    #form-registrar-servico #bloco-produtos {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin: 4px 0 12px;
+    }
+
+    #form-registrar-servico #adicionar-produto {
+        display: block;
+        width: fit-content;
+        margin-left: auto;
+    }
+
+    #form-registrar-servico #novo-cliente {
+        width: auto !important;
+        max-width: max-content !important;
+        min-width: 0;
+        align-self: flex-end;
+        padding: 8px 40px;
+        margin: 6px 0 0 auto;
+        font-size: 13px;
+        font-weight: 500;
+        border-radius: 12px;
+    }
+
+    #form-registrar-servico #registrar {
+        width: auto;
+        min-width: 170px;
+        height: 46px;
+        padding: 9px 24px;
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: 16px;
+    }
+
+    @media (max-width: 480px) {
+        #form-registrar-servico #container-dados-moto,
+        #form-registrar-servico #container-produtos-utilizados {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    #form-registrar-servico #novo-veiculo {
+        width: auto !important;
+        max-width: max-content !important;
+        min-width: 0;
+        grid-column: 1 / -1;
+        justify-self: end;
+        align-self: end;
+        padding: 8px 40px;
+        margin: 6px 0 0 auto;
+        font-size: 13px;
+        font-weight: 500;
+        border-radius: 12px;
+    }
+
 </style>
+
+
+<div id="toast-sucesso" class="fixed top-6 right-6 z-50 hidden items-center gap-3 rounded-xl px-5 py-4 shadow-lg" 
+    style="background-color: #4ADE80;" role="status">
+    <span class="text-xl" style="color: #14532D;">✓</span>
+
+    <div style="color: #14532D;">
+        <p class="font-semibold">Serviço registrado!</p>
+        <p class="text-sm">Registro realizado com sucesso.</p>
+    </div>
+</div>
 
 <script>
     const formularioServico = document.getElementById("form-registrar-servico");
@@ -143,8 +286,22 @@
     const mensagemErro = document.getElementById("error");
     const campoNomeCliente = document.getElementById("nome_cliente");
     const campoTelefone = document.getElementById("telefone");
+    const botaoNovoCliente = document.getElementById("novo-cliente");
+
+    if(campoTelefone && botaoNovoCliente){
+        const secaoCliente = campoTelefone.closest('[id^="container-"]');
+
+        if(secaoCliente){
+            secaoCliente.appendChild(botaoNovoCliente);
+        }
+    }
     const campoMarcaMoto = document.getElementById("search-input-marca");
     const campoModeloMoto = document.getElementById("search-input-modelo");
+    const botaoNovoVeiculo = document.getElementById("novo-veiculo");
+    const secaoVeiculo = campoModeloMoto.closest('[id^="container-"]');
+    if(secaoVeiculo && botaoNovoVeiculo){
+        secaoVeiculo.appendChild(botaoNovoVeiculo);
+    }
     const campoProdutoEstoque = document.getElementById("search-input-produto_estoque");
     const campoPrecoProduto = document.getElementById("preco_produto");
     const marcaHidden = document.getElementById("search-hidden-marca");
@@ -152,8 +309,113 @@
     const produtoHidden = document.getElementById("search-hidden-produto_estoque");
 
     let clienteSelecionado = null;
+    document.getElementById("novo-cliente").addEventListener("click", async () => {
+        const nome = campoNomeCliente.value.trim();
+        const telefone = campoTelefone.value.replace(/\D/g, "");
+
+        if (!nome) {
+            mensagemErro.textContent = "Informe o nome do cliente";
+            campoNomeCliente.focus();
+            return;
+        }
+
+        try {
+            const resposta = await fetch("/api/cliente/cadastrar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ nome, telefone })
+            });
+
+            const cliente = await resposta.json();
+
+            if (!resposta.ok) {
+                mensagemErro.textContent =
+                    cliente.mensagem || "Erro ao cadastrar cliente";
+                return;
+            }
+
+            clienteSelecionado = cliente.id;
+            campoNomeCliente.value = cliente.nome;
+            campoTelefone.value = formatarTelefone(cliente.telefone || "");
+
+            sugestoesClientes.hidden = true;
+            mensagemErro.textContent = "";
+
+            botaoNovoCliente.textContent = "✓ Cliente adicionado";
+
+        } catch (erro) {
+            console.error(erro);
+            mensagemErro.textContent = "Erro ao cadastrar cliente";
+        }
+    });
+
     let idMarcaSelecionada = null;
     let idModeloSelecionado = null;
+    
+    botaoNovoVeiculo.addEventListener("click", async () => {
+        const marca = campoMarcaMoto.value.trim();
+        const modelo = campoModeloMoto.value.trim();
+        const ano = Number(document.getElementById("ano_moto").value);
+
+        if (!clienteSelecionado) {
+            mensagemErro.textContent = "Selecione ou cadastre um cliente primeiro.";
+            return;
+        }
+
+        if (
+            !marca ||
+            !modelo ||
+            marca.length > 100 ||
+            modelo.length > 20 ||
+            !Number.isInteger(ano) ||
+            ano < 1900 ||
+            ano > new Date().getFullYear() + 1
+        ) {
+            mensagemErro.textContent = "Informe marca, modelo e ano válidos.";
+            return;
+        }
+
+        botaoNovoVeiculo.disabled = true;
+
+        try {
+            const resposta = await fetch("/api/moto/veiculo/cadastrar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    marca,
+                    modelo,
+                    ano,
+                    id_cliente: clienteSelecionado
+                })
+            });
+
+            const veiculo = await resposta.json();
+
+            if (!resposta.ok) {
+                mensagemErro.textContent =
+                    veiculo.mensagem || "Erro ao cadastrar veículo.";
+                return;
+            }
+
+            veiculoSelecionado = veiculo.id;
+            mensagemErro.textContent = "";
+            sugestoesMarca.hidden = true;
+            sugestoesModelos.hidden = true;
+            botaoNovoVeiculo.textContent = "✓ Veículo adicionado";
+
+        } catch (erro) {
+            console.error(erro);
+            mensagemErro.textContent = "Erro ao conectar com o servidor.";
+        } finally {
+            botaoNovoVeiculo.disabled = false;
+        }
+    });
+
+
     let produtoSelecionado = null;
     const produtosAdicionados = [];
 
@@ -208,6 +470,8 @@
             }, "Cliente não encontrado. Necessário cadastrá-lo.");
         } catch (erro) { console.error(erro); }
     });
+
+    
 
     let marcasDisponiveis = [];
     async function carregarMarcas() {
@@ -367,8 +631,8 @@
             mensagemErro.textContent = "Selecione um cliente já cadastrado";
             return;
         }
-        if (!idModeloSelecionado) {
-            mensagemErro.textContent = "Selecione um modelo de moto na lista";
+        if (!veiculoSelecionado) {
+            mensagemErro.textContent = "Adicione o veículo antes de registrar o serviço.";
             return;
         }
 
@@ -376,10 +640,10 @@
             descricao: document.getElementById("descricao").value.trim(),
             preco: document.getElementById("preco").value,
             id_cliente: clienteSelecionado,
-            id_modelo: idModeloSelecionado,
-            ano: Number(document.getElementById("ano_moto").value),
+            id_veiculo: veiculoSelecionado,
             produtos: produtosAdicionados
         };
+        
         try {
             const resposta = await fetch("/api/servico", {
                 method: "POST",
@@ -391,8 +655,12 @@
                 mensagemErro.textContent = resultado.mensagem || "Erro ao registrar serviço";
                 return;
             }
-            alert("Serviço registrado com sucesso!");
-            window.location.href = "/servicos";
+            const toast = document.getElementById("toast-sucesso");
+            toast.classList.remove("hidden");
+            toast.classList.add("flex");
+            setTimeout(() => {
+                window.location.href = "/servicos";
+            },5000);
         } catch (erro) {
             console.error(erro);
             mensagemErro.textContent = "Erro ao conectar com o servidor";

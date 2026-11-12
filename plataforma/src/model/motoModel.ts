@@ -38,4 +38,52 @@ export class MotoModel {
             }
         });
     }
+
+    async cadastrarVeiculoCompleto(marcaNome: string, modeloNome: string,ano: number, idCliente: number) {
+        return await db.$transaction(async (tx) => {
+            let marca = await tx.marca.findFirst({
+                where: {
+                    nome: {
+                        equals: marcaNome,
+                        mode: "insensitive"
+                    }
+                }
+            });
+
+            if (!marca) {
+                marca = await tx.marca.create({
+                    data: {
+                        nome: marcaNome
+                    }
+                });
+            }
+
+            let modelo = await tx.modelo.findFirst({
+                where: {
+                    nome: {
+                        equals: modeloNome,
+                        mode: "insensitive"
+                    },
+                    id_marca: marca.id
+                }
+            });
+
+            if (!modelo) {
+                modelo = await tx.modelo.create({
+                    data: {
+                        nome: modeloNome,
+                        id_marca: marca.id
+                    }
+                });
+            }
+
+            return await tx.veiculo.create({
+                data: {
+                    ano,
+                    id_modelo: modelo.id,
+                    id_cliente: idCliente
+                }
+            });
+        });
+    }
 }
