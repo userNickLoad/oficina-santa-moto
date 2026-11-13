@@ -6,7 +6,6 @@
         email = null,
         veiculo = []
     } = element;
-    console.log(veiculo)
 %>
 
 <div
@@ -35,11 +34,9 @@
         </div>
 
         <div
-            class="w-full flex justify-between"
-            >
-            <%- include('./button', { button: {type: "squary", id: `ver-detahles-cliente-${id}`, content: "Ver detalhes", onClick: `seeMore(${id})`, text_size: "text-xs", size: "w-[15vh]"} }) %>
-        
-            <%- include('./button', { button: {type: "squary", id: `ver-editar-cliente-${id}`, content: "Editar", onClick: `edit(${id})`, text_size: "text-xs", size: "w-[15vh]", href: `/clientes/editar/${id}`} }) %>
+            class="w-full flex justify-end"
+            >        
+            <%- include('./button', { button: {type: "squary", id: `ver-editar-cliente-${id}`, content: "Editar e ver mais", onClick: `edit(${id})`, text_size: "text-xs", size: "max-w", href: `/clientes/editar/${id}`} }) %>
 
         </div>
 

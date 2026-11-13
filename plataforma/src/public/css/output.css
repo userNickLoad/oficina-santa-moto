@@ -22,7 +22,6 @@
     --color-green-200: oklch(92.5% 0.084 155.995);
     --color-green-400: oklch(79.2% 0.209 151.711);
     --color-green-500: oklch(72.3% 0.219 149.579);
-    --color-green-600: oklch(62.7% 0.194 149.214);
     --color-green-800: oklch(44.8% 0.119 151.328);
     --color-blue-400: oklch(70.7% 0.165 254.624);
     --color-gray-50: oklch(98.5% 0.002 247.839);
@@ -232,9 +231,6 @@
   .relative {
     position: relative;
   }
-  .inset-0 {
-    inset: 0px;
-  }
   .top-2 {
     top: calc(var(--spacing) * 2);
   }
@@ -298,9 +294,6 @@
       max-width: 96rem;
     }
   }
-  .mx-4 {
-    margin-inline: calc(var(--spacing) * 4);
-  }
   .mx-auto {
     margin-inline: auto;
   }
@@ -348,9 +341,6 @@
   }
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
-  }
-  .mb-3 {
-    margin-bottom: calc(var(--spacing) * 3);
   }
   .mb-4 {
     margin-bottom: calc(var(--spacing) * 4);
@@ -427,9 +417,6 @@
   .h-\[15vh\] {
     height: 15vh;
   }
-  .h-\[32px\] {
-    height: 32px;
-  }
   .h-\[36px\] {
     height: 36px;
   }
@@ -496,9 +483,6 @@
   .w-\[5vh\] {
     width: 5vh;
   }
-  .w-\[15vh\] {
-    width: 15vh;
-  }
   .w-\[40\%\] {
     width: 40%;
   }
@@ -540,9 +524,6 @@
   }
   .max-w-\[80vw\] {
     max-width: 80vw;
-  }
-  .max-w-\[400px\] {
-    max-width: 400px;
   }
   .max-w-\[500px\] {
     max-width: 500px;
@@ -589,6 +570,9 @@
   .flex-col {
     flex-direction: column;
   }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
   .items-center {
     align-items: center;
   }
@@ -612,9 +596,6 @@
   }
   .gap-4 {
     gap: calc(var(--spacing) * 4);
-  }
-  .gap-8 {
-    gap: calc(var(--spacing) * 8);
   }
   .gap-\[\.5vh\] {
     gap: .5vh;
@@ -726,12 +707,6 @@
   .bg-\[\#EEEEEE\] {
     background-color: #EEEEEE;
   }
-  .bg-black\/40 {
-    background-color: color-mix(in srgb, #000 40%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-black) 40%, transparent);
-    }
-  }
   .bg-gray-50 {
     background-color: var(--color-gray-50);
   }
@@ -800,9 +775,6 @@
   }
   .p-5 {
     padding: calc(var(--spacing) * 5);
-  }
-  .p-8 {
-    padding: calc(var(--spacing) * 8);
   }
   .p-\[1vh\] {
     padding: 1vh;
@@ -967,9 +939,6 @@
   }
   .text-gray-700 {
     color: var(--color-gray-700);
-  }
-  .text-green-600 {
-    color: var(--color-green-600);
   }
   .text-green-800 {
     color: var(--color-green-800);

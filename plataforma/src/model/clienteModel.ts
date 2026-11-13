@@ -193,7 +193,7 @@ export class ClienteModel {
                         veiculosDissosiete.push(v.id)
                         return;
                     }
-                })
+                });
 
                 const updateVeiculos = []
                 if(veiculosDelete.length > 0){
