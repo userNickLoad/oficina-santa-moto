@@ -1,4 +1,4 @@
-const setHiddenContainer = (containerId, opened_message = null, openFunc = null) => {
+const setHiddenContainer = (containerId, opened_message = null, func = null) => {
     const container_root = (containerId instanceof HTMLElement) ? containerId : document.querySelector(`#${containerId}`);
     if (!container_root)
         throw new Error(`não foi possivel localizar ${containerId}`);
@@ -9,6 +9,29 @@ const setHiddenContainer = (containerId, opened_message = null, openFunc = null)
     hidden.querySelectorAll("input").forEach(input => {
         input.disabled = true;
     });
+    const toggle = () => {
+        if (container_root.dataset.open === "true") {
+            hidden.style.height = `${hidden.scrollHeight}px`;
+            requestAnimationFrame(() => {
+                hidden.style.height = "0px";
+            });
+            hidden.querySelectorAll("input").forEach(input => {
+                input.disabled = true;
+            });
+            container_root.dataset.open = "false";
+            if (func)
+                func(false);
+        }
+        else {
+            hidden.style.height = `${hidden.scrollHeight}px`;
+            hidden.querySelectorAll("input").forEach(input => {
+                input.disabled = false;
+            });
+            container_root.dataset.open = "true";
+            if (func)
+                func(true);
+        }
+    };
     if (btn_activation) {
         const btnMessage = (btn_activation.querySelector("p")) ? btn_activation.querySelector("p") : btn_activation;
         if (!btnMessage)
@@ -17,26 +40,15 @@ const setHiddenContainer = (containerId, opened_message = null, openFunc = null)
         opened_message = (opened_message) ? opened_message : closed_message;
         btn_activation.addEventListener("click", () => {
             if (container_root.dataset.open === "true") {
-                hidden.style.height = `${hidden.scrollHeight}px`;
-                requestAnimationFrame(() => {
-                    hidden.style.height = "0px";
-                });
-                hidden.querySelectorAll("input").forEach(input => {
-                    input.disabled = true;
-                });
                 btnMessage.textContent = closed_message;
-                container_root.dataset.open = "false";
             }
             else {
-                hidden.style.height = `${hidden.scrollHeight}px`;
-                hidden.querySelectorAll("input").forEach(input => {
-                    input.disabled = false;
-                });
                 btnMessage.textContent = opened_message;
-                container_root.dataset.open = "true";
             }
+            toggle();
         });
     }
+    return { toggle: toggle };
 };
 export { setHiddenContainer };
 //# sourceMappingURL=hiddenContainer.js.map

@@ -3,6 +3,7 @@ import { Prisma, type usuario, type usuario_permissao } from "../../generated/pr
 import type { Permissao } from "./permissaoModel.js";
 import { hashPassword, verifyPassword, generateSessionToken, hashSessionToken } from "./criptografia.js";
 import { redisdb } from "../../redis.config.js"
+import { FormFill } from "./errors.js";
 
 export type Usuario = usuario;
 export type UsuarioCadastroDTO = Omit<Usuario, "id">;
@@ -10,6 +11,7 @@ export type UsuarioEntraDTO = Pick<Usuario, "nome" | "senha">;
 export type UsuarioPublicoDTO = Pick<Usuario, "nome" | "email" | "telefone">;
 export type UsuarioPermissoesDTO = Omit<Usuario, "senha" | "usuario_permissao"> & { permissoes: Permissao[] | null };
 export type UsuaioPermissao = usuario_permissao;
+export type UsuarioUpdateDTO = Partial<Omit<Usuario, "id">> & {id: number}
 
 export interface SessionData {
     userId: number;
@@ -47,6 +49,52 @@ export class UsuarioModel {
 
     async getAllUsuarios(): Promise<Usuario[]> {
         return await db.usuario.findMany();
+    }
+
+    async update(usuarioUpdate: UsuarioUpdateDTO, senhaCurrent: string, token: string): Promise<Usuario | null>{
+        const {id, senha, ...dados} = usuarioUpdate;
+
+        try{
+            const usuario = await db.usuario.findUnique({
+                where: {
+                    id
+                }
+            });
+
+            if(!usuario)
+                throw new Error("Usuario não encontrado");
+
+            if(!(await verifyPassword(usuario?.senha, senhaCurrent)))
+                throw new FormFill("Senha incorreta");
+
+            let hash = senha
+            if(hash)
+                hash = await hashPassword(hash)
+
+            
+            await this.revokeSession(token)
+
+            const result = await db.usuario.update({
+                where: {
+                    id: id
+                },
+                data: {
+                    ...dados,
+                    ...((hash)? {
+                        senha: hash
+                    }: {})
+                }
+            });
+
+            return result;
+
+        } catch(error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+                throw new UsuarioJaExiste()
+            }
+
+            throw error
+        }
     }
 
     async createSession(
@@ -148,6 +196,15 @@ export class UsuarioModel {
 
             throw error;
         }
+    }
+
+    async revokeSession(
+        token: string
+    ){
+        const sessionKey = `session:${hashSessionToken(token)}`;
+
+        await redisdb.DEL(sessionKey);
 
     }
+
 }

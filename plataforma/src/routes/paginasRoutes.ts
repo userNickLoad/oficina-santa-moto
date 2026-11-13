@@ -140,8 +140,14 @@ router.get("/clientes/editar/:id", authMiddleware, async(req: Request, res: Resp
         console.log(error)
         res.status(500).json({mensagem: "Erro de servidor."})
     }
+}) 
 
-    
+router.get("/usuairo/atualizar-cadastro", authMiddleware, (req: Request, res: Response) => {
+    return res.render("./layouts/index", {
+        title: "Configurações",
+        content: "../pages/configuracoes",
+        voltar: true
+    });
 }) 
 
 

@@ -1,4 +1,5 @@
-import { UsuarioModel, Usuario, UsuarioEntraDTO, UsuarioIncorreto, UsuarioCadastroDTO, UsuarioJaExiste } from "../model/usuarioModel.js";
+import { FormFill } from "../model/errors.js";
+import { UsuarioModel, Usuario, UsuarioEntraDTO, UsuarioIncorreto, UsuarioCadastroDTO, UsuarioJaExiste, UsuarioUpdateDTO } from "../model/usuarioModel.js";
 import { Request, Response } from "express";
 
 const usuarioModel = new UsuarioModel();
@@ -63,6 +64,46 @@ class UsuarioController{
 
             return res.status(501).json({"mensagem": "algo deu errado"});
         }
+    }
+
+
+    async update(req: Request, res: Response){
+        try{
+            const id = Number(res.locals.usuario.userId ?? "")
+            const token = req.cookies.session_id;
+            const {senhaRepeate = null, passwordOld, ...dados} = req.body;
+
+            if(id < 1 || typeof token != "string")
+                return res.status(400).json({mensagem: "id do usuario n encontrado, faça login seu hackerzinho"})
+
+            if(!passwordOld)
+                return res.status(400).json({mensagem: "a senha antiga deve ser informada"})
+
+            if(!passwordOld)
+                return res.status(400).json({mensagem: "a senha antiga deve ser informada"})
+
+            const usuario: UsuarioUpdateDTO = dados;
+            usuario.id = id;
+
+            if(usuario.telefone){
+                usuario.telefone = "+55"+usuario.telefone.replace("(", "").replace(")", "").replace(" ", "").replace("-", "")
+            }
+
+            const result = await usuarioModel.update(usuario, passwordOld, token)
+
+            console.log(result)
+
+            return res.status(200).json({redirect: "/"});
+
+        }catch(e){
+            console.log(e)
+            if(e instanceof UsuarioJaExiste || e instanceof FormFill){
+                return res.status(403).json({"mensagem": e.message});
+            }
+
+            return res.status(501).json({"mensagem": "algo deu errado"});
+        }
+
     }
 }
 

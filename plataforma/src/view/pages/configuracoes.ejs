@@ -1,0 +1,262 @@
+<section
+    class="w-full flex flex-col items-center"
+    >
+    <%- include("../partials/cadastrar/form", {
+        form: {
+            action: "/api/usuario/atualizar",
+            method: "post",
+            id: "config",
+            name: "config",
+            elements: [
+                {
+                    type: "hidden_container", 
+                    container: {
+                        id: "nome",
+                        elements: [
+                            {   
+                                type: "container",
+                                container: {
+                                    id: "nome-options",
+                                    elements: [
+                                        {
+                                            type: "button", 
+                                            button: {
+                                                type: "simple", 
+                                                name: "activation-nome", 
+                                                id: "activation-nome", 
+                                                content: "Alterar nome de usuario",
+                                                size: "w-max"
+                                            }
+                                        }
+                                    ]
+                                }
+        
+                            },
+                            
+                            {type: "input", input: {title: "Novo nome de usuario", name: "nome", type: "text", maxlength: 50, placeholder: "ex: Maria Eduarda", text_size: "text-md", size: "w-full"}}
+                        ]
+                    }
+                },
+                {
+                    type: "hidden_container", 
+                    container: {
+                        id: "password",
+                        elements: [
+                            {   
+                                type: "container",
+                                container: {
+                                    id: "senha-options",
+                                    elements: [
+                                        {
+                                            type: "button", 
+                                            button: {
+                                                type: "simple", 
+                                                name: "activation-nome", 
+                                                id: "activation-nome", 
+                                                content: "Alterar senha",
+                                                size: "w-max"
+                                            }
+                                        }
+                                    ]
+                                }
+        
+                            },
+                            {type: "input", input: {title: "Nova senha", name: "senha", type: "password", maxlength: 50, placeholder: "ex: ASDJHnlasd123789ASD", text_size: "text-md", size: "w-full"}},
+                            {type: "input", input: {title: "Repita a nova senha", name: "senhaRepeate", type: "password", maxlength: 50, placeholder: "ex: ASDJHnlasd123789ASD", text_size: "text-md", size: "w-full"}}
+
+                        ]
+                    }
+                },
+                {
+                    type: "hidden_container", 
+                    container: {
+                        id: "email",
+                        elements: [
+                            {   
+                                type: "container",
+                                container: {
+                                    id: "email-options",
+                                    elements: [
+                                        {
+                                            type: "button", 
+                                            button: {
+                                                type: "simple", 
+                                                name: "activation-email", 
+                                                id: "activation-email", 
+                                                content: "Alterar email",
+                                                size: "w-max"
+                                            }
+                                        }
+                                    ]
+                                }
+        
+                            },
+                            {type: "input", input: {title: "Email", name: "email", type: "email", maxlength: 50, placeholder: "ex: nicolas@gmail.com", text_size: "text-md", size: "w-full"}},
+                        ]
+                    }
+                },
+                {
+                    type: "hidden_container", 
+                    container: {
+                        id: "telefone",
+                        elements: [
+                            {   
+                                type: "container",
+                                container: {
+                                    id: "telefone-options",
+                                    elements: [
+                                        {
+                                            type: "button", 
+                                            button: {
+                                                type: "simple", 
+                                                name: "activation-telefone", 
+                                                id: "activation-telefone", 
+                                                content: "Alterar telefone",
+                                                size: "w-max"
+                                            }
+                                        }
+                                    ]
+                                }
+        
+                            },
+                            {type: "input", input: {title: "Telefone", name: "telefone", mask: "phone", maxlength: 50, placeholder: "(11) 40000-9999", text_size: "text-md", size: "w-full"}},
+                        ]
+                    }
+                },
+                {
+                    type: "hidden_container", 
+                    container: {
+                        id: "old-password",
+                        elements: [
+                            {   
+                                type: "container",
+                                container: {
+                                    css: "hidden",
+                                    id: "senha-options",
+                                    elements: []
+                                }
+        
+                            },
+                            {type: "input", input: {title: "Senha atual", name: "passwordOld", type: "password", maxlength: 50, placeholder: "ex: ASDJHnlasd123789ASD", text_size: "text-md", size: "w-full"}},
+
+                        ]
+                    }
+                }
+            ],
+            buttons: [
+                {
+                    type: "submit",
+                    id: "submit",
+                    name: "submit",
+                    content: "Salvar alterações",
+                    submit: true,
+                    svg: { path: "save-icon"}
+                },
+            ]
+        }
+    }) %>
+</section>
+
+<script src="/js/phoneMask.js"></script>
+<script type="module">
+    import { setHiddenContainer } from "/js/hiddenContainer.js";
+    import { setForm, verifyEmpty, verifyEmail} from "/js/form.js";
+
+    let passwordOldValue = null
+
+    setForm(null, {
+        "senha": (value) => {
+            const emp = verifyEmpty(value);
+
+            if(emp)
+                return emp;
+
+            passwordOldValue = value;
+            return null
+        },
+        "senhaRepeate": (value) => {
+            const emp = verifyEmpty(value);
+
+            if(emp)
+                return emp;
+
+            if(passwordOldValue != value)
+                return "A senha deve ser exatamente igual"
+
+            return null
+        },
+        "email": (value) => {
+            return verifyEmail(value);
+        }
+    });
+
+    let openedAreas = 0;
+
+    const passwordOld = document.querySelector("#container-h-old-password")
+
+    if(!passwordOld)
+        throw new Error("não foi possivel achar a area de senha natiga")
+
+    const buttonSubmit = document.querySelector("#submit");
+
+    if(!buttonSubmit)
+        throw new Error("botão de submit não localizado");
+    
+    const deactivateButton = ()=>{
+        buttonSubmit.disabled = true;
+        buttonSubmit.classList.add("opacity-50")
+    }
+
+    const activeButton = () => {
+        buttonSubmit.disabled = false;
+        buttonSubmit.classList.remove("opacity-50")
+    }
+    
+    deactivateButton();
+
+    const { toggle } = setHiddenContainer(passwordOld)
+
+    const habilite = (value) => {
+        if(value){
+            if(openedAreas == 0){
+                toggle();
+                activeButton()
+            }
+                
+            openedAreas++;
+        } else {
+            if(openedAreas == 1){
+                toggle();
+                deactivateButton()
+            }
+                
+            openedAreas--;
+        }
+    }
+
+    const nameArea = document.querySelector('#container-h-nome');
+    if(!nameArea)
+        throw new Error("não foi possivel achar a area de nome");
+        
+    setHiddenContainer(nameArea, "Não alterar nome", habilite);
+
+    const passwordArea = document.querySelector('#container-h-password');
+    if(!nameArea)
+        throw new Error("não foi possivel achar a area de senha");
+
+    setHiddenContainer(passwordArea, "Não alterar senha", habilite);
+
+    const emailArea = document.querySelector('#container-h-email');
+    if(!emailArea)
+        throw new Error("não foi possivel achar a area de email");
+
+    setHiddenContainer(emailArea, "Não alterar email", habilite);
+
+    const telefoneArea = document.querySelector('#container-h-telefone');
+    if(!telefoneArea)
+        throw new Error("não foi possivel achar a area de telefone");
+
+    setHiddenContainer(telefoneArea, "Não alterar telefone", habilite);
+
+
+</script>

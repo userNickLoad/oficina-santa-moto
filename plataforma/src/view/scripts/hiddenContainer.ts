@@ -1,6 +1,9 @@
 
+type propReturns = {
+    toggle: ()=>void
+}
 
-const setHiddenContainer = (containerId: string | HTMLElement, opened_message: string | null = null, openFunc: ((()=>void)) | null = null) => {
+const setHiddenContainer = (containerId: string | HTMLElement, opened_message: string | null = null, func: (((value: boolean)=>void)) | null = null): propReturns => {
 
     const container_root = (containerId instanceof HTMLElement)? containerId : document.querySelector<HTMLElement>(`#${containerId}`);
 
@@ -18,6 +21,35 @@ const setHiddenContainer = (containerId: string | HTMLElement, opened_message: s
         input.disabled = true;
     });
 
+    const toggle = ()=>{
+        if(container_root.dataset.open === "true"){
+            hidden.style.height = `${hidden.scrollHeight}px`;
+
+            requestAnimationFrame(() => {
+                hidden.style.height = "0px";
+            });
+
+            hidden.querySelectorAll<HTMLInputElement>("input").forEach(input => {
+                input.disabled = true;
+            })
+    
+            container_root.dataset.open = "false";
+
+            if(func)
+                func(false)
+        } else {
+            hidden.style.height = `${hidden.scrollHeight}px`;
+            
+            hidden.querySelectorAll<HTMLInputElement>("input").forEach(input => {
+                input.disabled = false;
+            })
+
+            container_root.dataset.open = "true";
+            if(func)
+                func(true)
+        }
+    }
+
     if(btn_activation){
 
         const btnMessage = (btn_activation.querySelector("p"))? btn_activation.querySelector("p"): btn_activation;
@@ -27,36 +59,19 @@ const setHiddenContainer = (containerId: string | HTMLElement, opened_message: s
         const closed_message = btnMessage?.textContent;
         opened_message = (opened_message)? opened_message: closed_message;
 
-        btn_activation.addEventListener("click", ()=>{
+
+        btn_activation.addEventListener("click", () => {
             if(container_root.dataset.open === "true"){
-                hidden.style.height = `${hidden.scrollHeight}px`;
-
-                requestAnimationFrame(() => {
-                    hidden.style.height = "0px";
-                });
-
-                hidden.querySelectorAll<HTMLInputElement>("input").forEach(input => {
-                    input.disabled = true;
-                })
-
                 btnMessage.textContent = closed_message;
-        
-                container_root.dataset.open = "false";
             } else {
-                hidden.style.height = `${hidden.scrollHeight}px`;
-                
-                hidden.querySelectorAll<HTMLInputElement>("input").forEach(input => {
-                    input.disabled = false;
-                })
-
                 btnMessage.textContent = opened_message;
-
-                container_root.dataset.open = "true";
             }
+            toggle()
+
         })
     }
     
-
+    return {toggle: toggle}
 }
 
 export {setHiddenContainer}

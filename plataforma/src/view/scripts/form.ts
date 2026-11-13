@@ -16,8 +16,13 @@ const verifyTelefone: verifier = (value: string) => {
 }
 
 const verifyEmail: verifier = (value: string) => {
-    if(value.search(/@gmail.com/))
-        return `Use a extenção @gmail.com como ${value.split("@")[0]}@gmail.com`
+    const a = value.trim().split("@");
+    console.log("email: ", a)
+    if(a.length != 2)
+        return `Use a extenção @gmail.com como ${a[0]}@gmail.com`
+
+    if(a[1] != "gmail.com")
+        return `Use a extenção @gmail.com como ${a[0]}@gmail.com`
 
     return null
 }
@@ -88,8 +93,6 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
             if(input.disabled || input.classList.contains("hidden"))
                 return;
 
-            console.log(input.name)
-
             const parent = input.closest('[data-parent="inputbox"]');
             if(!parent){
                 throw new Error(`não foi possivel localizar o pai de ${input.id}`)
@@ -113,7 +116,7 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
             input.addEventListener("click", reset)
 
             let issueVerifyier: verifier | undefined  = undefined;
-
+        
             if(verifyIssues)
                 issueVerifyier = verifyIssues[input.id.match(/\[([^\]]+)\]$/)?.[1] ?? input.id]
 
@@ -140,8 +143,6 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
         const contains_files = Array.from(form.querySelectorAll<HTMLInputElement>('input[type="file"]')).some((input => (input.files && input.files.length > 0)))
 
         try {
-
-
             const response = await fetch(form.action, {
                 method: form.method,
                 ...(
@@ -176,7 +177,7 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
 
             if (resultado.confirm) {
                 const confirm = document.querySelector<HTMLElement>("#confirm");
-                console.log(confirm)
+                
                 if (!confirm)
                     throw new Error("Não foi possível encontrar o #confirm");
 

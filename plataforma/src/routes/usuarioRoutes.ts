@@ -8,6 +8,6 @@ const usuarioController = new UsuarioController();
 
 router.post("/entrar", usuarioController.entrar);
 router.post("/cadastrar", authMiddleware, usuarioController.cadastrar);
-// router.get("/:id", getUsuarioById);
+router.post("/atualizar", authMiddleware, usuarioController.update);
 
 export default router;

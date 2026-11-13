@@ -5,4 +5,11 @@ class UniqueError extends Error {
     }
 }
 
-export {UniqueError}
+class FormFill extends Error {
+    constructor(message: string){
+        super(message)
+        this.name = "FormFill"
+    }
+}
+
+export {UniqueError, FormFill}

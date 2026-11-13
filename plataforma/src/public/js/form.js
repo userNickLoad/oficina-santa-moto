@@ -9,8 +9,12 @@ const verifyTelefone = (value) => {
     return null;
 };
 const verifyEmail = (value) => {
-    if (value.search(/@gmail.com/))
-        return `Use a extenção @gmail.com como ${value.split("@")[0]}@gmail.com`;
+    const a = value.trim().split("@");
+    console.log("email: ", a);
+    if (a.length != 2)
+        return `Use a extenção @gmail.com como ${a[0]}@gmail.com`;
+    if (a[1] != "gmail.com")
+        return `Use a extenção @gmail.com como ${a[0]}@gmail.com`;
     return null;
 };
 const parseFormData = (formData) => {
@@ -56,7 +60,6 @@ const setForm = (formId = null, verifyIssues = null) => {
         form.querySelectorAll("input").forEach(input => {
             if (input.disabled || input.classList.contains("hidden"))
                 return;
-            console.log(input.name);
             const parent = input.closest('[data-parent="inputbox"]');
             if (!parent) {
                 throw new Error(`não foi possivel localizar o pai de ${input.id}`);
@@ -117,7 +120,6 @@ const setForm = (formId = null, verifyIssues = null) => {
             }
             if (resultado.confirm) {
                 const confirm = document.querySelector("#confirm");
-                console.log(confirm);
                 if (!confirm)
                     throw new Error("Não foi possível encontrar o #confirm");
                 confirm.innerText = resultado.confirm;
