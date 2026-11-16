@@ -12,7 +12,7 @@ export const registrarVenda = async (req: Request, res: Response) => {
 
         if(clienteId !== null && (!Number.isInteger(clienteId) || clienteId <= 0)){
             return res.status(400).json({
-                mensagem: "Cliente inválido"
+                mensagem: "Cliente não encontrado"
             });
         }
 
@@ -48,4 +48,40 @@ export const registrarVenda = async (req: Request, res: Response) => {
 
         return res.status(500).json({mensagem: "Erro ao registrar venda"});
     }
+};
+
+export const excluirVenda = async (req: Request, res: Response) => {
+    try{
+        const idVenda = Number(req.params.id);
+
+        if(!Number.isInteger(idVenda) || idVenda <= 0){
+            return res.status(400).json({
+                mensagem: "ID da venda invalido"
+            });
+        }
+        const resultado = await vendaModel.excluirVenda(idVenda);
+
+        return res.status(200).json(resultado);
+    } catch (error){
+        console.error("Erro ao excluir venda: ", error);
+
+        if(error instanceof Error){
+            if(error.message === "Venda não encontrada"){
+                return res.status(404).json({
+                    mensagem: error.message
+                });
+            }
+
+            if(error.message === "Não é possível excluir uma venda vinculada a um serviço"){
+                return res.status(409).json({
+                    mensagem: error.message
+                });
+            }
+        }
+
+        return res.status(500).json({
+            mensagem: "Erro ao excluir venda"
+        });
+    }
+
 };

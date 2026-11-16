@@ -21,7 +21,7 @@
                     Cliente
                 </label>
 
-                <input type="text" id="filtro-cliente" name="cliente" placeholder="Nome do cliente"
+                <input type="text" id="filtro-cliente" name="cliente" placeholder="Nome do cliente" value="<%= innerContent.filtros.cliente || '' %>"
                     class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-gray-500">
             </div>
 
@@ -30,7 +30,8 @@
                     Data inicial
                 </label>
 
-                <input type="date" id="data-inicial" name="dataInicial" class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-gray-500" value="<%= innerContent.filtros.dataInicial %>">
+                <input type="date" id="data-inicial" autocomplete="off" name="dataInicial" 
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-gray-500" value="<%= innerContent.filtros.dataInicial || '' %>">
             </div>
 
             <div>
@@ -38,13 +39,14 @@
                     Data final
                 </label>
 
-                <input type="date" id="data-final" name="dataFinal" class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-gray-500" value="<%= innerContent.filtros.dataFinal %>">
+                <input type="date" id="data-final" autocomplete="off" name="dataFinal" 
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-gray-500" value="<%= innerContent.filtros.dataFinal || '' %>">
             </div>
         </div>
 
         <div class="flex flex-wrap justify-end gap-3">
 
-            <a href="/vendas/historico" class="border border-gray-300 rounded-full px-6 py-3 font-semibold text-gray-700 hover:bg-gray-100 transition">
+            <a href="/vendas/historico?cliente=&dataInicial=&dataFinal=" id="limpar-filtros" class="border border-gray-300 rounded-full px-6 py-3 font-semibold text-gray-700 hover:bg-gray-100 transition">
                 Limpar filtros
             </a>
 
@@ -84,7 +86,7 @@
                                 <p class="font-semibold text-gray-800">
                                     Venda #<%= venda.id %>
                                 </p>
-
+                
                                 <p class="text-sm text-gray-500">
                                     <%= venda.cliente %>
                                 </p>
@@ -93,14 +95,6 @@
                                     <%= new Date(venda.data).toLocaleDateString("pt-BR") %>
                                 </p>
                             </div>
-
-                            <p class="font-semibold text-gray-800">
-                                <%= venda.total.toLocaleString("pt-BR", {
-                                    style: "currency",
-                                    currency: "BRL"
-                                }) %>
-                            </p>
-
                         </div>
 
                         <div class="flex flex-col gap-2 pl-3 border-l-2 border-gray-200">
@@ -121,6 +115,17 @@
                                     </p>
                                 </div>
                             <% }); %>
+
+                            <div class="flex items-center justify-end gap-4 mt-1">
+                                <p class="font-semibold text-gray-800">
+                                    Total: <%= venda.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL"}) %>
+                                </p>
+                                <button type="button" class="excluir-venda inline-flex items-center justify-center gap-2 text-sm text-red-600 hover:text-red-800 transition"
+                                    data-id="<%= venda.id %>">
+                                    <img src="/assets/trash-bin.png" alt="" class="w-4 h-4">
+                                    <span>Excluir</span>
+                                </button>   
+                            </div>
                         </div>
                     </div>
                 <% }); %>
@@ -128,3 +133,78 @@
         <% } %>
     </div>
 </section>
+
+<div id="toast-sucesso"
+     class="hidden fixed top-6 right-6 z-[60] bg-green-600 text-white px-6 py-4 rounded-xl shadow-lg">
+    <p id="mensagem-sucesso"></p>
+</div>
+
+<script>
+
+    let tempoToast;
+
+    function mostrarSucesso(mensagem) {
+        const toast = document.getElementById("toast-sucesso");
+        const texto = document.getElementById("mensagem-sucesso");
+
+        texto.textContent = mensagem;
+        toast.classList.remove("hidden");
+
+        clearTimeout(tempoToast);
+
+        tempoToast = setTimeout(() => {
+            toast.classList.add("hidden");
+        }, 3000);
+    }
+
+    document.querySelectorAll(".excluir-venda").forEach((botao) => {
+        botao.addEventListener("click", async () => {
+            const idVenda = botao.dataset.id;
+
+            const confirmar = confirm(
+                `Deseja realmente excluir a venda #${idVenda}?\n\nOs produtos serão devolvidos ao estoque.`
+            );
+
+            if (!confirmar) return;
+
+            botao.disabled = true;
+
+            try {
+                const resposta = await fetch(`/api/venda/${idVenda}`, {
+                    method: "DELETE"
+                });
+
+                const resultado = await resposta.json();
+
+                if (!resposta.ok) {
+                    throw new Error(
+                        resultado.mensagem || "Erro ao excluir venda."
+                    );
+                }
+
+                mostrarSucesso(
+                    resultado.mensagem || "Venda excluída com sucesso!"
+                );
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+
+            } catch (error) {
+                alert(error.message || "Erro ao excluir venda.");
+                botao.disabled = false;
+            }
+        });
+    });
+
+    document.getElementById("limpar-filtros").addEventListener("click", () => {
+        event.preventDefault();
+
+        document.getElementById("data-inicial").value = "";
+        document.getElementById("data-final").value = "";
+        document.getElementById("filtro-cliente").value = ""
+
+        window.location.href="/vendas/historico?cliente=&dataInicial=&dataFinal=";
+    }); 
+</script>
+
