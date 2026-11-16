@@ -26,6 +26,7 @@ export class ServicoModel {
             }
         });
     }
+
     async getTodosServicos(){
         return await db.servico.findMany({
             include: {
@@ -45,6 +46,7 @@ export class ServicoModel {
             }
         });
     }
+
     async concluirServico(id: number): Promise<Servico | null> {
         const resultado = await db.servico.updateMany({
             where: {
@@ -66,6 +68,7 @@ export class ServicoModel {
             }
         });
     }
+
     async cancelarServico(id: number): Promise<Servico | null> {
         return await db.$transaction(async (txt) => {
 
@@ -113,6 +116,7 @@ export class ServicoModel {
             return servico;
         });
     }
+    
     async registrarServico(dados: {
         descricao: string;
         preco: string;

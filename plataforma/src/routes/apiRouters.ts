@@ -10,6 +10,7 @@ import { buscarProdutos } from "../controller/produtoController.js";
 import marcaRouters from "./marcaRouters.js";
 import { LocalController } from "../controller/localController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
+import vendaRoutes from "./vendaRoutes.js";
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use("/produto", authMiddleware, produtoRouters);
 
 const localController = new LocalController;
 router.get("/local", authMiddleware, localController.getLocal)
+router.use("/venda", vendaRoutes);
 
 export default router;
