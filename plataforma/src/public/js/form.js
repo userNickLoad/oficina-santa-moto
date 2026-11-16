@@ -20,7 +20,9 @@ const verifyEmail = (value) => {
 const parseFormData = (formData) => {
     const result = {};
     const setArrays = new Set();
+    console.log("Entries: ");
     for (const [key, value] of formData.entries()) {
+        console.log(key, value);
         const match = key.match(/^([^\[]+)\[(\d+)\]\[([^\]]+)\]$/);
         if (!match) {
             result[key] = value;
@@ -38,6 +40,7 @@ const parseFormData = (formData) => {
     setArrays.forEach((arrayName) => {
         result[arrayName] = result[arrayName].filter((l) => (l != null));
     });
+    console.log(result);
     return result;
 };
 const setForm = (formId = null, verifyIssues = null) => {

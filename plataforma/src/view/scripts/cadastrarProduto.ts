@@ -33,10 +33,10 @@ setSearchBox(searchCategoria, "/api/categoria?nome=", null, "nome", (value, cont
         categoriaId.value = (categoria.id ?? "")
 
         categoria.atributos.map((at: any) => {
-            const clone = addELement()
-            console.log(clone)
+            const clone = addELement(undefined, at.nome)
 
             const label = clone.querySelector<HTMLElement>("label");
+
             if(!label)
                 throw new Error("label")
             label.innerText = String(at.nome[0]).toLocaleUpperCase() + at.nome.slice(1, at.nome.length-1)
@@ -97,6 +97,7 @@ const prateleiras = document.querySelector<HTMLElement>('#addble-container-prate
 
 if(!prateleiras)
     throw new Error("não foi possivel localizar #addble-container-prateleiras")
+
 
 let prateleiraIt = 0
 
@@ -163,7 +164,8 @@ setAddble(prateleiras, "prateleira", prateleiraIt, (clone: HTMLElement) => {
     if(!estanteId)
         throw new Error("Não foi possivel achar estanteId")
 
-  
+    estanteId.disabled = false;
+
     const estanteRow = clone.querySelector<HTMLElement>('#search-estanteRow');
     if(!estanteRow)
         throw new Error("Não foi possivel achar estanteRow")
@@ -274,7 +276,7 @@ setAddble(prateleiras, "prateleira", prateleiraIt, (clone: HTMLElement) => {
             console.log("Status estante: ", es != undefined)
             if(es){
                 estanteId.value = String(es.id);
-
+                console.log(estanteId, estanteId.value)
                 estante = es;
                 setPrateleira(estante.qtd_linhas, estante.qtd_colunas);
             }else {
@@ -396,6 +398,19 @@ setForm(null, {
         
         if(idEmp)
             return "O local deve ser valido"
+
+        return null
+    },
+    "quantidade": (value, input) => {
+        const prateleiras = document.querySelectorAll('[id$="[remove-prateleiras]"]').length
+
+        if(prateleiras)
+            return null
+
+        const emp = verifyEmpty(value)
+
+        if(emp)
+            return "Preencha ou associe a prateleiras"
 
         return null
     }

@@ -22,8 +22,7 @@ setSearchBox(searchCategoria, "/api/categoria?nome=", null, "nome", (value, cont
         const categoria = content[0];
         categoriaId.value = (categoria.id ?? "");
         categoria.atributos.map((at) => {
-            const clone = addELement();
-            console.log(clone);
+            const clone = addELement(undefined, at.nome);
             const label = clone.querySelector("label");
             if (!label)
                 throw new Error("label");
@@ -116,6 +115,7 @@ setAddble(prateleiras, "prateleira", prateleiraIt, (clone) => {
     const estanteId = clone.querySelector('#estanteId');
     if (!estanteId)
         throw new Error("Não foi possivel achar estanteId");
+    estanteId.disabled = false;
     const estanteRow = clone.querySelector('#search-estanteRow');
     if (!estanteRow)
         throw new Error("Não foi possivel achar estanteRow");
@@ -206,6 +206,7 @@ setAddble(prateleiras, "prateleira", prateleiraIt, (clone) => {
             console.log("Status estante: ", es != undefined);
             if (es) {
                 estanteId.value = String(es.id);
+                console.log(estanteId, estanteId.value);
                 estante = es;
                 setPrateleira(estante.qtd_linhas, estante.qtd_colunas);
             }
@@ -302,6 +303,15 @@ setForm(null, {
         const idEmp = verifyEmpty(localId.value);
         if (idEmp)
             return "O local deve ser valido";
+        return null;
+    },
+    "quantidade": (value, input) => {
+        const prateleiras = document.querySelectorAll('[id$="[remove-prateleiras]"]').length;
+        if (prateleiras)
+            return null;
+        const emp = verifyEmpty(value);
+        if (emp)
+            return "Preencha ou associe a prateleiras";
         return null;
     }
 });

@@ -12,11 +12,15 @@ type ProdutoImagemLocalizacaoDTO = produto & {imagens: imagem[], prateleiras: Pr
 
 type ProdutoAtributo = produto_atributo;
 
-type PrateleiraAddDTO = {prateleira: {id: number | null, row: number, col: number}, estante: {id: number, row: number, col: number}, quantidade: number} 
+type PrateleiraAddDTO = {id_estante: number, coluna: number, linha: number, quantidade: number} 
 
-type ProdutoCreateDTO = Omit<Produto, "id"> 
-    & {atributos: {id_atributo: number, valor: number | string}[]} 
-    & {imagens: string[]};
+type ProdutoCreateDTO = Omit<
+    Produto,
+    "id" | "qtd_disponivel"
+> & {
+    atributos: Record<string, number | string>[];
+    imagens: string[];
+};
 type ProdutoFilterDTO = {
     nome?: string,
     id_categoria?: number,
@@ -34,11 +38,16 @@ class ProdutoModel{
 
     async create(
         newProduto: ProdutoCreateDTO,
-        local: PrateleiraAddDTO[],
-        quantidade: number
+        estante: PrateleiraAddDTO[],
+        quantidade: number,
+        marca: string
     ): Promise<Produto> {
 
         const { atributos, imagens, ...produto } = newProduto;
+
+        let qtd_disponivel = quantidade
+
+        estante.map(e => {qtd_disponivel += e.quantidade})
 
         if (!produto.id_categoria)
             throw new FormFill("não foi possivel localizar o id da categoria");
@@ -53,11 +62,22 @@ class ProdutoModel{
         const atributosToAdd = atributosDB.flatMap<
             Prisma.produto_atributoCreateWithoutProdutoInput
         >((atributo) => {
+
+            const nome = atributo.nome.trim().toLowerCase();
+
             const at = atributos.find(
-                at => at.id_atributo === atributo.id
+                item => Object.keys(item).some(
+                    chave => chave.trim().toLowerCase() === nome
+                )
             );
 
-            if (at === undefined || at.valor === "") {
+            let valor = at
+                ? at[Object.keys(at).find(
+                    chave => chave.trim().toLowerCase() === nome
+                )!]
+                : undefined;
+
+            if (valor === undefined || valor === "") {
                 if (atributo.obrigatorio) {
                     throw new FormFill(
                         `Atributo "${atributo.nome}" obrigatório não tem valor`
@@ -68,7 +88,8 @@ class ProdutoModel{
             }
 
             if (atributo.numerico) {
-                if (typeof at.valor !== "number") {
+                valor = Number(String(valor ?? "").replace(",", "."))
+                if (Number.isNaN(valor)) {
                     throw new FormFill(
                         `Atributo "${atributo.nome}" deveria ser numérico`
                     );
@@ -78,11 +99,11 @@ class ProdutoModel{
                     atributo: {
                         connect: { id: atributo.id }
                     },
-                    valor_numerico: at.valor
+                    valor_numerico: valor
                 }];
             }
 
-            if (typeof at.valor !== "string") {
+            if (typeof valor !== "string") {
                 throw new FormFill(
                     `Atributo "${atributo.nome}" deveria ser textual`
                 );
@@ -92,7 +113,7 @@ class ProdutoModel{
                 atributo: {
                     connect: { id: atributo.id }
                 },
-                valor_texto: at.valor
+                valor_texto: valor
             }];
         });
 
@@ -100,8 +121,8 @@ class ProdutoModel{
         // Evita posições duplicadas
         const posicoes = new Set<string>();
 
-        for (const p of local) {
-            const key = `${p.estante.id}-${p.prateleira.row}-${p.prateleira.col}`;
+        for (const p of estante) {
+            const key = `${p.id_estante}-${p.linha}-${p.coluna}`;
 
             if (posicoes.has(key))
                 throw new FormFill(`Prateleira duplicada na posição ${key}`);
@@ -113,18 +134,18 @@ class ProdutoModel{
 
             // 1. Buscar as estantes e os modelos das posições solicitadas
             const estanteDB = await Promise.all(
-                local.map(async (l) => {
+                estante.map(async (l) => {
                     const estante = await tx.estante.findUnique({
                         where: {
-                            id: l.estante.id
+                            id: l.id_estante
                         },
                         include: {
                             modelo_estante: {
                                 include: {
                                     modelo_prateleira_modelo_estante: {
                                         where: {
-                                            coluna: l.prateleira.col,
-                                            linha: l.prateleira.row
+                                            coluna: l.coluna,
+                                            linha: l.linha
                                         }
                                     }
                                 }
@@ -134,7 +155,7 @@ class ProdutoModel{
 
                     if (!estante)
                         throw new FormFill(
-                            `Não foi localizada a estante ${l.estante.id}`
+                            `Não foi localizada a estante ${l.id_estante}`
                         );
 
                     const modeloPosicao =
@@ -142,7 +163,7 @@ class ProdutoModel{
 
                     if (!modeloPosicao)
                         throw new FormFill(
-                            `Não existe modelo de prateleira na posição (${l.prateleira.row}, ${l.prateleira.col})`
+                            `Não existe modelo de prateleira na posição (${l.linha}, ${l.coluna})`
                         );
 
                     return {
@@ -156,31 +177,20 @@ class ProdutoModel{
             // 2. Resolver as prateleiras
             const prateleiraDB = await Promise.all(
                 estanteDB.map(async ({ estante, modeloPosicao, local: l }) => {
+                    const prateleiraCadastrada = await tx.prateleira.findUnique({
+                        where: {
+                            id_estante_linha_coluna: {
+                                id_estante: l.id_estante,
+                                coluna: l.coluna,
+                                linha: l.linha
+                            }
+                        }
+                    })
 
                     // Prateleira já cadastrada
-                    if (l.prateleira.id != null) {
-
-                        const prateleira = await tx.prateleira.findUnique({
-                            where: {
-                                id: l.prateleira.id
-                            }
-                        });
-
-                        if (
-                            !prateleira ||
-                            prateleira.id_estante !== estante.id ||
-                            prateleira.linha !== l.prateleira.row ||
-                            prateleira.coluna !== l.prateleira.col ||
-                            prateleira.id_modelo_prateleira !==
-                                modeloPosicao.id_modelo_prateleira
-                        ) {
-                            throw new FormFill(
-                                `Prateleira ${l.prateleira.id} não corresponde à posição informada`
-                            );
-                        }
-
+                    if (prateleiraCadastrada) {
                         return {
-                            id: prateleira.id,
+                            id: prateleiraCadastrada.id,
                             quantidade: l.quantidade
                         };
                     }
@@ -190,14 +200,14 @@ class ProdutoModel{
                         where: {
                             id_estante_linha_coluna: {
                                 id_estante: estante.id,
-                                coluna: l.prateleira.col,
-                                linha: l.prateleira.row
+                                coluna: l.coluna,
+                                linha: l.linha
                             }
                         },
                         create: {
                             id_estante: estante.id,
-                            coluna: l.prateleira.col,
-                            linha: l.prateleira.row,
+                            coluna: l.coluna,
+                            linha: l.linha,
                             id_modelo_prateleira:
                                 modeloPosicao.id_modelo_prateleira
                         },
@@ -220,6 +230,21 @@ class ProdutoModel{
                 })
             );
 
+            let marcaId = newProduto.id_marca 
+
+            if(marcaId == null || marcaId == 0)
+                marcaId =  (await tx.marca.upsert({
+                        where: {
+                            nome: marca
+                        },
+                        create: {
+                            nome: marca
+                        },
+                        update: {}
+                    })).id
+
+            produto.id_marca = (marcaId == 0) ? null: marcaId;
+
             // Evita associar o produto duas vezes à mesma prateleira
             const idsPrateleiras = prateleiraDB.map(p => p.id);
 
@@ -233,7 +258,7 @@ class ProdutoModel{
                 data: {
                     ...produto,
 
-                    qtd_disponivel: quantidade,
+                    qtd_disponivel,
 
                     produto_imagem: {
                         create: imagens.map(caminho => ({
@@ -389,4 +414,4 @@ class ProdutoModel{
     }
 }
 
-export {ProdutoModel }
+export {ProdutoModel, ProdutoCreateDTO }

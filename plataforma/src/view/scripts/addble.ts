@@ -1,5 +1,5 @@
 type prop = {
-    addELement: (values?: Record<string, any> )=>HTMLElement, 
+    addELement: (values?: Record<string, any>, selfName?: string)=>HTMLElement, 
     wipeout: ()=>void
 }
 
@@ -20,7 +20,7 @@ const setAddble = function (element: HTMLElement, name: string, iterator: number
         throw new Error("não foi possivel localizar o placement");
 
 
-    const buildClone = (): HTMLElement => {
+    const buildClone = (selfName: string | null = null): HTMLElement => {
         const clone = addble.cloneNode(true) as HTMLElement;
 
         clone.classList.remove("hidden");
@@ -38,7 +38,7 @@ const setAddble = function (element: HTMLElement, name: string, iterator: number
 
         clone.querySelectorAll("input").forEach(input => {
             input.disabled = false;
-            input.name = `${name}[${iterator}][${input.name}]`;
+            input.name = `${name}[${iterator}][${(selfName)? selfName: input.name}]`;
 
             const parent = input.closest('[data-parent="inputbox"]')
 
@@ -64,8 +64,8 @@ const setAddble = function (element: HTMLElement, name: string, iterator: number
         iterator++;
     })
 
-    const addELement = (values: Record<string, any> | null = null): HTMLElement => {
-        const clone = buildClone();
+    const addELement = (values: Record<string, any> | null = null, selfName: string | null = null): HTMLElement => {
+        const clone = buildClone(selfName);
         place.appendChild(clone);
         iterator++
         if(values != null)

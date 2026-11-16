@@ -9,7 +9,7 @@
             action: "/api/produto",
             method: "post",
             elements: [
-                {type: "input", input: {name: "Nome", type: "text", title: "Nome do produto", maxlength: 50, placeholder: "ex: Óleo de motor 10W-30", text_size: "text-md", size: "w-full"}},
+                {type: "input", input: {name: "nome", type: "text", title: "Nome do produto", maxlength: 50, placeholder: "ex: Óleo de motor 10W-30", text_size: "text-md", size: "w-full"}},
                 {
                     type: "hidden_container", 
                     container: {
@@ -102,6 +102,15 @@
                             
                             {type: "input", input: {title: "Quantidade", name: "quantidade", type: "number", maxlength: 50, placeholder: "1", text_size: "text-md", size: "w-[40%]", output: "Quantidade não alocada em prateleira" /*, size: "lg:w-[25vw] w-[40vw]"*/}},
                             {type: "input", input: {title: "Preço", name: "preco", maxlength: 50, placeholder: "R$ 0,00", text_size: "text-md", mask: "currency", size: "w-[40%]" /*, size: "lg:w-[25vw] w-[40vw]"*/}}
+                        ]
+                    }
+                },
+                {
+                    type: "container",
+                    container: {
+                        id: "row",
+                        elements: [
+                            {type: "input", input: {title: "Alerta de quantidade", name: "alerta_quantidade", type: "number", maxlength: 50, placeholder: "1", text_size: "text-md", size: "w-[40%]",/*, size: "lg:w-[25vw] w-[40vw]"*/}},
                         ]
                     }
                 },

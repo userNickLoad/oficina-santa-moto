@@ -30,7 +30,10 @@ const verifyEmail: verifier = (value: string) => {
 const parseFormData = (formData: FormData) => {
     const result: Record<string, any> = {};
     const setArrays = new Set<string>();
+    console.log("Entries: ")
+
     for (const [key, value] of formData.entries()) {
+        console.log(key, value)
         const match = key.match(/^([^\[]+)\[(\d+)\]\[([^\]]+)\]$/);
         if (!match) {
             result[key] = value;
@@ -55,6 +58,9 @@ const parseFormData = (formData: FormData) => {
         result[arrayName] = result[arrayName].filter((l: any) => (l != null))
     })
 
+    console.log(result)
+
+    
     return result;
 };
 

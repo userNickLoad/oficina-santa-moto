@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { ProdutoModel } from "../model/produtoModel.js";
+import { ProdutoCreateDTO, ProdutoModel } from "../model/produtoModel.js";
+import { unlink } from "node:fs/promises";
 
 const produtoModel = new ProdutoModel();
 
@@ -41,46 +42,64 @@ const parseCurrency = (value: string): number => {
 };
 
 export async function criarProduto(req: Request, res: Response) {
-    console.log(req.body)
+    const arquivos = req.files as Express.Multer.File[] | undefined;
+
     try {
         const contentString = (req.body.content ?? "");
-
-        if(contentString != "")
+        
+        if(contentString == "")
             throw new Error("Content não achado")
 
         const content = JSON.parse(contentString);
+        console.log(content)
+        const {atributo, preco, marcaId, categoriaId, categoria, prateleira, marca, quantidade, alerta_quantidade, ...produto} = content
 
-        const {atributo, marca, preco, marcaId, categoriaId, prateleira, ...produto} = content
+        if(produto["imagem[]"])
+            delete produto["imagem[]"]
 
-        const arquivos = req.files as Express.Multer.File[] | undefined;
-
-        const newProduto = {
+        const newProduto: ProdutoCreateDTO = {
             ...produto,
+            codigo_barras: null,
             id_categoria: Number(categoriaId),
             id_marca: marcaId
                 ? Number(marcaId)
                 : null,
+            altura: null,
+            comprimento: null,
+            largura: null,
             preco_venda: parseCurrency(preco),
             atributos: atributo,
-            prateleiras: prateleira,
+            alerta_quantidade: Number(alerta_quantidade ?? ""),
             imagens: arquivos?.map(arquivo => arquivo.filename) ?? []
         };
 
-        console.log(newProduto)
+        const prateleiras = prateleira.map((p: any) => {
+                const {estanteId, prateleiraRow, prateleiraCol, quantidade} = p;
 
-        // const produtoCriado = await produtoModel.create(
-        //     newProduto,
-        //     localParsed ,
-        //     Number(quantidade)
-        // );
+                return {
+                    id_estante: Number(estanteId),
+                    linha: (prateleiraRow)? Number(prateleiraRow) : 1,
+                    coluna: (prateleiraCol)? Number(prateleiraCol) : 1,
+                    quantidade: Number(quantidade)
+                }
+            })
+
+
+        const produtoCriado = await produtoModel.create(newProduto, prateleiras, Number(quantidade ?? ""), marca);
 
         return res.status(201).json({
-            mensagem: "Produto cadastrado com sucesso",
+            confirm: "Produto cadastrado com sucesso",
             // produto: produtoCriado
         });
 
     } catch (error) {
         console.error("Erro ao cadastrar produto:", error);
+
+        if (arquivos?.length) {
+            await Promise.allSettled(
+                arquivos.map(arquivo => unlink(arquivo.path))
+            );
+        }
 
         return res.status(400).json({
             mensagem: error instanceof Error
