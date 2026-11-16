@@ -14,7 +14,8 @@
         radios = [],
         max_number = "",
         value = null,
-        step = "1"
+        step = "1",
+        output = null
     } = item;
     const id_applay = name.toLowerCase();
     const column_applay = (column)? "justify-center py-[1vh]": "flex-col";
@@ -24,9 +25,9 @@
 %>
 
 
-<div class="<%= size %> flex <%= column_applay %> gap-[2vh]" data-parent = "inputbox">
+<div class="<%= size %> flex <%= column_applay %> gap-[1vh]" data-parent = "inputbox">
     <label class="<%= text_size %> flex items-center" for="<%= item.name %>">
-        <%= title %>
+        <%- title %>
     </label>
 
     <% if(type == "textarea") { %>
@@ -207,6 +208,14 @@
     <p
         class="text-red-900 min-h-[3vh]"
         id="output-<%= id_applay %>"
-    ></p>
+    >
+        <% if(output){ %>
+            <span
+                class="text-gray-700 text-sm"
+                >
+                <%= output %>
+            </span>
+        <% } %>
+    </p>
 </div>
     

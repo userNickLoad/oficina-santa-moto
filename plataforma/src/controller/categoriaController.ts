@@ -26,14 +26,15 @@ class CategoriaController{
     }
 
     async getByStartsWithName(req: Request, res: Response){
-        const { paramNome } = req.params;
+        const  paramNome  = req.query.nome;
 
         if(!(typeof paramNome === "string"))
             return res.status(400).json({message: "nome não fornecido"});
 
         try{
 
-            const result = categoriaModel.getByStartsWithName(paramNome);
+            const result = await categoriaModel.getByStartsWithName(paramNome);
+
             return res.status(200).json(result);
 
         }catch(error){
@@ -44,17 +45,35 @@ class CategoriaController{
     }
 
     async create(req: Request, res: Response){
-        const newCategoria: CategoriaCreateDTO = req.body;
+        const {atributo, ...dados} = req.body;
+
+        const newCategoria: CategoriaCreateDTO = {
+            ...dados,
+            atributos: atributo.map((a: any) => {
+                const {obrigatorio, tipo, nome} = a
+
+                return {
+                    nome,
+                    obrigatorio: (obrigatorio ?? "") == 'on',
+                    numerico: (tipo ?? "") == 'numerico'
+
+                }
+            })
+        }
 
         try{
             const result = await categoriaModel.create(newCategoria);
 
-            return res.status(201).json(result);
+            return res.status(201).json({
+                confirm: "Categoria cadastrada"
+            });
 
         }catch(error){
             console.log(error);
-            return res.status(500).json({message: "algum erro ocorreu"})
+            return res.status(500).json({mensagem: "algum erro ocorreu"})
         }
 
     }
 }
+
+export {CategoriaController}

@@ -16,7 +16,8 @@
         css = null,
         title = null,
         mask = "./addbleMask",
-        elements = []
+        elements = [],
+        button = true
     } = container;
 
     const classCss = (css)? container.class: `flex ${flex} w-full ${gap} justify-around items-center`;
@@ -36,28 +37,30 @@
     >
     <div
         id="addble-placement-<%= id %>"
-        class="w-full flex flex-col gap-[1vh] "
+        class="w-full flex flex-col gap-[1vh]"
         >
         <div 
             id="addble-element-<%= id %>"
-            class="w-full hidden  <%= classCss %> "
+            class="w-full hidden  <%= classCss %>"
             >
                 
             <%- include(mask, {mask: {id, elements}}) %>
-
         
         </div>
 
     </div>
     
-    <div
-        class="w-full flex justify-center"
-    >
-        <%- include("../button", {button: {
-            id: `add-new-${id}`,
-            type: "simple",
-            content: "adicionar",
-            size: "w-auto px-[1vw]"
-        }}) %>
-    </div>
+    <% if(button){ %>
+        <div
+            class="w-full flex justify-center"
+        >
+            <%- include("../button", {button: {
+                id: `add-new-${id}`,
+                type: "simple",
+                content: "adicionar",
+                size: "w-auto px-[1vw]"
+            }}) %>
+        </div>
+    <% } %>
+
 </div>

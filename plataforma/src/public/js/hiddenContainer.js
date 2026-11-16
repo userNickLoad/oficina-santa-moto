@@ -48,7 +48,16 @@ const setHiddenContainer = (containerId, opened_message = null, func = null) => 
             toggle();
         });
     }
-    return { toggle: toggle };
+    const update = () => {
+        if (container_root.dataset.open === "true") {
+            const currentHeight = hidden.offsetHeight;
+            hidden.style.height = `${currentHeight}px`;
+            requestAnimationFrame(() => {
+                hidden.style.height = `${hidden.scrollHeight}px`;
+            });
+        }
+    };
+    return { toggle: toggle, update };
 };
 export { setHiddenContainer };
 //# sourceMappingURL=hiddenContainer.js.map

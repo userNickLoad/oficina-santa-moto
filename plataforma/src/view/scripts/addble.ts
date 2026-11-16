@@ -1,15 +1,12 @@
 type prop = {
-    addELement: (values: Record<string, any>)=>void
+    addELement: (values?: Record<string, any> )=>HTMLElement, 
+    wipeout: ()=>void
 }
 
 const setAddble = function (element: HTMLElement, name: string, iterator: number, cloneExpecific: ((clone: HTMLElement) => void) | null = null): prop  {
     const btn_add = element.querySelector('button[id^="add-new-"]');
 
-    if(!btn_add)
-        throw new Error(`Não foi possivel localizar o botão de adição do ${element.id}`);
-
     const addble = element.querySelector<HTMLElement>('[id^="addble-element-"]');
-
     if(!addble)
         throw new Error(`não foi possivel localizar o elemento clonavel `);
 
@@ -60,24 +57,30 @@ const setAddble = function (element: HTMLElement, name: string, iterator: number
         return clone;
     }
 
-
+    if(btn_add)
     btn_add.addEventListener("click", ()=>{
         const clone = buildClone();
         place.appendChild(clone);
         iterator++;
-
     })
 
-    const addELement = (values: Record<string, any>): void => {
+    const addELement = (values: Record<string, any> | null = null): HTMLElement => {
         const clone = buildClone();
         place.appendChild(clone);
         iterator++
+        if(values != null)
         clone.querySelectorAll("input").forEach(input => {
             input.value = values[input.id] ?? "";
         })
+
+        return clone
     }
 
-    return {addELement}
+    const wipeout = () => {
+        place.innerHTML = ""
+    }
+
+    return {addELement, wipeout}
 
 }
 

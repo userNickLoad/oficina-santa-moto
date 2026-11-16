@@ -7,9 +7,9 @@ const clone = (element: HTMLElement, iterator: number, value: string): HTMLEleme
     return clone;
 }
 
-const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=>void) => {
+const setSearchBox = (root: HTMLElement, action: string | any[], onSearch: ((value: any)=>void) | null = null, key: string = "nome", onInput: ((value: any, content: any[])=>void) | null = null, intrusive: boolean = false) => {
+    let content: any[] = (typeof action != "string")? action: []
     const input = root.querySelector<HTMLInputElement>('input[id^="search-input"]');
-  
 
     if (!input)
         throw new Error("não foi possivel achar o input da caixa de pesquisa");
@@ -59,10 +59,9 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
 
     const executeSearch = () => {
         const value = input.value.trim().toLowerCase();
-
+        
         if (!value)
             return;
-
     };
 
     button.addEventListener("click", executeSearch)
@@ -96,9 +95,6 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
 
         input.value = options[selectedIndex].textContent?.trim() ?? "";
 
-        if(onSearch)
-            onSearch(input.value)
-
         autocompleteBox.classList.add("h-0");
         autocompleteBox.classList.remove("h-auto");
 
@@ -118,6 +114,34 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
 
         clearSelection();
     });
+
+    const update = (content: any[])=> {
+        placement.innerHTML = "";
+
+        for (let i = 0; i < content.length; i++) {
+            const newElement = clone(defaultElement, i, (typeof content[i] == "object")? content[i][key]: content[i]);
+
+            // Seleção pelo mouse
+            newElement.addEventListener("mousedown", event => {
+                event.preventDefault();
+
+                input.value = newElement.textContent?.trim() ?? "";
+
+                autocompleteBox.classList.add("h-0");
+                autocompleteBox.classList.remove("h-auto");
+
+                if(onInput)
+                    onInput(input.value, content)
+
+                clearSelection();
+            });
+
+            placement.appendChild(newElement);
+        }
+    }
+
+    if(intrusive)
+        update(content)
 
     // Navegação pelo teclado
     input.addEventListener("keydown", event => {
@@ -159,13 +183,18 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
                     executeSearch();
                 }
 
+                if(onSearch)
+                    onSearch(input.value)
+
+                if(onInput)
+                    onInput(input.value, content)
+
                 break;
             }
 
             case "Escape": {
                 autocompleteBox.classList.add("h-0");
                 autocompleteBox.classList.remove("h-auto");
-
                 clearSelection();
                 break;
             }
@@ -174,22 +203,33 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
 
     // Pesquisa dinâmica
     input.addEventListener("input", async () => {
-        const value = input.value.trim().toLowerCase();
+        const valueb = input.value.trim().toLowerCase();
 
-        if (value === input.dataset.input)
-            return;
+        if(intrusive){
+            if(content.filter((c)=>(String(c).startsWith(String(valueb)))).length == 0){
+                input.value = valueb.slice(0, valueb.length - 1)
+            }
+        }
+
+        const value = input.value.trim().toLowerCase();
 
         input.dataset.input = value;
 
         clearSelection();
         placement.innerHTML = "";
 
-        if (value.length < 2)
-            return;
+        if(intrusive){
+            update(content.filter((c)=>(String(c).startsWith(String(valueb)))))
+            if(onInput)
+                onInput(value, content)
+            return
+        }
 
         try {
-            const result = await fetch(`${action}${encodeURIComponent(value)}`);
+            if(value.length < 2)
+                return
             
+            const result = await fetch(`${action}${encodeURIComponent(value)}`);
             if (!result.ok && result.status !== 404) {
                 window.alert("Erro ao tentar pesquisar o input na searchbox");
                 return;
@@ -200,34 +240,24 @@ const setSearchBox = (root: HTMLElement, action: string, onSearch: (value: any)=
                 return;
             }
 
-            const content: { nome: string }[] = await result.json();
+            content = await result.json();
 
-            for (let i = 0; i < content.length; i++) {
-                const newElement = clone(defaultElement, i, content[i].nome);
+            update(content)
 
-                // Seleção pelo mouse
-                newElement.addEventListener("mousedown", event => {
-                    event.preventDefault();
-
-                    input.value = newElement.textContent?.trim() ?? "";
-
-                    autocompleteBox.classList.add("h-0");
-                    autocompleteBox.classList.remove("h-auto");
-
-                    clearSelection();
-                });
-
-                placement.appendChild(newElement);
-            }
-
-            if(onSearch)
-                onSearch(content)
+            if(onInput)
+                onInput(value, content)
+           
 
         } catch (error) {
             console.log(error);
         }
     });
+
 };
+
+const rmSearchBox = (root: HTMLElement) => {
+
+}
 
 
 export {setSearchBox}
