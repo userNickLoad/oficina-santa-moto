@@ -58,8 +58,8 @@ CREATE TABLE IF NOT EXISTS local(
 	id SERIAL PRIMARY KEY,
 	id_local INTEGER REFERENCES local(id),
 	nome VARCHAR(20) NOT NULL,
-	linha INT NOT NULL CHECK (linha > 0),
-	coluna INT NOT NULL CHECK (coluna > 0),
+	linha INT CHECK (linha > 0),
+	coluna INT CHECK (coluna > 0),
 	linhas INT NOT NULL DEFAULT 1 CHECK (linhas > 0),
 	colunas INT NOT NULL DEFAULT 1 CHECK (colunas > 0),
 	CONSTRAINT uq_local_posicao

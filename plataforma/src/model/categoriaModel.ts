@@ -5,14 +5,12 @@ import { UniqueError } from "./errors.js";
 
 type Categoria = categoria;
 type CategoriaAtributosDTO = Categoria & {atributos: Atributo[]};
-type CategoriaCreateDTO = Omit<Categoria, "id"> & {atributos: AtributoCreateDTO[]};
+type CategoriaCreateDTO = Omit<Categoria, "id"> & {atributos: Omit<AtributoCreateDTO, "id_categoria">[]};
 type CategoriaUpdateDTO = {
     id: number,
     nome?: string,
     descricao?: string | null
 }
-
-
 
 class CategoriaModel {
     async getByIdWithAtributos(categoriaId: number): Promise<CategoriaAtributosDTO | null> {
@@ -36,16 +34,32 @@ class CategoriaModel {
         }
     }
 
-    async getByStartsWithName(categoriaName: string): Promise<Categoria[]>{
+    async getByStartsWithName(categoriaName: string): Promise<CategoriaAtributosDTO[]>{
         try{
-            return await prisma.categoria.findMany({
+            const result =  await prisma.categoria.findMany({
                 where: {
                     nome: {
                         startsWith: categoriaName,
                         mode: "insensitive"
                     }
+                },
+                include: {
+                    atributo: true
+                },
+                take: 20,
+                orderBy: {
+                    nome: 'asc'
                 }
             })
+
+            return result.map(r => {
+                const {atributo, ...dados} = r;
+
+                return {
+                    atributos: atributo,
+                    ...dados
+                }
+            });
         }catch(error){
             throw error;
         }

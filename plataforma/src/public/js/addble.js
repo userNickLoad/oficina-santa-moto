@@ -1,7 +1,5 @@
 const setAddble = function (element, name, iterator, cloneExpecific = null) {
     const btn_add = element.querySelector('button[id^="add-new-"]');
-    if (!btn_add)
-        throw new Error(`Não foi possivel localizar o botão de adição do ${element.id}`);
     const addble = element.querySelector('[id^="addble-element-"]');
     if (!addble)
         throw new Error(`não foi possivel localizar o elemento clonavel `);
@@ -11,7 +9,7 @@ const setAddble = function (element, name, iterator, cloneExpecific = null) {
     const place = element.querySelector('[id^="addble-placement-"]');
     if (!place)
         throw new Error("não foi possivel localizar o placement");
-    const buildClone = () => {
+    const buildClone = (selfName = null) => {
         const clone = addble.cloneNode(true);
         clone.classList.remove("hidden");
         clone.classList.add("flex");
@@ -24,7 +22,7 @@ const setAddble = function (element, name, iterator, cloneExpecific = null) {
         });
         clone.querySelectorAll("input").forEach(input => {
             input.disabled = false;
-            input.name = `${name}[${iterator}][${input.name}]`;
+            input.name = `${name}[${iterator}][${(selfName) ? selfName : input.name}]`;
             const parent = input.closest('[data-parent="inputbox"]');
             if (!parent)
                 return;
@@ -36,20 +34,26 @@ const setAddble = function (element, name, iterator, cloneExpecific = null) {
             cloneExpecific(clone);
         return clone;
     };
-    btn_add.addEventListener("click", () => {
-        const clone = buildClone();
-        place.appendChild(clone);
-        iterator++;
-    });
-    const addELement = (values) => {
-        const clone = buildClone();
-        place.appendChild(clone);
-        iterator++;
-        clone.querySelectorAll("input").forEach(input => {
-            input.value = values[input.id] ?? "";
+    if (btn_add)
+        btn_add.addEventListener("click", () => {
+            const clone = buildClone();
+            place.appendChild(clone);
+            iterator++;
         });
+    const addELement = (values = null, selfName = null) => {
+        const clone = buildClone(selfName);
+        place.appendChild(clone);
+        iterator++;
+        if (values != null)
+            clone.querySelectorAll("input").forEach(input => {
+                input.value = values[input.id] ?? "";
+            });
+        return clone;
     };
-    return { addELement };
+    const wipeout = () => {
+        place.innerHTML = "";
+    };
+    return { addELement, wipeout };
 };
 export { setAddble };
 //# sourceMappingURL=addble.js.map

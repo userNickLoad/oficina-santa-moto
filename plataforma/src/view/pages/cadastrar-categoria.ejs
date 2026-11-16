@@ -9,14 +9,14 @@
             action: "/api/categoria",
             method: "post",
             elements: [
-                {type: "input", input: {title: "Nome da categoria",  name: "atributo[nome]", type: "text", maxlength: 50, placeholder: "ex: óleo, escapamento, capacete etc..."}},
+                {type: "input", input: {title: "Nome da categoria",  name: "nome", type: "text", maxlength: 50, placeholder: "ex: óleo, escapamento, capacete etc..."}},
                 {
                     type: "addble_container",
                     container: {
                         id: "atributos",
                         title: "Atributos",
                         elements: [
-                            {type: "input", input: {title: "Nome do atributo", id: "nome-atributo", name: "nome atributo", maxlength: "20"}},
+                            {type: "input", input: {title: "Nome do atributo", id: "nome", name: "nome", maxlength: "20"}},
                             {   
                                 type: "container",
                                 container: {
@@ -34,7 +34,7 @@
                 },
                 {
                     type: "input", 
-                    input: {title: "Descricao", name: "atributo[descricao]", type: "textarea", maxlength: "250", placeholder: "Escreva a descrição da categoria (opcional)"}
+                    input: {title: "Descricao", name: "descricao", type: "textarea", maxlength: "250", placeholder: "Escreva a descrição da categoria (opcional)"}
                 }
             ],
             buttons: [  

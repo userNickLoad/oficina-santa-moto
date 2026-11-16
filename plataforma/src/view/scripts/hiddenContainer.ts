@@ -1,6 +1,7 @@
 
 type propReturns = {
-    toggle: ()=>void
+    toggle: ()=>void,
+    update: () => void
 }
 
 const setHiddenContainer = (containerId: string | HTMLElement, opened_message: string | null = null, func: (((value: boolean)=>void)) | null = null): propReturns => {
@@ -70,8 +71,19 @@ const setHiddenContainer = (containerId: string | HTMLElement, opened_message: s
 
         })
     }
+
+    const update = () => {
+        if(container_root.dataset.open === "true"){
+            const currentHeight = hidden.offsetHeight;
+            hidden.style.height = `${currentHeight}px`;
+
+            requestAnimationFrame(() => {
+                hidden.style.height = `${hidden.scrollHeight}px`;
+            });
+        }
+    }
     
-    return {toggle: toggle}
+    return {toggle: toggle, update}
 }
 
 export {setHiddenContainer}

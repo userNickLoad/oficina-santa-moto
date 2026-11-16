@@ -1,15 +1,12 @@
 type prop = {
-    addELement: (values: Record<string, any>)=>void
+    addELement: (values?: Record<string, any>, selfName?: string)=>HTMLElement, 
+    wipeout: ()=>void
 }
 
 const setAddble = function (element: HTMLElement, name: string, iterator: number, cloneExpecific: ((clone: HTMLElement) => void) | null = null): prop  {
     const btn_add = element.querySelector('button[id^="add-new-"]');
 
-    if(!btn_add)
-        throw new Error(`Não foi possivel localizar o botão de adição do ${element.id}`);
-
     const addble = element.querySelector<HTMLElement>('[id^="addble-element-"]');
-
     if(!addble)
         throw new Error(`não foi possivel localizar o elemento clonavel `);
 
@@ -23,7 +20,7 @@ const setAddble = function (element: HTMLElement, name: string, iterator: number
         throw new Error("não foi possivel localizar o placement");
 
 
-    const buildClone = (): HTMLElement => {
+    const buildClone = (selfName: string | null = null): HTMLElement => {
         const clone = addble.cloneNode(true) as HTMLElement;
 
         clone.classList.remove("hidden");
@@ -41,7 +38,7 @@ const setAddble = function (element: HTMLElement, name: string, iterator: number
 
         clone.querySelectorAll("input").forEach(input => {
             input.disabled = false;
-            input.name = `${name}[${iterator}][${input.name}]`;
+            input.name = `${name}[${iterator}][${(selfName)? selfName: input.name}]`;
 
             const parent = input.closest('[data-parent="inputbox"]')
 
@@ -60,24 +57,30 @@ const setAddble = function (element: HTMLElement, name: string, iterator: number
         return clone;
     }
 
-
+    if(btn_add)
     btn_add.addEventListener("click", ()=>{
         const clone = buildClone();
         place.appendChild(clone);
         iterator++;
-
     })
 
-    const addELement = (values: Record<string, any>): void => {
-        const clone = buildClone();
+    const addELement = (values: Record<string, any> | null = null, selfName: string | null = null): HTMLElement => {
+        const clone = buildClone(selfName);
         place.appendChild(clone);
         iterator++
+        if(values != null)
         clone.querySelectorAll("input").forEach(input => {
             input.value = values[input.id] ?? "";
         })
+
+        return clone
     }
 
-    return {addELement}
+    const wipeout = () => {
+        place.innerHTML = ""
+    }
+
+    return {addELement, wipeout}
 
 }
 

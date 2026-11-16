@@ -1,6 +1,6 @@
 console.log("LOGIN.TS CARREGADO");
 const verifyEmpty = (value) => {
-    return (value.trim() === "") ? "Campo vazio" : null;
+    return (String(value).trim() === "") ? "Campo vazio" : null;
 };
 const verifyTelefone = (value) => {
     if (value.replace(/\D/g, "").length < 10) {
@@ -20,10 +20,10 @@ const verifyEmail = (value) => {
 const parseFormData = (formData) => {
     const result = {};
     const setArrays = new Set();
+    console.log("Entries: ");
     for (const [key, value] of formData.entries()) {
         console.log(key, value);
         const match = key.match(/^([^\[]+)\[(\d+)\]\[([^\]]+)\]$/);
-        console.log(match);
         if (!match) {
             result[key] = value;
             continue;
@@ -79,7 +79,7 @@ const setForm = (formId = null, verifyIssues = null) => {
             let issueVerifyier = undefined;
             if (verifyIssues)
                 issueVerifyier = verifyIssues[input.id.match(/\[([^\]]+)\]$/)?.[1] ?? input.id];
-            const issue = (issueVerifyier) ? issueVerifyier(input.value) : verifyEmpty(input.value);
+            const issue = (issueVerifyier) ? issueVerifyier(input.value, input) : verifyEmpty(input.value);
             if (issue) {
                 console.log(issue, input.name);
                 errorDisplay.textContent = issue;
@@ -92,29 +92,42 @@ const setForm = (formId = null, verifyIssues = null) => {
             return;
         // Obtém os dados do formulário
         const formData = new FormData(form);
+        const contains_files = Array.from(form.querySelectorAll('input[type="file"]')).some(input => input.files && input.files.length > 0);
         const dados = parseFormData(formData);
-        const contains_files = Array.from(form.querySelectorAll('input[type="file"]')).some((input => (input.files && input.files.length > 0)));
+        let body;
+        let headers;
+        if (contains_files) {
+            const multipart = new FormData();
+            // Adiciona o JSON com os demais campos
+            multipart.append("content", JSON.stringify(dados));
+            // Adiciona os arquivos individualmente
+            form.querySelectorAll('input[type="file"]').forEach(input => {
+                if (!input.files)
+                    return;
+                for (const file of input.files) {
+                    multipart.append(input.name, file);
+                }
+            });
+            body = multipart;
+        }
+        else {
+            headers = {
+                "Content-Type": "application/json"
+            };
+            body = JSON.stringify(dados);
+        }
         try {
             const response = await fetch(form.action, {
                 method: form.method,
-                ...((contains_files) ? {
-                    body: formData
-                } :
-                    {
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(dados)
-                    })
+                headers,
+                body
             });
-            console.log("foi -1");
+            console.log(response);
             const resultado = await response.json();
-            console.log("foi");
             if (!response.ok) {
                 errorOutput.innerText = resultado.mensagem;
                 return;
             }
-            console.log("foi 2");
             if (resultado.redirect) {
                 window.location = resultado.redirect;
             }

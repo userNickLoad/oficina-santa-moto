@@ -9,7 +9,7 @@
             action: "/api/produto",
             method: "post",
             elements: [
-                {type: "input", input: {name: "Nome do produto", type: "text", title: "Nome do produto", maxlength: 50, placeholder: "ex: Óleo de motor 10W-30", text_size: "text-md", size: "w-full"}},
+                {type: "input", input: {name: "nome", type: "text", title: "Nome do produto", maxlength: 50, placeholder: "ex: Óleo de motor 10W-30", text_size: "text-md", size: "w-full"}},
                 {
                     type: "hidden_container", 
                     container: {
@@ -47,7 +47,20 @@
                                 }
         
                             },
-                            {type: "input", input: {title: "Nome da categoria", name: "Categoria", type: "text", maxlength: 50, placeholder: "ex: bateria, óleo, pneu, ect..", text_size: "text-md", size: "w-full"}}
+                            {type: "input", input: {title: "Nome da categoria", name: "categoria", id: "categoria", type: "search", maxlength: 50, placeholder: "ex: bateria, óleo, pneu, ect..", text_size: "text-md", size: "w-full"}},
+                            {
+                                type: "addble_container",
+                                container: {
+                                    id: "atributos",
+                                    title: "Atributos",
+                                    mask: "./addbleMaskInputVeiculo",
+                                    button: false,
+                                    elements: [
+                                        {type: "input", input: {title: "", id: "atributo", name: "atributo", maxlength: "20"}},
+                                    ]
+                                    
+                                }
+                            },
                         ]
                     }
                 },
@@ -72,24 +85,12 @@
                                                 content: "associar",
                                                 size: "w-[40%]"
                                             }
-                                        },
-                                        {
-                                            type: "button", 
-                                            button: {
-                                                type: "href", 
-                                                name: "cadastrar-marca", 
-                                                id: "cadastrar-marca", 
-                                                content: "cadastrar nova",
-                                                href: "/cadastrar-marca",
-                                                size: "w-[40%]"
-                                            }
                                         }
                                     ]
                                 }
         
                             },
-                            
-                            {type: "input", input: {title: "Nome da marca", name: "Marca", type: "text", maxlength: 50, placeholder: "ex: honda", text_size: "text-md", size: "w-full"}}
+                            {type: "input", input: {title: "Nome da marca", name: "marca", id: "marca", type: "search", maxlength: 50, placeholder: "ex: honda", text_size: "text-md", size: "w-full"}}
                         ]
                     }
                 },
@@ -99,8 +100,55 @@
                         id: "row",
                         elements: [
                             
-                            {type: "input", input: {title: "Quantidade", name: "quantidade", type: "number", maxlength: 50, placeholder: "1", text_size: "text-md", size: "w-[40%]" /*, size: "lg:w-[25vw] w-[40vw]"*/}},
-                            {type: "input", input: {title: "Preço", name: "preço", maxlength: 50, placeholder: "R$ 0,00", text_size: "text-md", mask: "currency", size: "w-[40%]" /*, size: "lg:w-[25vw] w-[40vw]"*/}}
+                            {type: "input", input: {title: "Quantidade", name: "quantidade", type: "number", maxlength: 50, placeholder: "1", text_size: "text-md", size: "w-[40%]", output: "Quantidade não alocada em prateleira" /*, size: "lg:w-[25vw] w-[40vw]"*/}},
+                            {type: "input", input: {title: "Preço", name: "preco", maxlength: 50, placeholder: "R$ 0,00", text_size: "text-md", mask: "currency", size: "w-[40%]" /*, size: "lg:w-[25vw] w-[40vw]"*/}}
+                        ]
+                    }
+                },
+                {
+                    type: "container",
+                    container: {
+                        id: "row",
+                        elements: [
+                            {type: "input", input: {title: "Alerta de quantidade", name: "alerta_quantidade", type: "number", maxlength: 50, placeholder: "1", text_size: "text-md", size: "w-[40%]",/*, size: "lg:w-[25vw] w-[40vw]"*/}},
+                        ]
+                    }
+                },
+                {
+                    type: "addble_container",     
+                    container: {
+                        id: "prateleiras",
+                        title: "Prateleiras",
+                        flex: "flex flex-col",
+                        mask: "./addbleMaskInputVeiculo",
+                        elements: [
+                            {type: "input", input: {size: "hidden", id: "estanteId", name: "estanteId"}},
+                            {type: "input", input: {title: "Localize a estante na loja (Faça primeiro)", type: "search", id: "local", name: "local", placeholder: "ex: estoque/parafusos, frente/ganchos", output: 'Separar com / (barra) as camadas de estoque'}},
+                            {
+                                type: "container", 
+                                container: {
+                                    id: "cordenadas",
+                                    title: "Identificação da estante",
+                                    css: "w-full flex flex-row justify-around",
+                                    elements: [
+                                        {type: "input", input: {title: "Linha", type: "search", name: "estanteRow", id: "estanteRow", size: "w-[40%]", placeholder: "ex: 2"}},
+                                        {type: "input", input: {title: "Coluna", type: "search", name: "estanteCol", id: "estanteCol", size: "w-[40%]", placeholder: "ex: 2"}},
+                                    ]
+                                }
+                            },
+                            {
+                                type: "container", 
+                                container: {
+                                    id: "cordenadas",
+                                    title: "Identificação da prateleira",
+                                    css: "w-full flex flex-row justify-around mt-[1vh]",
+                                    elements: [
+                                        {type: "input", input: {title: "Linha", type: "search", name: "prateleiraRow", id: "prateleiraRow", size: "w-[40%]", placeholder: "ex: 1"}},
+                                        {type: "input", input: {title: "Coluna", type: "search", name: "prateleiraCol", id: "prateleiraCol", size: "w-[40%]", placeholder: "ex: 3"}},
+                                    ]
+                                }
+                            },
+                            {type: "input", input: {type: "number", title: "Quantidade do produto na prateleira", id: "quantidade", name: "quantidade"}}
                         ]
                     }
                 },
@@ -111,7 +159,8 @@
                 {
                     type: "input",
                     input: {type: "image", id: "img-produto", name: "imagem", tile: "Imagem do produto", placeholder: "Arraste uma imagem do produto ou clique para escolher"}
-                }
+                },
+                      
             ],
             buttons: [
                 {
