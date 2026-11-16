@@ -48,8 +48,9 @@
             <% } else { %>
                 <div class="flex flex-col divide-y divide-gray-200">
                     <% innerContent.vendasRecentes.forEach((venda) => { %>
-                        <div class="flex flex-col gap-3 py-4">
-                            <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div class="w-full grid grid-cols-1 gap-2 py-3">
+
+                            <div class="w-full grid grid-cols-1 gap-1">
                                 <div>
                                     <p class="font-semibold text-gray-800">Venda #<%= venda.id %></p>
                                     <p class="text-sm text-gray-500"><%= venda.cliente %></p>
@@ -57,22 +58,32 @@
                                         <%= new Date(venda.data).toLocaleDateString("pt-BR") %>
                                     </p>
                                 </div>
-                                <p class="font-semibold text-gray-800">
-                                    <%= venda.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) %>
-                                </p>
-                            </div>
 
-                            <div class="flex flex-col gap-2 pl-3 border-l-2 border-gray-200">
-                                <% venda.produtos.forEach((produto) => { %>
-                                    <div class="flex items-center justify-between gap-3 text-sm">
-                                        <p class="text-gray-600">
-                                            <%= produto.quantidade %>x <%= produto.nome %>
-                                        </p>
-                                        <p class="text-gray-500">
-                                            <%= (produto.preco * produto.quantidade).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) %>
-                                        </p>
-                                    </div>
-                                <% }); %>
+                                <div class="flex flex-col gap-2 pl-3 border-l-2 border-gray-200">
+                                    <% venda.produtos.forEach((produto) => { %>
+                                        <div class="flex items-center justify-between gap-3 text-sm">
+                                            <p class="text-gray-600">
+                                                <%= produto.quantidade %>x <%= produto.nome %>
+                                            </p>
+                                            <p class="text-gray-500">
+                                                <%= (produto.preco * produto.quantidade).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) %>
+                                            </p>
+                                        </div>
+                                    <% }); %>
+                                </div>
+
+                                <div class="flex items-center justify-end gap-4 mt-1">
+                                    <p class="font-semibold text-gray-650">
+                                        Total: <%= venda.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) %>
+                                    </p>
+                                    <button type="button" 
+                                        class="excluir-venda inline-flex items-center gap-2 text-sm text-red-600 hover: text-red-800 transition"
+                                        data-id="<%= venda.id %>">
+                                        <img src="/assets/trash-bin.png" alt="" class="w-4 h-4">
+                                        <span>Excluir</span>
+                                    </button>
+                                </div>
+
                             </div>
                         </div>
                     <% }); %>
@@ -188,6 +199,48 @@
         if (event.key === "Escape" && !modalVenda.classList.contains("hidden")) {
             fecharModalVenda();
         }
+    });
+</script>
+
+<script>
+    document.querySelectorAll(".excluir-venda").forEach((botao) => {
+        botao.addEventListener("click", async () => {
+            const idVenda = botao.dataset.id;
+
+            const confirmar = confirm(
+                `Deseja realmente excluir a venda #${idVenda}?\n\nOs produtos serão devolvidos ao estoque.`
+            );
+
+            if (!confirmar) return;
+
+            botao.disabled = true;
+
+            try {
+                const resposta = await fetch(`/api/venda/${idVenda}`, {
+                    method: "DELETE"
+                });
+
+                const resultado = await resposta.json();
+
+                if (!resposta.ok) {
+                    throw new Error(resultado.mensagem || "Erro ao excluir venda.");
+                }
+
+                const toast = document.getElementById("toast-sucesso");
+                const mensagem = document.getElementById("mensagem-sucesso");
+
+                mensagem.textContent = resultado.mensagem || "Venda excluída com sucesso!";
+                toast.classList.remove("hidden");
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+
+            } catch (error) {
+                alert(error.message || "Erro ao excluir venda.");
+                botao.disabled = false;
+            }
+        });
     });
 </script>
 

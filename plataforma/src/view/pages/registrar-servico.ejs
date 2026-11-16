@@ -77,6 +77,17 @@
             + Novo cliente
         </button>
     </div>
+
+    <div id="veiculos-cliente" class="w-full max-w-[500px] mt-3 hidden">
+        <label for="selecionar-veiculo" class="block text-sm font-medium text-gray-700 mb-2">
+            Veículos cadastrados do cliente
+        </label>
+
+        <select id="selecionar-veiculo" class="w-full border border-gray-300 rounded-xl px-3 py-3 bg-white">
+            <option value="">Selecione um veículo</option>
+        </select>
+    </div>
+
     <div class="w-full max-w-[500px] mt-3">
         <button type="button" id="novo-veiculo" class="text-sm font-medium
             cursor-pointer px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors">
@@ -89,13 +100,15 @@
     <button type="button" id="adicionar-produto" class="text-sm font-medium cursor-pointer px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors">
         + Adicionar produto
     </button>
+
     <div id="lista-produtos" class="flex flex-col gap-2 mt-3"></div>
+
     <div class="mt-4 p-4 bg-gray-50 rounded-xl flex justify-between items-center gap-3">
         <span class="font-medium text-gray-500">Valor total do serviço:</span>
         <span id="valor-total-servico" class="font-semibold text-lg">R$ 0,00</span>
     </div>
-</div>
 
+</div>
 
 <style>
 
@@ -295,13 +308,23 @@
             secaoCliente.appendChild(botaoNovoCliente);
         }
     }
+
     const campoMarcaMoto = document.getElementById("search-input-marca");
     const campoModeloMoto = document.getElementById("search-input-modelo");
     const botaoNovoVeiculo = document.getElementById("novo-veiculo");
     const secaoVeiculo = campoModeloMoto.closest('[id^="container-"]');
+    const blocoVeiculosCliente = document.getElementById("veiculos-cliente");
+    const selecionarVeiculo = document.getElementById("selecionar-veiculo");
+
+    let veiculoSelecionado = null;
     if(secaoVeiculo && botaoNovoVeiculo){
         secaoVeiculo.appendChild(botaoNovoVeiculo);
     }
+
+    if(secaoVeiculo && blocoVeiculosCliente){
+        secaoVeiculo.prepend(blocoVeiculosCliente);
+    }
+
     const campoProdutoEstoque = document.getElementById("search-input-produto_estoque");
     const campoPrecoProduto = document.getElementById("preco_produto");
     const marcaHidden = document.getElementById("search-hidden-marca");
@@ -338,7 +361,9 @@
 
             clienteSelecionado = cliente.id;
             campoNomeCliente.value = cliente.nome;
-            campoTelefone.value = formatarTelefone((cliente.telefone || "").replace(/^\+55/, ""));
+            campoTelefone.value = formatarTelefone(cliente.telefone ?? "");
+
+            carregarVeiculosCliente([]);
 
             sugestoesClientes.hidden = true;
             mensagemErro.textContent = "";
@@ -352,6 +377,58 @@
 
     let idMarcaSelecionada = null;
     let idModeloSelecionado = null;
+
+    function carregarVeiculosCliente(veiculos = []) {
+        selecionarVeiculo.replaceChildren();
+
+        const opcaoInicial = document.createElement("option");
+        opcaoInicial.value = "";
+        opcaoInicial.textContent = "Selecione um veículo";
+        selecionarVeiculo.appendChild(opcaoInicial);
+
+        veiculoSelecionado = null;
+        blocoVeiculosCliente.classList.add("hidden");
+
+        veiculos.forEach(veiculo => {
+            const opcao = document.createElement("option");
+
+            opcao.value = veiculo.id;
+            opcao.textContent =
+                `${veiculo.modelo.marca.nome} ${veiculo.modelo.nome} - ${veiculo.ano}`;
+
+            selecionarVeiculo.appendChild(opcao);
+        });
+
+        if (veiculos.length > 0) {
+            blocoVeiculosCliente.classList.remove("hidden");
+        }
+
+        selecionarVeiculo.onchange = () => {
+            const veiculo = veiculos.find(
+                item => item.id === Number(selecionarVeiculo.value)
+            );
+
+            if (!veiculo) {
+                veiculoSelecionado = null;
+                return;
+            }
+
+            veiculoSelecionado = veiculo.id;
+
+            campoMarcaMoto.value = veiculo.modelo.marca.nome;
+            campoModeloMoto.value = veiculo.modelo.nome;
+            document.getElementById("ano_moto").value = veiculo.ano;
+
+            idMarcaSelecionada = veiculo.modelo.marca.id;
+            idModeloSelecionado = veiculo.modelo.id;
+
+            marcaHidden.value = idMarcaSelecionada;
+            modeloHidden.value = idModeloSelecionado;
+
+            botaoNovoVeiculo.textContent = "+ Adicionar veículo";
+            mensagemErro.textContent = "";
+        };
+    }
 
     botaoNovoVeiculo.addEventListener("click", async () => {
         const marca = campoMarcaMoto.value.trim();
@@ -454,19 +531,40 @@
 
     campoNomeCliente.addEventListener("input", async () => {
         clienteSelecionado = null;
+        
+        carregarVeiculosCliente([]);
+
+        campoMarcaMoto.value = " ";
+        campoModeloMoto.value = " ";
+        document.getElementById("ano_moto").value = "";
+
+        idMarcaSelecionada = null;
+        idModeloSelecionado = null;
+
+        marcaHidden.value = "";
+        modeloHidden.value = "";
+
+        botaoNovoVeiculo.textContent = "+ Adicionar veiculo";
+
         const nome = campoNomeCliente.value.trim();
         sugestoesClientes.hidden = true;
         if (nome.length < 2) return;
         try {
             const resposta = await fetch(`/api/cliente/buscar?nome=${encodeURIComponent(nome)}`);
             if (!resposta.ok) throw new Error("Erro ao buscar clientes");
+
             const clientes = await resposta.json();
+
             if (campoNomeCliente.value.trim() !== nome) return;
+
             mostrarSugestoes(sugestoesClientes, clientes, cliente => {
                 clienteSelecionado = cliente.id;
                 campoNomeCliente.value = cliente.nome;
-                campoTelefone.value = formatarTelefone(cliente.telefone??"");
+                campoTelefone.value = formatarTelefone(cliente.telefone ?? "");
+                carregarVeiculosCliente(cliente.veiculo ?? []);
+
             }, "Cliente não encontrado. Necessário cadastrá-lo.");
+
         } catch (erro) { console.error(erro); }
     });
 
@@ -529,6 +627,14 @@
             }, "Modelo não encontrado");
         } catch (erro) { console.error(erro); }
     });
+
+    [campoMarcaMoto, campoModeloMoto, document.getElementById("ano_moto")]
+        .forEach(campo => {
+            campo.addEventListener("input", () => {
+                veiculoSelecionado = null;
+                selecionarVeiculo.value = "";
+            });
+        });
 
     campoProdutoEstoque.addEventListener("input", async () => {
         produtoSelecionado = null;
@@ -668,7 +774,7 @@
     });
 
     function formatarTelefone(valor) {
-        const numeros = String(valor).replace(/\D/g, "").slice(0, 11);
+        const numeros = String(valor ?? "").replace(/\D/g, "").replace(/^55(?=\d{10,11}$)/, "").slice(0, 11);
 
         if (numeros.length <= 2) {
             return numeros.length

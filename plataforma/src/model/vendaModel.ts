@@ -49,7 +49,6 @@ export class VendaModel {
         };
     }
 
-    
     async buscarHistoricoVendas(filtros: {
         cliente?: string;
         dataInicial?: string;
@@ -135,6 +134,10 @@ export class VendaModel {
             const itens = [];
 
             for(const item of dados.produtos){
+                if(!Number.isSafeInteger(item.quantidade) || item.quantidade <=0 ){
+                    throw new Error("A quantidade vendida não pode ser negativa");
+                }
+                
                 const produto = await tx.produto.findUnique({
                     where: {
                         id: item.id_produto
