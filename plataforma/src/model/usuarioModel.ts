@@ -206,5 +206,4 @@ export class UsuarioModel {
         await redisdb.DEL(sessionKey);
 
     }
-
 }
