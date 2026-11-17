@@ -23,7 +23,7 @@ class CategoriaController{
             return res.status(500).json({message: "algum erro ocorreu"});
 
         }
-    }
+    }   
 
     async getByStartsWithName(req: Request, res: Response){
         const  paramNome  = req.query.nome;
@@ -45,7 +45,7 @@ class CategoriaController{
     }
 
     async create(req: Request, res: Response){
-        const {atributo, ...dados} = req.body;
+        const {atributo = [], ...dados} = req.body;
 
         const newCategoria: CategoriaCreateDTO = {
             ...dados,

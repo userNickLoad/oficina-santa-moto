@@ -5,9 +5,13 @@ import { VendaModel } from "../model/vendaModel.js";
 import { AppError } from "../model/errors.js";
 import { ProdutoImagemLocalizacaoDTO } from "../model/produtoModel.js";
 import { getProdutoByIdMiddle } from "../controller/produtoController.js";
+import { CategoriaModel } from "../model/categoriaModel.js";
+import { MarcaModel } from "../model/marcaModel.js";
 
 const clienteModel = new ClienteModel();
 const vendaModel = new VendaModel();
+const categoriaModel = new CategoriaModel();
+const marcaModel = new MarcaModel();
 
 const router = Router();
 
@@ -32,14 +36,34 @@ router.get("/entrar", (req: Request, res: Response) => {
 });
 
 
-router.get("/estoque", authMiddleware, (req: Request, res: Response) => {
+router.get("/estoque", authMiddleware, async (req: Request, res: Response) => {
+    try {
+        const categoriasDB = await categoriaModel.getByStartsWithName("");
+        const marcas = await marcaModel.getByStartsWithName("");
 
-    res.render("./layouts/index", {
-        title: "estoque",
-        content: "../pages/estoque",
-        voltar: true
-    });
-})
+        const categories = categoriasDB.map(categoria => ({
+            id: categoria.id,
+            nome: categoria.nome,
+            attributes: categoria.atributos.map(atributo => ({
+                ...atributo,
+                values: []
+            }))
+        }));
+
+        res.render("./layouts/index", {
+            title: "estoque",
+            content: "../pages/estoque",
+            voltar: true,
+            categories,
+            marcas
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar filtros do estoque:", error);
+
+        res.status(500).send("Erro ao carregar a página de estoque.");
+    }
+});
 
 
 router.get("/cadastrar-produto", authMiddleware, (req: Request, res: Response) => {
