@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ProdutoCreateDTO, ProdutoModel } from "../model/produtoModel.js";
 import { unlink } from "node:fs/promises";
+import { AppError } from "../model/errors.js";
 
 const produtoModel = new ProdutoModel();
 
@@ -51,7 +52,6 @@ export async function criarProduto(req: Request, res: Response) {
             throw new Error("Content não achado")
 
         const content = JSON.parse(contentString);
-        console.log(content)
         const {atributo, preco, marcaId, categoriaId, categoria, prateleira, marca, quantidade, alerta_quantidade, ...produto} = content
 
         if(produto["imagem[]"])
@@ -73,7 +73,7 @@ export async function criarProduto(req: Request, res: Response) {
             imagens: arquivos?.map(arquivo => arquivo.filename) ?? []
         };
 
-        const prateleiras = prateleira.map((p: any) => {
+        const prateleiras = prateleira?.map((p: any) => {
                 const {estanteId, prateleiraRow, prateleiraCol, quantidade} = p;
 
                 return {
@@ -82,7 +82,7 @@ export async function criarProduto(req: Request, res: Response) {
                     coluna: (prateleiraCol)? Number(prateleiraCol) : 1,
                     quantidade: Number(quantidade)
                 }
-            })
+            }) ?? []
 
 
         const produtoCriado = await produtoModel.create(newProduto, prateleiras, Number(quantidade ?? ""), marca);
@@ -107,4 +107,22 @@ export async function criarProduto(req: Request, res: Response) {
                 : "Erro ao cadastrar produto"
         });
     }
+}
+
+export async function getProdutoByIdMiddle(req: Request, res: Response, next: NextFunction){
+    const produtoId = Number(req.params.id ?? "")
+
+    if(produtoId == 0){
+        return next(new AppError("Volte para outra pagina e tente novamente", 400))
+    }
+
+    const produto = await produtoModel.getProduto(produtoId);
+
+    if(!produto){
+        return next(new AppError("Produto não encontrado", 404))
+    }
+
+    res.locals.produto = produto;
+
+    return next()
 }

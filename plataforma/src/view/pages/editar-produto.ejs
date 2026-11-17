@@ -1,0 +1,202 @@
+
+<%  
+    const { produto } = innerContent;
+    const {nome, preco_venda, qtd_disponivel, descricao, alerta_quantidade} = produto;
+
+    console.log(produto);
+%>
+<section class="flex flex-col w-full items-center">
+    <h1 class="my-[2vh] text-lg w-full">
+        Entrada no estoque
+    </h1>
+
+    <%- include("../partials/cadastrar/form", {
+        form: {
+            id: "form-cadastrar-produto",
+            action: "/api/produto",
+            method: "post",
+            elements: [
+                {type: "input", input: {name: "nome", type: "text", title: "Nome do produto", maxlength: 50, placeholder: "ex: Óleo de motor 10W-30", text_size: "text-md", size: "w-full", value: nome}},
+                {
+                    type: "hidden_container", 
+                    container: {
+                        id: "categoria",
+                        title: "Categoria",
+                        elements: [
+                            {   
+                                type: "container",
+                                container: {
+                                    id: "categoria-opçoes",
+                                    elements: [
+                                        {
+                                            type: "button", 
+                                            button: {
+                                                type: "simple", 
+                                                name: "activation-categoria", 
+                                                id: "activation-categoria", 
+                                                content: "editar",
+                                                size: "w-[40%]"
+                                            }
+                                        },
+                                        {
+                                            type: "button", 
+                                            button: {
+                                                type: "href", 
+                                                name: "adicionar-categoria", 
+                                                id: "adicionar-categoria", 
+                                                content: "cadastrar nova",
+                                                href: "/cadastrar-categoria",
+                                                size: "w-[40%]"
+                                            }
+                                        }
+                                    ]
+                                }
+        
+                            },
+                            {type: "input", input: {title: "Nome da categoria", name: "categoria", id: "categoria", type: "search", maxlength: 50, placeholder: "ex: bateria, óleo, pneu, ect..", text_size: "text-md", size: "w-full"}},
+                            {
+                                type: "addble_container",
+                                container: {
+                                    id: "atributos",
+                                    title: "Atributos",
+                                    mask: "./addbleMaskInputVeiculo",
+                                    button: false,
+                                    elements: [
+                                        {type: "input", input: {title: "", id: "atributo", name: "atributo", maxlength: "20"}},
+                                    ]
+                                    
+                                }
+                            },
+                        ]
+                    }
+                },
+                {
+                    type: "hidden_container", 
+                    container: {
+                        id: "marca",
+                        title: "Marca",
+                        elements: [
+                            {   
+                                type: "container",
+                                container: {
+                                    id: "marca-opçoes",
+                                    elements: [
+                                        {
+                                            type: "button", 
+                                            button: {
+                                                type: "simple", 
+                                                name: "activation-marca", 
+                                                id: "activation-marca", 
+                                                content: "editar",
+                                                size: "w-[40%]"
+                                            }
+                                        }
+                                    ]
+                                }
+        
+                            },
+                            {type: "input", input: {title: "Nome da marca", name: "marca", id: "marca", type: "search", maxlength: 50, placeholder: "ex: honda", text_size: "text-md", size: "w-full"}}
+                        ]
+                    }
+                },
+                {
+                    type: "container",
+                    container: {
+                        id: "row",
+                        elements: [
+                            {type: "input", input: {title: "Alerta de quantidade", name: "alerta_quantidade", type: "number", maxlength: 50, placeholder: "1", text_size: "text-md", size: "w-[40%]",/*, size: "lg:w-[25vw] w-[40vw]"*/}},
+                            {type: "input", input: {title: "Preço", name: "preco", maxlength: 50, placeholder: "R$ 0,00", text_size: "text-md", mask: "currency", size: "w-[40%]" /*, size: "lg:w-[25vw] w-[40vw]"*/}}
+                        ]
+                    }
+                },
+                {
+                    type: "hidden_container",
+                    container: {
+                        id: "prateleiras",
+                        title: "Prateleiras",
+                        elements: [
+                            {
+                                type: "container",
+                                container: {
+                                    id: "prateleiras-opçoes",
+                                    elements: [
+                                        {
+                                            type: "button",
+                                            button: {
+                                                type: "simple",
+                                                name: "activation-marca",
+                                                id: "activation-marca",
+                                                content: "editar",
+                                                size: "w-[40%]"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                type: "addble_container",     
+                                container: {
+                                    id: "prateleiras",
+                                    flex: "flex flex-col",
+                                    mask: "./addbleMaskInputVeiculo",
+                                    elements: [
+                                        {type: "input", input: {size: "hidden", id: "estanteId", name: "estanteId"}},
+                                        {type: "input", input: {title: "Localize a estante na loja (Faça primeiro)", type: "search", id: "local", name: "local", placeholder: "ex: estoque/parafusos, frente/ganchos", output: 'Separar com / (barra) as camadas de estoque'}},
+                                        {
+                                            type: "container", 
+                                            container: {
+                                                id: "cordenadas",
+                                                title: "Identificação da estante",
+                                                css: "w-full flex flex-row justify-around",
+                                                elements: [
+                                                    {type: "input", input: {title: "Linha", type: "search", name: "estanteRow", id: "estanteRow", size: "w-[40%]", placeholder: "ex: 2"}},
+                                                    {type: "input", input: {title: "Coluna", type: "search", name: "estanteCol", id: "estanteCol", size: "w-[40%]", placeholder: "ex: 2"}},
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            type: "container", 
+                                            container: {
+                                                id: "cordenadas",
+                                                title: "Identificação da prateleira",
+                                                css: "w-full flex flex-row justify-around mt-[1vh]",
+                                                elements: [
+                                                    {type: "input", input: {title: "Linha", type: "search", name: "prateleiraRow", id: "prateleiraRow", size: "w-[40%]", placeholder: "ex: 1"}},
+                                                    {type: "input", input: {title: "Coluna", type: "search", name: "prateleiraCol", id: "prateleiraCol", size: "w-[40%]", placeholder: "ex: 3"}},
+                                                ]
+                                            }
+                                        },
+                                        {type: "input", input: {type: "number", title: "Quantidade do produto na prateleira", id: "quantidade", name: "quantidade"}}
+                                    ]
+                                }
+                            },
+                        ]
+                    }
+                },
+                {
+                    type: "input", 
+                    input: {title: "Descricao", name: "descricao", id: "descricao", type: "textarea", maxlength: "250", placeholder: "Escreva a descrição do produto", text_size: "text-md"}
+                },
+                {
+                    type: "input",
+                    input: {type: "image", id: "img-produto", name: "imagem", tile: "Imagem do produto", placeholder: "Arraste uma imagem do produto ou clique para escolher"}
+                },
+                      
+            ],
+            buttons: [
+                {
+                    type: "submit",
+                    id: "submit",
+                    name: "submit",
+                    content: "Salvar alterações",
+                    submit: true,
+                    svg: { path: "save-icon"}
+                }
+            ]
+        }
+    }) %>
+</section>
+
+<script type="module" src="/js/editarProduto.js"></script>
+<script src="/js/currencyMask.js"></script>
+<script src="/js/inputFile.js"></script>

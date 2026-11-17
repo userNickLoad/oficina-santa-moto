@@ -1,4 +1,5 @@
-import { produto, produto_atributo, Prisma, imagem, local, prateleira, estante } from "../../generated/prisma/client.js";
+import { Decimal } from "@prisma/client/runtime/client";
+import { produto, produto_atributo, Prisma, imagem, local, prateleira, estante, atributo } from "../../generated/prisma/client.js";
 import prisma from "../database/prisma.js";
 import { Atributo } from "./atributoModel.js";
 import { FormFill } from "./errors.js";
@@ -8,9 +9,7 @@ type Produto = produto;
 type ProdutoGetDTO = produto & {imagens: imagem[]};
 type EstanteDTO = estante & {local: Local[]};
 type PrateleiraDTO = prateleira & {estante: EstanteDTO};
-type ProdutoImagemLocalizacaoDTO = produto & {imagens: imagem[], prateleiras: PrateleiraDTO[]};
-
-type ProdutoAtributo = produto_atributo;
+type ProdutoImagemLocalizacaoDTO = produto & {imagens: imagem[], prateleiras: PrateleiraDTO[], atributos: Record<string, number | string | null>};
 
 type PrateleiraAddDTO = {id_estante: number, coluna: number, linha: number, quantidade: number} 
 
@@ -23,7 +22,7 @@ type ProdutoCreateDTO = Omit<
 };
 type ProdutoFilterDTO = {
     nome?: string,
-    id_categoria?: number,
+    id_categoria?: number | null,
     id_marca?: number,
     atributos?: {
         id_atributo: number,
@@ -40,7 +39,7 @@ class ProdutoModel{
         newProduto: ProdutoCreateDTO,
         estante: PrateleiraAddDTO[],
         quantidade: number,
-        marca: string
+        marca: string | null
     ): Promise<Produto> {
 
         const { atributos, imagens, ...produto } = newProduto;
@@ -49,49 +48,62 @@ class ProdutoModel{
 
         estante.map(e => {qtd_disponivel += e.quantidade})
 
-        if (!produto.id_categoria)
-            throw new FormFill("não foi possivel localizar o id da categoria");
+        let atributosToAdd: Prisma.produto_atributoCreateWithoutProdutoInput[] | null = null
 
-        // Lógica original dos atributos (preservada)
-        const atributosDB = await prisma.atributo.findMany({
+        if (produto.id_categoria){
+            const atributosDB = await prisma.atributo.findMany({
             where: {
                 id_categoria: produto.id_categoria
             }
         });
 
-        const atributosToAdd = atributosDB.flatMap<
+        atributosToAdd = atributosDB.flatMap<
             Prisma.produto_atributoCreateWithoutProdutoInput
-        >((atributo) => {
+            >((atributo) => {
 
-            const nome = atributo.nome.trim().toLowerCase();
+                const nome = atributo.nome.trim().toLowerCase();
 
-            const at = atributos.find(
-                item => Object.keys(item).some(
-                    chave => chave.trim().toLowerCase() === nome
-                )
-            );
+                const at = atributos.find(
+                    item => Object.keys(item).some(
+                        chave => chave.trim().toLowerCase() === nome
+                    )
+                );
 
-            let valor = at
-                ? at[Object.keys(at).find(
-                    chave => chave.trim().toLowerCase() === nome
-                )!]
-                : undefined;
+                let valor = at
+                    ? at[Object.keys(at).find(
+                        chave => chave.trim().toLowerCase() === nome
+                    )!]
+                    : undefined;
 
-            if (valor === undefined || valor === "") {
-                if (atributo.obrigatorio) {
-                    throw new FormFill(
-                        `Atributo "${atributo.nome}" obrigatório não tem valor`
-                    );
+                if (valor === undefined || valor === "") {
+                    if (atributo.obrigatorio) {
+                        throw new FormFill(
+                            `Atributo "${atributo.nome}" obrigatório não tem valor`
+                        );
+                    }
+
+                    return [];
                 }
 
-                return [];
-            }
+                if (atributo.numerico) {
+                    valor = Number(String(valor ?? "").replace(",", "."))
+                    if (Number.isNaN(valor)) {
+                        throw new FormFill(
+                            `Atributo "${atributo.nome}" deveria ser numérico`
+                        );
+                    }
 
-            if (atributo.numerico) {
-                valor = Number(String(valor ?? "").replace(",", "."))
-                if (Number.isNaN(valor)) {
+                    return [{
+                        atributo: {
+                            connect: { id: atributo.id }
+                        },
+                        valor_numerico: valor
+                    }];
+                }
+
+                if (typeof valor !== "string") {
                     throw new FormFill(
-                        `Atributo "${atributo.nome}" deveria ser numérico`
+                        `Atributo "${atributo.nome}" deveria ser textual`
                     );
                 }
 
@@ -99,23 +111,13 @@ class ProdutoModel{
                     atributo: {
                         connect: { id: atributo.id }
                     },
-                    valor_numerico: valor
+                    valor_texto: valor
                 }];
-            }
-
-            if (typeof valor !== "string") {
-                throw new FormFill(
-                    `Atributo "${atributo.nome}" deveria ser textual`
-                );
-            }
-
-            return [{
-                atributo: {
-                    connect: { id: atributo.id }
-                },
-                valor_texto: valor
-            }];
-        });
+            });
+        }
+            
+        // Lógica original dos atributos (preservada)
+       
 
 
         // Evita posições duplicadas
@@ -232,7 +234,7 @@ class ProdutoModel{
 
             let marcaId = newProduto.id_marca 
 
-            if(marcaId == null || marcaId == 0)
+            if((marcaId == null || marcaId == 0) && marca != null)
                 marcaId =  (await tx.marca.upsert({
                         where: {
                             nome: marca
@@ -269,10 +271,10 @@ class ProdutoModel{
                             }
                         }))
                     },
-
-                    produto_atributo: {
+                    ...((atributosToAdd)?({produto_atributo: {
                         create: atributosToAdd
-                    },
+                    }}) : {}),
+                    
 
                     produto_prateleira: {
                         create: prateleiraDB.map(p => ({
@@ -368,6 +370,12 @@ class ProdutoModel{
                             }
                         }
                     }
+                }, 
+                categoria: true,
+                produto_atributo: {
+                    include: {
+                        atributo: true
+                    }
                 }
             }
         })
@@ -375,7 +383,7 @@ class ProdutoModel{
         if(!result)
             return null;
 
-        const {produto_prateleira, produto_imagem, ...dados} = result;
+        const {produto_prateleira, produto_imagem, produto_atributo = [], ...dados} = result;
 
         const prateleiras = (await Promise.all(produto_prateleira.map(async pp => {    
             const localId = pp.prateleira.estante.id_local;          
@@ -390,10 +398,22 @@ class ProdutoModel{
     
         }))).filter((p): p is PrateleiraDTO => p !== null)
 
+        const atributos: Record<string, number | string | null> = {};
+        produto_atributo.map((p) => {
+            const {atributo, valor_numerico, valor_texto} = p
+            if(atributo.numerico && valor_numerico){
+                atributos[atributo.nome] = Number(valor_numerico)  
+            }else if(valor_texto){
+                atributos[atributo.nome] = valor_texto
+            }
+            atributos[atributo.nome] = null
+        })
+
         return {
             ...dados,
             imagens: produto_imagem.map(pi => (pi.imagem)),
-            prateleiras: prateleiras
+            prateleiras: prateleiras,
+            atributos: atributos
         }
     }
 
@@ -414,4 +434,4 @@ class ProdutoModel{
     }
 }
 
-export {ProdutoModel, ProdutoCreateDTO }
+export {ProdutoModel, ProdutoCreateDTO, ProdutoImagemLocalizacaoDTO }
