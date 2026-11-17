@@ -52,7 +52,7 @@ export async function criarProduto(req: Request, res: Response) {
 
         const content = JSON.parse(contentString);
         console.log(content)
-        const {atributo, preco, marcaId, categoriaId, categoria, prateleira, marca, quantidade, alerta_quantidade, ...produto} = content
+        const {atributo= [], preco, marcaId, categoriaId, categoria, prateleira = [], marca, quantidade, alerta_quantidade, ...produto} = content;
 
         if(produto["imagem[]"])
             delete produto["imagem[]"]
@@ -105,6 +105,33 @@ export async function criarProduto(req: Request, res: Response) {
             mensagem: error instanceof Error
                 ? error.message
                 : "Erro ao cadastrar produto"
+        });
+    }
+}
+
+export async function listarProdutosEstoque(req: Request, res: Response) {
+    try {
+        const pagina = Math.max(1, Number(req.query.pagina) || 1);
+
+        const produtos = await produtoModel.getByFilter({
+            pagina
+        });
+
+        return res.status(200).json(
+            produtos.map(produto => ({
+                id: produto.id,
+                nome: produto.nome,
+                preco_venda: produto.preco_venda,
+                qtd_disponivel: produto.qtd_disponivel,
+                imagem: produto.imagens[0]?.caminho ?? null
+            }))
+        );
+
+    } catch (error) {
+        console.error("Erro ao listar produtos do estoque:", error);
+
+        return res.status(500).json({
+            mensagem: "Erro ao carregar produtos do estoque."
         });
     }
 }
