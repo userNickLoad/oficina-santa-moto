@@ -1,27 +1,61 @@
-async function carregarProdutosEstoque() {
+let paginaAtual = 1;
+let carregandoProdutos = false;
+let existemMaisProdutos = true;
+
+let versaoFiltros = 0;
+
+function reiniciarListagem(){
+    versaoFiltros++;
+    paginaAtual = 1;
+    existemMaisProdutos = true;
+
     const lista = document.getElementById("lista-produtos");
-    const mensagem = document.getElementById("mensagem-estoque");
+    lista?.replaceChildren();
+
+    if(!carregandoProdutos){
+        carregarProdutosEstoque();
+    }
+}
+
+async function carregarProdutosEstoque() {
+    if(carregandoProdutos || !existemMaisProdutos) return;
+
+    const lista = document.getElementById("lista-produtos");
+    const mensagem = document.getElementById("mensagem-estoque");   
+
+    if(!lista || !mensagem) return;
+
+    carregandoProdutos = true;
+    const versaoRequisicao = versaoFiltros;
+
+    let carregamentoConcluido = false;
+
     const pesquisa = document.querySelector('input[name="nomeProduto"]');
     const itemPesquisa = pesquisa?.value.trim().toLowerCase() ?? "";
-    const categoriaSelecionada = document.querySelector('input[name="categorias"]:checked');
-    const idCategoria = categoriaSelecionada?.value;
-    const marcaSelecionada = document.querySelector('input[name="filtros[1]"]:checked');
-    const idMarca = marcaSelecionada?.value;
+    const categoriaSelecionada = document.querySelectorAll('input[name="categorias"]:checked');
+    const marcaSelecionada = document.querySelectorAll('input[name="filtros[1]"]:checked');
     const disponibilidadeSelecionada = Array.from(document.querySelectorAll('input[name="filtros[2]"]:checked')).map(input => input.value);
-
-    if (!lista || !mensagem) return;
 
     mensagem.classList.add("hidden");
 
     try {
         const url = new URL("/api/produto/estoque", window.location.origin);
-
-        if(idCategoria){
-            url.searchParams.set("id_categoria", idCategoria);
+        url.searchParams.set("pagina", paginaAtual);
+        if(itemPesquisa){
+            url.searchParams.set("nome", itemPesquisa);
         }
 
-        if(idMarca){
-            url.searchParams.set("id_marca", idMarca);
+        categoriaSelecionada.forEach(categoria => {
+            url.searchParams.append("id_categoria", categoria.value);
+        });
+
+        marcaSelecionada.forEach(marca => {
+            url.searchParams.append("id_marca", marca.value);
+        });
+
+        if(disponibilidadeSelecionada.length === 1){
+            const disponibilidade = disponibilidadeSelecionada[0] === "20" ? "em_estoque" : "sem_estoque";
+            url.searchParams.set("disponibilidade", disponibilidade);
         }
 
         const resposta = await fetch(url);
@@ -31,21 +65,14 @@ async function carregarProdutosEstoque() {
         }
 
         const produtos = await resposta.json();
-        const produtosFiltrados = produtos.filter(produto => {
-            const correspondeNome = produto.nome.toLowerCase().includes(itemPesquisa);
-            const quantidade = Number(produto.qtd_disponivel);
-
-            const correspondeDisponibilidade = disponibilidadeSelecionada.length === 0 || disponibilidadeSelecionada.length === 2 ||
-                (disponibilidadeSelecionada.includes("20") && quantidade > 0) || (disponibilidadeSelecionada.includes("21") && quantidade === 0);
-
-            return correspondeNome && correspondeDisponibilidade;
-        });
+        if(versaoRequisicao !== versaoFiltros){return;}
+        existemMaisProdutos = produtos.length === 20;
+        const produtosFiltrados = produtos;
         
-        lista.replaceChildren();
         mensagem.classList.add("hidden");
         mensagem.style.display = "none";
 
-        if (produtosFiltrados.length === 0) {
+        if (produtosFiltrados.length === 0 && lista.children.length === 0) {
             mensagem.replaceChildren();
             const imagem = document.createElement("img");
             imagem.src = "/assets/estoque.png";
@@ -59,7 +86,7 @@ async function carregarProdutosEstoque() {
             mensagem.style.display = "flex";
             mensagem.style.flexDirection = "column";
             mensagem.style.alignItems = "center";
-            
+            existemMaisProdutos = false;
             return;
         }
 
@@ -96,10 +123,35 @@ async function carregarProdutosEstoque() {
             lista.appendChild(card);
         });
 
+        paginaAtual++;
+        carregamentoConcluido = true;
+
     } catch (erro) {
         console.error("Erro ao carregar estoque:", erro);
-        mensagem.textContent = "Não foi possível carregar os produtos";
-        mensagem.classList.remove("hidden");
+        if(versaoRequisicao === versaoFiltros){
+            existemMaisProdutos = false;
+            
+            mensagem.textContent = "Não foi possível carregar os produtos";
+            mensagem.classList.remove("hidden");
+            mensagem.style.display = "flex";
+        }
+        
+    } finally{
+        carregandoProdutos = false;
+
+        if(versaoRequisicao !== versaoFiltros){
+            carregarProdutosEstoque();
+        }else if(carregamentoConcluido && existemMaisProdutos){
+            const marcador = document.getElementById("marcador-scroll");
+
+            if(marcador){
+                const posicao = marcador.getBoundingClientRect();
+
+                if(posicao.top <= window.innerHeight + 200 && posicao.bottom >= -200){
+                    carregarProdutosEstoque();
+                }
+            }
+        }
     }
 }
 
@@ -107,28 +159,51 @@ document.addEventListener("DOMContentLoaded", () => {
     const pesquisa = document.querySelector('input[name="nomeProduto"]');
     const formulario = document.getElementById("filters-form");
 
-    carregarProdutosEstoque();
+    reiniciarListagem();
 
-    pesquisa?.addEventListener("input", carregarProdutosEstoque);
+    pesquisa?.addEventListener("input", reiniciarListagem);
 
     formulario?.addEventListener("submit", (evento) => {
         evento.preventDefault();
-        carregarProdutosEstoque();
+        reiniciarListagem();
     });
 
     const categorias = document.querySelectorAll('input[name="categorias"]');
     categorias.forEach(categoria => {
-        categoria.addEventListener("change", carregarProdutosEstoque);
+        categoria.addEventListener("change", reiniciarListagem);
     });
 
     const marcas = document.querySelectorAll('input[name="filtros[1]"]');
     marcas.forEach(marca => {
-        marca.addEventListener("change", carregarProdutosEstoque);
+        marca.addEventListener("change", reiniciarListagem);
     });   
 
     const disponibilidades = document.querySelectorAll('input[name="filtros[2]"]');
     disponibilidades.forEach(disponibilidade => {
-        disponibilidade.addEventListener("change", carregarProdutosEstoque);
-    });   
+        disponibilidade.addEventListener("change", reiniciarListagem);
+    });
+    
+    const botaoLimpar = document.getElementById("limpar-filtros");
+    botaoLimpar?.addEventListener("click", () => {
+        formulario?.reset();
+        reiniciarListagem();
+    });
+
+    const observador = new IntersectionObserver((entradas) => {
+        if(entradas[0].isIntersecting && !carregandoProdutos && existemMaisProdutos){
+            carregarProdutosEstoque();  
+        }
+    }, {rootMargin: "200px"});
+
+    const marcador = document.createElement("div");
+    marcador.id = "marcador-scroll";
+    marcador.style.height = "1px";
+
+    const lista = document.getElementById("lista-produtos");
+
+    if(lista){
+        lista.insertAdjacentElement("afterend", marcador);
+        observador.observe(marcador);   
+    }
 
 });

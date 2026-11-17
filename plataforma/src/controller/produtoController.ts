@@ -109,48 +109,69 @@ export async function criarProduto(req: Request, res: Response) {
     }
 }
 
-
 export async function listarProdutosEstoque(req: Request, res: Response) {
     try {
         const pagina = Math.max(1, Number(req.query.pagina) || 1);
 
+        const disponibilidadeParam = req.query.disponibilidade;
+
+        if(disponibilidadeParam !== undefined && disponibilidadeParam !== "em_estoque" && disponibilidadeParam !== "sem_estoque"){
+            return res.status(400).json({
+                mensagem: "Disponibilidade inválida"
+            });
+        }
+
+        const disponibilidade = disponibilidadeParam as "em_estoque" | "sem_estoque" | undefined;
+
+        const nomeParam = req.query.nome;
+
+        if(nomeParam !== undefined && typeof nomeParam !== "string"){
+            return res.status(400).json({
+                mensagem: "Nome do produto inválido"
+            });
+        }
+        const nome = nomeParam?.trim() || undefined;
+
         const categoriaParam = req.query.id_categoria;
 
-        let id_categoria: number | undefined;
+        let id_categoria: number[] | undefined;
 
         if (categoriaParam !== undefined) {
-            if (
-                typeof categoriaParam !== "string" ||
-                !/^\d+$/.test(categoriaParam) ||
-                Number(categoriaParam) < 1
+            const categorias = Array.isArray(categoriaParam) ? categoriaParam : [categoriaParam];
+            if (categorias.some( categoria => typeof categoria !== "string" ||
+                !/^\d+$/.test(categoria) || !Number.isSafeInteger(Number(categoria)) || Number(categoria) < 1)
             ) {
                 return res.status(400).json({
                     mensagem: "Categoria inválida."
                 });
             }
 
-            id_categoria = Number(categoriaParam);
+            id_categoria = categorias.map(categoria => Number(categoria));
         }
 
         const marcaParam = req.query.id_marca;
 
-        let id_marca: number | undefined;
+        let id_marca: number[] | undefined;
 
         if (marcaParam !== undefined) {
-            if (
-                typeof marcaParam !== "string" || !/^\d+$/.test(marcaParam) || Number(marcaParam) < 1) {
+            const marcas = Array.isArray(marcaParam) ? marcaParam : [marcaParam];
+            if (marcas.some(marca => typeof marca !== "string" || !/^\d+$/.test(marca)
+                 || !Number.isSafeInteger(Number(marca)) || Number(marca) < 1))
+                {
                     return res.status(400).json({
                         mensagem: "Marca inválida."
                 });
             }
 
-            id_marca = Number(marcaParam);
+            id_marca = marcas.map(marca => Number(marca));
         }
 
         const produtos = await produtoModel.getByFilter({
             pagina,
+            nome,
             id_categoria,
-            id_marca
+            id_marca,
+            disponibilidade
         });
 
         return res.status(200).json(
