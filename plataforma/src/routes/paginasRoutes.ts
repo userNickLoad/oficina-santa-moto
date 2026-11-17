@@ -1,8 +1,10 @@
-import { Router, Response, Request } from "express";
+import { Router, Response, Request, NextFunction } from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { ClienteModel } from "../model/clienteModel.js";
-import { title } from "node:process";
 import { VendaModel } from "../model/vendaModel.js";
+import { AppError } from "../model/errors.js";
+import { ProdutoImagemLocalizacaoDTO } from "../model/produtoModel.js";
+import { getProdutoByIdMiddle } from "../controller/produtoController.js";
 import { CategoriaModel } from "../model/categoriaModel.js";
 import { MarcaModel } from "../model/marcaModel.js";
 
@@ -71,6 +73,23 @@ router.get("/cadastrar-produto", authMiddleware, (req: Request, res: Response) =
         content: "../pages/cadastrar-produto",
         voltar: true
     });
+})
+
+router.get("/estoque/produto/:id/editar", authMiddleware, getProdutoByIdMiddle, (req: Request, res: Response) => {
+    const produto = res.locals.produto as ProdutoImagemLocalizacaoDTO;
+
+    res.render("./layouts/index", {
+        title: "Produto",
+        content: "../pages/editar-produto",
+        voltar: true,
+        innerContent: {produto}
+    });
+})
+
+router.get("/estoque/produto/:id", authMiddleware, getProdutoByIdMiddle, (req: Request, res: Response) => {
+    const produto = res.locals.produto as ProdutoImagemLocalizacaoDTO
+
+    return res.status(200).json({...produto})
 })
 
 router.get("/cadastrar-categoria", authMiddleware, (req: Request, res: Response) => {
@@ -224,6 +243,20 @@ router.get("/vendas/historico", authMiddleware, async(req: Request, res: Respons
             mensagem: "Erro ao carregar o histórico de vendas"
         });
     }
+});
+
+router.use((err: Error | AppError, req: Request, res: Response, next: NextFunction) => {
+    console.error(err.stack); // Loga o erro no servidor
+  
+    const statusCode = (err instanceof AppError)? err.statusCode : 500;
+    const message = err.message || "Algo de errado ocorreu, entre em contato com a equipe tecnica" 
+
+  return res.status(statusCode).render("./layouts/index", {
+        title: "Cliente",
+        content: "../pages/error",
+        innerContent: `${statusCode} ${message}`,
+        voltar: true
+    });
 });
 
 export default router;
