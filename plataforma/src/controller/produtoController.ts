@@ -109,12 +109,48 @@ export async function criarProduto(req: Request, res: Response) {
     }
 }
 
+
 export async function listarProdutosEstoque(req: Request, res: Response) {
     try {
         const pagina = Math.max(1, Number(req.query.pagina) || 1);
 
+        const categoriaParam = req.query.id_categoria;
+
+        let id_categoria: number | undefined;
+
+        if (categoriaParam !== undefined) {
+            if (
+                typeof categoriaParam !== "string" ||
+                !/^\d+$/.test(categoriaParam) ||
+                Number(categoriaParam) < 1
+            ) {
+                return res.status(400).json({
+                    mensagem: "Categoria inválida."
+                });
+            }
+
+            id_categoria = Number(categoriaParam);
+        }
+
+        const marcaParam = req.query.id_marca;
+
+        let id_marca: number | undefined;
+
+        if (marcaParam !== undefined) {
+            if (
+                typeof marcaParam !== "string" || !/^\d+$/.test(marcaParam) || Number(marcaParam) < 1) {
+                    return res.status(400).json({
+                        mensagem: "Marca inválida."
+                });
+            }
+
+            id_marca = Number(marcaParam);
+        }
+
         const produtos = await produtoModel.getByFilter({
-            pagina
+            pagina,
+            id_categoria,
+            id_marca
         });
 
         return res.status(200).json(
