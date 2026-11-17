@@ -1,4 +1,3 @@
-
 async function carregarProdutosEstoque() {
     const lista = document.getElementById("lista-produtos");
     const mensagem = document.getElementById("mensagem-estoque");
@@ -31,10 +30,7 @@ async function carregarProdutosEstoque() {
         }
 
         const formatarPreco = valor =>
-            Number(valor).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL"
-            });
+            Number(valor).toLocaleString("pt-BR", {style: "currency", currency: "BRL"});
 
         produtos.forEach(produto => {
             const card = document.createElement("article");
