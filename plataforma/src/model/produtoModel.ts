@@ -23,8 +23,9 @@ type ProdutoCreateDTO = Omit<
 };
 type ProdutoFilterDTO = {
     nome?: string,
-    id_categoria?: number,
-    id_marca?: number,
+    id_categoria?: number | number[],
+    id_marca?: number | number[],
+    disponibilidade?: "em_estoque" | "sem_estoque";
     atributos?: {
         id_atributo: number,
         valor: number | string
@@ -299,15 +300,25 @@ class ProdutoModel{
         const where: Prisma.produtoWhereInput = {
             ...(filter.nome && {
                 nome: {
-                    startsWith: filter.nome,
+                    contains: filter.nome,
                     mode: "insensitive"
                 }
             }),
             ...(filter.id_categoria !== undefined && {
-                id_categoria: filter.id_categoria
+                id_categoria: Array.isArray(filter.id_categoria) ? { in: filter.id_categoria } : filter.id_categoria
             }),
             ...(filter.id_marca !== undefined && {
-                id_marca: filter.id_marca
+                id_marca: Array.isArray(filter.id_marca) ? { in: filter.id_marca} : filter.id_marca
+            }),
+            ...(filter.disponibilidade === "em_estoque" && {
+                qtd_disponivel: {
+                    gt: 0
+                }
+            }),
+            ...(filter.disponibilidade === "sem_estoque" && {
+                qtd_disponivel: {
+                    equals: 0
+                }
             }),
             ...(filter.atributos?.length && {
                 AND: filter.atributos.map(at => ({

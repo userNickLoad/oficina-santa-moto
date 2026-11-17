@@ -15,36 +15,7 @@
         }) %>
         <!-- Categorias -->
         <%- include("../partials/categories/categories", {
-            categories: [
-                {
-                    id: 1,
-                    nome: "Câmbio",
-                    attributes: [
-                        {
-                            id: 4,
-                            nome: "Material",
-                            values: [
-                                { id: 12, nome: "Alumínio" },
-                                { id: 13, nome: "Aço" }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    id: 2,
-                    nome: "Embreagem",
-                    attributes: [
-                        {
-                            id: 5,
-                            nome: "Tipo",
-                            values: [
-                                { id: 14, nome: "Manual" },
-                                { id: 15, nome: "Automática" }
-                            ]
-                        }
-                    ]
-                }
-            ]
+            categories: categories
         }) %>
 
         <!-- Filtros independentes -->
@@ -53,11 +24,10 @@
                 {
                     id: 1,
                     nome: "Marcas",
-                    options: [
-                        { id: 10, nome: "Shimano" },
-                        { id: 11, nome: "Sunrace" },
-                        { id: 12, nome: "SRAM" }
-                    ]
+                    options: marcas.map(marca => ({
+                        id: marca.id,
+                        nome: marca.nome
+                    }))
                 },
                 {
                     id: 2,
@@ -71,10 +41,9 @@
         }) %>
 
         <div class="flex gap-[2vw]">
-            <a href="/estoque" class="mt-4 rounded-xl bg-primary p-3 font-bold flex-1 text-center">
-
+            <button type="button" id="limpar-filtros" class="mt-4 rounded-xl bg-primary p-3 font-bold flex-1 text-center">
                 Limpar filtros
-            </a>
+            </button>
             <button
                 type="submit"
                 class="mt-4 rounded-xl bg-primary p-3 font-bold flex-1"
@@ -82,8 +51,14 @@
                 Aplicar filtros
             </button>            
         </div>
-
     </form>
+    <div class="mt-8 mb-10">
+        <h2 class="text-xl font-bold mb-4"> Produtos em estoque </h2>
+
+        <div id="lista-produtos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <div id="mensagem-estoque" class="hidden text-gray-500 text-center py-8"></div>
+    </div>
 </section>
 
 <script type="module" src="/js/buttonCategory.js"></script>
+<script type="module" src="/js/listarProdutosEstoque.js"></script>
