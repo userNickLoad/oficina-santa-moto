@@ -12,7 +12,7 @@ export async function update(req: Request, res: Response) {
 
     try {
         const contentString = (req.body.content ?? "");
-        
+
         if(!id){
             throw new Error("produto invalido")
         }
@@ -45,7 +45,7 @@ export async function update(req: Request, res: Response) {
 
         const result = await produtoModel.update(updateProduto, marca, images.map((i: {remove: string}) => (Number(i.remove))))
 
-        
+
         if(!result){
             throw new Error()
         }
@@ -66,7 +66,7 @@ export async function update(req: Request, res: Response) {
                 ? error.message
                 : "Erro ao atualizar produto"
         });
-        
+
     }
 }
 
@@ -112,7 +112,7 @@ export async function criarProduto(req: Request, res: Response) {
 
     try {
         const contentString = (req.body.content ?? "");
-        
+
         if(contentString == "")
             throw new Error("Content não achado")
 

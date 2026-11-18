@@ -13,7 +13,7 @@ type EstanteDTO = estante & {local: Local[]};
 type PrateleiraDTO = prateleira & {estante: EstanteDTO} & {quantidade: number};
 type ProdutoImagemLocalizacaoDTO = produto & {imagens: imagem[], prateleiras: PrateleiraDTO[], atributos: Record<string, number | string | null>, marca: marca | null};
 
-type PrateleiraAddDTO = {id_estante: number, coluna: number, linha: number, quantidade: number} 
+type PrateleiraAddDTO = {id_estante: number, coluna: number, linha: number, quantidade: number}
 
 type ProdutoCreateDTO = Omit<
     Produto,
@@ -189,14 +189,14 @@ class ProdutoModel{
                     id: updateProduto.id
                 },
                 data: {
-                    ...produto,  
+                    ...produto,
                     produto_imagem: {
                         create: imagens.map(i => ({
                             imagem: {
                                 create: {
                                     caminho: i
                                 }
-                            } 
+                            }
                         }))
                     },
                     ...((atributosToAdd)
@@ -223,7 +223,7 @@ class ProdutoModel{
                         : {}
                     ),
 
-                    
+
                 }
             })
 
@@ -317,9 +317,9 @@ class ProdutoModel{
                 }];
             });
         }
-            
+
         // Lógica original dos atributos (preservada)
-       
+
 
 
         // Evita posições duplicadas
@@ -434,7 +434,7 @@ class ProdutoModel{
                 })
             );
 
-            let marcaId = newProduto.id_marca 
+            let marcaId = newProduto.id_marca
 
             if((marcaId == null || marcaId == 0) && marca != null)
                 marcaId =  (await tx.marca.upsert({
@@ -476,7 +476,7 @@ class ProdutoModel{
                     ...((atributosToAdd)?({produto_atributo: {
                         create: atributosToAdd
                     }}) : {}),
-                    
+
 
                     produto_prateleira: {
                         create: prateleiraDB.map(p => ({
@@ -533,7 +533,7 @@ class ProdutoModel{
                                 : { valor_texto: at.valor })
                         }
                     }
-                })) 
+                }))
             })
         }
 
@@ -582,7 +582,7 @@ class ProdutoModel{
                             }
                         }
                     }
-                }, 
+                },
                 categoria: true,
                 produto_atributo: {
                     include: {
@@ -598,8 +598,8 @@ class ProdutoModel{
 
         const {produto_prateleira, produto_imagem, produto_atributo = [], ...dados} = result;
 
-        const prateleiras = (await Promise.all(produto_prateleira.map(async pp => {    
-            const localId = pp.prateleira.estante.id_local;          
+        const prateleiras = (await Promise.all(produto_prateleira.map(async pp => {
+            const localId = pp.prateleira.estante.id_local;
                 return {
                     ...pp.prateleira,
                     quantidade: pp.quantidade,
@@ -607,16 +607,16 @@ class ProdutoModel{
                         ...pp.prateleira.estante,
                         local: (localId)? await localModel.getHierarquiaLocal(localId): []
                     }
-                    
+
                 }
-    
+
         }))).filter((p): p is PrateleiraDTO => p !== null)
 
         const atributos: Record<string, number | string | null> = {};
         produto_atributo.map((p) => {
             const {atributo, valor_numerico, valor_texto} = p
             if(atributo.numerico && valor_numerico){
-                atributos[atributo.nome] = Number(valor_numerico)  
+                atributos[atributo.nome] = Number(valor_numerico)
                 return
             }else if(valor_texto){
                 atributos[atributo.nome] = valor_texto

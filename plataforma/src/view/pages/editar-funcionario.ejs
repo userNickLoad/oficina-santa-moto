@@ -1,0 +1,173 @@
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        const erro = params.get("erro");
+
+        if (!erro) return;
+
+        const mensagens = {
+            administrador: "Não é possível desativar ou remover a permissão do último administrador ativo",
+            propriaConta: "Você não pode desativar sua própria conta ou remover sua permissão de administrador",
+            duplicado: "Já existe um usuário com esse nome",
+            dados: "Verifique os dados informados",
+            servidor: "Não foi possível atualizar o funcionário"
+        };
+
+        const mensagem = mensagens[erro];
+
+        if (!mensagem) return;
+
+        const toast = document.createElement("div");
+
+        toast.className =
+            "fixed top-5 right-5 z-50 max-w-sm rounded-xl " +
+            "bg-red-100 border border-red-300 text-red-800 " +
+            "px-5 py-4 shadow-lg";
+
+        toast.textContent = mensagem;
+        toast.setAttribute("role", "alert");
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.remove(), 5000);
+
+        window.history.replaceState(
+            {},
+            "",
+            window.location.pathname
+        );
+    });
+</script>
+
+<%
+    const { funcionario } = innerContent;
+
+    const permissaoAtual =
+        funcionario.usuario_permissao[0]?.permissao.nome || "";
+
+    const nomePermissao = permissaoAtual === "admin"
+        ? "Administrador"
+        : "Funcionário";
+%>
+
+<section class="w-full max-w-[1100px] mx-auto px-4 py-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">
+            Editar funcionário
+        </h1>
+
+        <p class="text-gray-600 mt-1">
+            Atualize os dados e as permissões do funcionário
+        </p>
+    </div>
+
+    <form action="/funcionarios/editar/<%= funcionario.id %>" method="POST" class="w-full border border-gray-300 rounded-2xl p-6 md:p-8 flex flex-col gap-6">
+
+        <div class="flex items-center justify-between gap-4">
+
+            <div class="flex flex-col gap-1">
+                <h2 class="text-xl font-semibold text-gray-900">
+                    <%= funcionario.nome %>
+                </h2>
+
+                <p class="text-sm text-gray-500">
+                    <%= nomePermissao %>
+                </p>
+            </div>
+
+            <span class="<%= funcionario.ativo ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'%> px-4 py-1.5 rounded-full text-sm font-medium">
+                <%= funcionario.ativo ? "Ativo" : "Inativo" %>
+            </span>
+
+        </div>
+        <div class="border-t border-gray-200"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="flex flex-col gap-2">
+                <label for="nome" class="font-medium text-gray-800">
+                    Nome
+                </label>
+                <input type="text" id="nome" name="nome" value="<%= funcionario.nome %>" maxlength="100" required class="w-full border border-gray-300 rounded-xl
+                    px-4 py-3 outline-none focus:border-orange-400"/>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="email" class="font-medium text-gray-800">
+                    E-mail
+                </label>
+
+                <input type="email" id="email" name="email" value="<%= funcionario.email || '' %>" class="w-full border border-gray-300 rounded-xl
+                    px-4 py-3 outline-none focus:border-orange-400"/>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="telefone" class="font-medium text-gray-800">
+                    Telefone
+                </label>
+
+                <input type="tel" id="telefone" name="telefone" data-mask="phone" maxlength="15" value="<%= funcionario.telefone || '' %>"
+                    placeholder="Ex: (11) 98765-4321" class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-orange-400"/>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="permissao" class="font-medium text-gray-800">
+                    Permissão
+                </label>
+
+                <select id="permissao" name="permissao" required class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white outline-none
+                    focus:border-orange-400">
+                    <option value="funcionario" <%= permissaoAtual === "funcionario" ? "selected" : "" %>>
+                        Funcionário
+                    </option>
+
+                    <option value="admin" <%= permissaoAtual === "admin" ? "selected" : "" %>>
+                        Administrador
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-200"></div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h3 class="font-semibold text-gray-900">
+                    Status do funcionário
+                </h3>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    Defina se o funcionário está ativo no sistema
+                </p>
+            </div>
+
+            <div class="inline-flex self-start sm:self-auto rounded-xl bg-gray-100 p-1 gap-1">
+                <label class="cursor-pointer">
+                    <input type="radio" name="ativo" value="true" class="peer sr-only" <%= funcionario.ativo ? "checked" : "" %>/>
+                    <span class="block px-5 py-2 rounded-lg text-sm font-medium text-gray-600 peer-checked:bg-white peer-checked:text-green-700
+                        peer-checked:shadow-sm transition-all">
+                        Ativo
+                    </span>
+                </label>
+
+                <label class="cursor-pointer">
+                    <input type="radio" name="ativo" value="false" class="peer sr-only" <%= !funcionario.ativo ? "checked" : "" %>/>
+                    <span class="block px-5 py-2 rounded-lg text-sm font-medium text-gray-600 peer-checked:bg-white peer-checked:text-red-600
+                         peer-checked:shadow-sm transition-all">
+                        Inativo
+                    </span>
+                </label>
+            </div>
+        </div>
+        <div class="border-t border-gray-200"></div>
+
+        <div class="flex flex-wrap justify-end gap-3">
+            <a href="/funcionarios" class="px-6 py-3 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors">
+                Cancelar
+            </a>
+            <button type="submit" class="px-6 py-3 rounded-full bg-primary text-white font-medium hover:scale-105 transition-transform duration-300">
+                Salvar alterações
+            </button>
+        </div>
+    </form>
+</section>
+
+<script src="/js/phoneMask.js"></script>

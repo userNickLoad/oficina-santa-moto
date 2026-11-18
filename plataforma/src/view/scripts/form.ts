@@ -10,7 +10,7 @@ const verifyEmpty: verifier = (value) => {
 const verifyTelefone: verifier = (value: string) => {
     if(value.replace(/\D/g, "").length < 10){
         return "O telefone deve ter pelo menos 10 caracteres ou nenhum";
-    } 
+    }
 
     return null;
 }
@@ -60,11 +60,9 @@ const parseFormData = (formData: FormData) => {
 
     console.log(result)
 
-    
+
     return result;
 };
-
-
 
 const setForm = (formId: string | null = null, verifyIssues: Record<string, verifier> | null = null) => {
     const form = document.querySelector<HTMLFormElement>(
@@ -79,7 +77,7 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
 
     if (!errorOutput) {
         throw new Error("ErrorOutput não localizado");
-    } 
+    }
 
 
     form.addEventListener("submit", async (event) => {
@@ -114,11 +112,11 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
 
             if(errorDisplay.textContent != "")
                 reset()
-            
+
             input.addEventListener("click", reset)
 
             let issueVerifyier: verifier | undefined  = undefined;
-        
+
             if(verifyIssues)
                 issueVerifyier = verifyIssues[input.id.match(/\[([^\]]+)\]$/)?.[1] ?? input.id]
 
@@ -196,7 +194,7 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
 
             if (resultado.confirm) {
                 const confirm = document.querySelector<HTMLElement>("#confirm");
-                
+
                 if (!confirm)
                     throw new Error("Não foi possível encontrar o #confirm");
 
@@ -208,7 +206,7 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
                 void confirm.offsetWidth;
                 confirm.classList.add("animate-confirm");
             }
-            
+
 
             // Aqui você pode tratar o sucesso do login.
 

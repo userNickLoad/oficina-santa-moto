@@ -26,7 +26,7 @@ const searchCategoria = document.querySelector<HTMLElement>(
 if (!searchCategoria)
     throw new Error("Não foi possível localizar #search-categoria");
 
-const sectionCategoria = searchCategoria.closest("section") 
+const sectionCategoria = searchCategoria.closest("section")
 
 if( !sectionCategoria )
     throw new Error("Não foi possível localizar #search-categoria section")
@@ -50,7 +50,7 @@ let i = 0
 const { addELement, wipeout } = setAddble(addbleAtributos, "atributo", i);
 
 setSearchBox(searchCategoria, "/api/categoria?nome=", null, "nome", (value, content)=>{
-   
+
     if(content && content.length == 1 && value === content[0].nome){
         const categoria = content[0]
 
