@@ -1,4 +1,14 @@
-<footer class="w-[100vw] h-[10vh] flex items-center bg-primary px-[5vw] text-2xl justify-between">
-    
+<footer class="w-full h-[10vh] flex items-center bg-primary px-[5vw] text-2xl justify-between">
+
+    <% if (typeof content !== "undefined" && content === "../pages/inicio") { %>
+
+        <form action="/sair" method="POST">
+            <button type="submit" class="flex items-center gap-2 px-4 py-2 border border-red-600 text-red-600
+                 rounded-xl hover:text-white transition-colors cursor-pointer text-base">
+                <img src="/assets/quit.png" alt="sair" class="w-5 h-5 object-contain">
+                <span>Sair</span>
+            </button>
+        </form>
+    <% } %>
 
 </footer>

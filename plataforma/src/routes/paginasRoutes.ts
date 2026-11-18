@@ -10,6 +10,7 @@ import { MarcaModel } from "../model/marcaModel.js";
 import { UsuarioController } from "../controller/usuarioController.js";
 import { adminMiddleware } from "../middlewares/adminMiddleware.js";
 import { UsuarioModel } from "../model/usuarioModel.js";
+import { logout } from "../middlewares/logout.js";
 
 const clienteModel = new ClienteModel();
 const vendaModel = new VendaModel();
@@ -41,6 +42,7 @@ router.get("/entrar", (req: Request, res: Response) => {
     });
 });
 
+router.post("/sair", logout);
 
 router.get("/estoque", authMiddleware, async (req: Request, res: Response) => {
     try {
@@ -101,7 +103,7 @@ router.get("/estoque/produto/:id", authMiddleware, getProdutoByIdMiddle, (req: R
         voltar: true,
         innerContent: {produto}
     });
-})
+});
 
 router.get("/cadastrar-categoria", authMiddleware, (req: Request, res: Response) => {
     res.render("./layouts/index", {

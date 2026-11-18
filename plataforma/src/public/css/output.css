@@ -8,6 +8,7 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
     --color-red-100: oklch(93.6% 0.032 17.717);
+    --color-red-200: oklch(88.5% 0.062 18.334);
     --color-red-300: oklch(80.8% 0.114 19.571);
     --color-red-400: oklch(70.4% 0.191 22.216);
     --color-red-500: oklch(63.7% 0.237 25.331);
@@ -232,6 +233,9 @@
   }
 }
 @layer utilities {
+  .pointer-events-none {
+    pointer-events: none;
+  }
   .sr-only {
     position: absolute;
     width: 1px;
@@ -300,11 +304,23 @@
   .right-\[2vw\] {
     right: 2vw;
   }
+  .bottom-\[3vh\] {
+    bottom: 3vh;
+  }
   .left-0 {
     left: 0px;
   }
   .left-2 {
     left: calc(var(--spacing) * 2);
+  }
+  .left-\[1vw\] {
+    left: 1vw;
+  }
+  .left-\[5vw\] {
+    left: 5vw;
+  }
+  .left-\[13vw\] {
+    left: 13vw;
   }
   .z-2 {
     z-index: 2;
@@ -497,6 +513,9 @@
   }
   .h-\[10vh\] {
     height: 10vh;
+  }
+  .h-\[12vh\] {
+    height: 12vh;
   }
   .h-\[15vh\] {
     height: 15vh;
@@ -765,6 +784,9 @@
   .justify-end {
     justify-content: flex-end;
   }
+  .justify-start {
+    justify-content: flex-start;
+  }
   .gap-1 {
     gap: var(--spacing);
   }
@@ -937,6 +959,9 @@
   }
   .border-red-500 {
     border-color: var(--color-red-500);
+  }
+  .border-red-600 {
+    border-color: var(--color-red-600);
   }
   .border-yellow-500 {
     border-color: var(--color-yellow-500);
@@ -1124,11 +1149,17 @@
   .py-\[2vh\] {
     padding-block: 2vh;
   }
+  .pt-6 {
+    padding-top: calc(var(--spacing) * 6);
+  }
   .pt-\[2vh\] {
     padding-top: 2vh;
   }
   .pb-3 {
     padding-bottom: calc(var(--spacing) * 3);
+  }
+  .pb-12 {
+    padding-bottom: calc(var(--spacing) * 12);
   }
   .pl-3 {
     padding-left: calc(var(--spacing) * 3);
@@ -1418,6 +1449,9 @@
       --tw-scale-z: 110%;
       scale: var(--tw-scale-x) var(--tw-scale-y);
     }
+    .hover\:scale-\[1\.02\]:hover {
+      scale: 1.02;
+    }
     .hover\:bg-gray-50:hover {
       background-color: var(--color-gray-50);
     }
@@ -1433,8 +1467,20 @@
     .hover\:bg-green-700:hover {
       background-color: var(--color-green-700);
     }
+    .hover\:bg-red-100:hover {
+      background-color: var(--color-red-100);
+    }
+    .hover\:bg-red-200:hover {
+      background-color: var(--color-red-200);
+    }
+    .hover\:bg-red-400:hover {
+      background-color: var(--color-red-400);
+    }
     .hover\:bg-red-500:hover {
       background-color: var(--color-red-500);
+    }
+    .hover\:bg-red-600:hover {
+      background-color: var(--color-red-600);
     }
     .hover\:bg-red-700:hover {
       background-color: var(--color-red-700);

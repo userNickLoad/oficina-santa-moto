@@ -320,8 +320,6 @@ class ProdutoModel{
 
         // Lógica original dos atributos (preservada)
 
-
-
         // Evita posições duplicadas
         const posicoes = new Set<string>();
 
@@ -476,7 +474,6 @@ class ProdutoModel{
                     ...((atributosToAdd)?({produto_atributo: {
                         create: atributosToAdd
                     }}) : {}),
-
 
                     produto_prateleira: {
                         create: prateleiraDB.map(p => ({
