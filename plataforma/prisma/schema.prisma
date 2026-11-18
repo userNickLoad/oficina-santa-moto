@@ -76,8 +76,8 @@ model local {
   id          Int       @id @default(autoincrement())
   id_local    Int?
   nome        String    @db.VarChar(20)
-  linha       Int
-  coluna      Int
+  linha       Int?
+  coluna      Int?
   linhas      Int       @default(1)
   colunas     Int       @default(1)
   estante     estante[]

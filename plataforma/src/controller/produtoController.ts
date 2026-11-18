@@ -5,6 +5,120 @@ import { AppError, FormFill } from "../model/errors.js";
 
 const produtoModel = new ProdutoModel();
 
+export async function entrada(req: Request, res: Response){
+    const id = Number(req.params.id ?? "")
+
+    console.log(req.body)
+
+    const naoAlocado = String(req.body['desalocado[check]'] ?? "")
+
+    console.log(req.body)
+
+    const qtdNaoAlocado = (naoAlocado == "true")? Number(req.body['desalocado[quantidade]'] ?? ""): 0;
+
+    console.log(qtdNaoAlocado)
+
+    const prateleiras = req.body.prateleira?.map(({id, check, quantidade}: {id: string, check?: string, quantidade?: string}) => {
+        if(check){
+            return {
+                id: Number(id ?? ""),
+                quantidade: Number(quantidade ?? "")
+            }
+        } else 
+            return null
+    }).filter((p: any) => (p != null)) || [];
+
+    const realocarEmprateleira = req.body.prateleira?.map(({id, desalocar, quantidade}: {id: string, desalocar?: string, quantidade?: string}) => {
+        if(desalocar){
+            return {
+                id: Number(id ?? ""),
+                quantidade: Number(quantidade ?? "")
+            }
+        } else 
+            return null
+    }).filter((p: any) => (p != null)) || [];
+
+    const newPrateleiras = req.body.newPrateleiras?.map((p: any) => {
+                const {estanteId, prateleiraRow, prateleiraCol, quantidade} = p;
+
+                return {
+                    id_estante: Number(estanteId),
+                    linha: (prateleiraRow)? Number(prateleiraRow) : 1,
+                    coluna: (prateleiraCol)? Number(prateleiraCol) : 1,
+                    quantidade: Number(quantidade)
+                }
+            }) ?? []
+
+    try{
+        const result = await produtoModel.entrada(id, qtdNaoAlocado, prateleiras, realocarEmprateleira, newPrateleiras);
+
+        if(!result)
+            throw new Error("Algo deu errado")
+
+        return res.status(200).json({confirm: "Entrada registrada no estoque"})
+
+    }catch(error){
+        console.log(error)
+        return res.status(400).json({
+            mensagem: error instanceof Error
+                ? error.message
+                : "Erro ao atualizar produto"
+        });
+    }
+}
+
+export async function baixa(req: Request, res: Response) {
+    const id = Number(req.params.id ?? "")
+    
+    try {
+        const naoAlocado = String(req.body['nao-alocado[check]'] ?? "")
+
+        console.log(req.body)
+
+        const qtdNaoAlocado = (naoAlocado == "true")? Number(req.body['nao-alocado[quantidade]'] ?? ""): 0;
+
+        const prateleiras = req.body.prateleira?.map(({id, check, quantidade}: {id: string, check?: string, quantidade?: string}) => {
+            if(check){
+                return {
+                    id: Number(id ?? ""),
+                    quantidade: Number(quantidade ?? "")
+                }
+            } else 
+                return null
+        }).filter((p: any) => (p != null)) || [];
+
+        const realocarEmprateleira = req.body.prateleira?.map(({id, desalocar, quantidade}: {id: string, desalocar?: string, quantidade?: string}) => {
+            if(desalocar){
+                return {
+                    id: Number(id ?? ""),
+                    quantidade: Number(quantidade ?? "")
+                }
+            } else 
+                return null
+        }).filter((p: any) => (p != null)) || [];
+
+        console.log(id, qtdNaoAlocado, prateleiras)
+
+        const result = await produtoModel.baixa(id, qtdNaoAlocado, prateleiras, realocarEmprateleira)
+
+        if(!result){
+            throw new Error()
+        }
+
+        return res.status(200).json({confirm: "Baixas registradas"})
+
+    } catch (error) {
+
+        console.log(error)
+        return res.status(400).json({
+            mensagem: error instanceof Error
+                ? error.message
+                : "Erro ao atualizar produto"
+        });
+    }
+
+}
+
 export async function update(req: Request, res: Response) {
     const id = Number(req.params.id ?? "")
 

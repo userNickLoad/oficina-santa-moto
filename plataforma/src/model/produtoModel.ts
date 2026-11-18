@@ -1,11 +1,12 @@
 import { Decimal } from "@prisma/client/runtime/client";
-import { produto, produto_atributo, Prisma, imagem, local, prateleira, estante, atributo, marca } from "../../generated/prisma/client.js";
+import { produto, produto_atributo, Prisma, imagem, local, prateleira, estante, atributo, marca, produto_prateleira } from "../../generated/prisma/client.js";
 import prisma from "../database/prisma.js";
 import { Atributo } from "./atributoModel.js";
 import { FormFill } from "./errors.js";
 import { Local, LocalModel } from "./localModel.js";
 import { unlink } from "node:fs/promises"
 import path from "node:path";
+import { error } from "node:console";
 
 type Produto = produto;
 type ProdutoGetDTO = produto & {imagens: imagem[]};
@@ -46,6 +47,323 @@ type ProdutoFilterDTO = {
 const localModel = new LocalModel();
 
 class ProdutoModel{
+
+    async entrada(produtoId: number, qtdNaoAlocado: number, prateleiras: {id: number, quantidade: number}[], realocate: {id: number, quantidade: number}[], newPrateleiras: PrateleiraAddDTO[]): Promise<Produto | null>{
+
+        const result = await prisma.$transaction(async (tx) => {
+            const produtoDB = await tx.produto.findUnique({
+                where:{
+                    id: produtoId
+                },
+                include: {
+                    produto_prateleira: {
+                        include: {
+                            prateleira: true
+                        }
+                    }
+                }
+            })
+        
+            if(!produtoDB)
+                throw new Error("produto não localizados")
+
+
+            const prateleirasVelhasMap: Map<string, PrateleiraAddDTO> = new Map()
+
+            let qtdAlocado = 0
+
+            produtoDB.produto_prateleira.map(p => {
+                const id_estante = p.prateleira.id_estante;
+                const  linha = p.prateleira.linha;
+                const  coluna = p.prateleira.coluna; 
+                const quantidade = p.quantidade
+
+                qtdAlocado += quantidade;
+                
+                const a: PrateleiraAddDTO = {id_estante, linha, coluna, quantidade}
+
+                prateleirasVelhasMap.set(`${id_estante}-${linha}-${coluna}`, a)                
+            })
+
+
+            if(newPrateleiras.some((t) => (prateleirasVelhasMap.get(`${t.id_estante}-${t.linha}-${t.coluna}`))))
+                throw new Error("Alguma pratelira que você está tentando criar, já existe")
+
+            let qtdRealocar = 0;
+
+            realocate.map((r) => {qtdRealocar += r.quantidade})
+
+            const qtdDesalocado = produtoDB.qtd_disponivel - qtdAlocado;
+
+            if(qtdDesalocado < qtdRealocar)
+                throw new Error(`apenas ${qtdDesalocado} desalocados, tente realocar esses produtos e não ${qtdRealocar}`)
+
+            let qtdPrateleiras = 0;
+
+            prateleiras.map(p => {qtdPrateleiras += p.quantidade})
+
+            let qtdNewPrateleiras = 0;
+
+            newPrateleiras.map((p) => {qtdNewPrateleiras += p.quantidade})
+
+            let totalIncrement = qtdPrateleiras + qtdNewPrateleiras + qtdNaoAlocado
+
+            const realocateDb = await Promise.all((realocate.concat(prateleiras)).map(async (r) => {
+                const result = tx.produto_prateleira.update({
+                    where: {
+                        id_produto_id_prateleira: {
+                            id_prateleira: r.id,
+                            id_produto: produtoId
+                        }
+                    },
+                    data: {
+                        quantidade: {
+                            increment: r.quantidade
+                        }
+                    }
+                })
+
+                return result;
+            }))
+
+
+            const estanteDB = await Promise.all(
+                newPrateleiras.map(async (l) => {
+                    const estante = await tx.estante.findUnique({
+                        where: {
+                            id: l.id_estante
+                        },
+                        include: {
+                            modelo_estante: {
+                                include: {
+                                    modelo_prateleira_modelo_estante: {
+                                        where: {
+                                            coluna: l.coluna,
+                                            linha: l.linha
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    if (!estante)
+                        throw new FormFill(
+                            `Não foi localizada a estante ${l.id_estante}`
+                        );
+
+                    const modeloPosicao =
+                        estante.modelo_estante.modelo_prateleira_modelo_estante[0];
+
+                    if (!modeloPosicao)
+                        throw new FormFill(
+                            `Não existe modelo de prateleira na posição (${l.linha}, ${l.coluna})`
+                        );
+
+                    return {
+                        estante,
+                        modeloPosicao,
+                        local: l
+                    };
+                })
+            );
+
+            // 2. Resolver as prateleiras
+            const prateleiraDB = await Promise.all(
+                estanteDB.map(async ({ estante, modeloPosicao, local: l }) => {
+                    const prateleiraCadastrada = await tx.prateleira.findUnique({
+                        where: {
+                            id_estante_linha_coluna: {
+                                id_estante: l.id_estante,
+                                coluna: l.coluna,
+                                linha: l.linha
+                            }
+                        }
+                    })
+
+                    // Prateleira já cadastrada
+                    if (prateleiraCadastrada) {
+                        return {
+                            id: prateleiraCadastrada.id,
+                            quantidade: l.quantidade
+                        };
+                    }
+
+                    // Prateleira ainda não cadastrada: criar pelo modelo
+                    const prateleira = await tx.prateleira.upsert({
+                        where: {
+                            id_estante_linha_coluna: {
+                                id_estante: estante.id,
+                                coluna: l.coluna,
+                                linha: l.linha
+                            }
+                        },
+                        create: {
+                            id_estante: estante.id,
+                            coluna: l.coluna,
+                            linha: l.linha,
+                            id_modelo_prateleira:
+                                modeloPosicao.id_modelo_prateleira
+                        },
+                        update: {}
+                    });
+
+                    if (
+                        prateleira.id_modelo_prateleira !==
+                        modeloPosicao.id_modelo_prateleira
+                    ) {
+                        throw new Error(
+                            "A prateleira existente não corresponde ao modelo configurado"
+                        );
+                    }
+
+                    return {
+                        id: prateleira.id,
+                        quantidade: l.quantidade
+                    };
+                })
+            );
+
+            const produtoChange = await tx.produto.update({
+                where: {
+                    id: produtoId
+                },
+                data: {
+                    qtd_disponivel: {
+                        increment: totalIncrement
+                    },
+                    produto_prateleira: {
+                        create: prateleiraDB.map(p => ({
+                            quantidade: p.quantidade,
+                            prateleira: {
+                                connect: {
+                                    id: p.id
+                                }
+                            }
+                        }))
+                    }
+                }
+            })
+            return produtoChange
+
+        })
+
+        
+
+        return result;
+    }
+
+
+    async baixa(id: number, qtdNaoAlocado: number, prateleiras: {id: number, quantidade: number}[], prateleirasDesalocar: {id: number, quantidade: number}[]): Promise<Produto>{
+
+        const result = await prisma.$transaction(async (tx) => {
+            const produtoDB = await tx.produto.findUnique({
+                where: {
+                    id,
+                },
+                include: {
+                    produto_prateleira: true
+                }
+            });
+
+            if(!produtoDB)
+                throw new Error("produto não localizados")
+
+            const prateleirasMap: Map<number, produto_prateleira> = new Map(produtoDB.produto_prateleira.map(p => [p.id_prateleira, p]))
+
+            let qtdDispPrateleiras = 0
+
+            prateleiras.forEach((p) => {
+                qtdDispPrateleiras += p.quantidade
+            })
+
+            const qtdIndisponivel = qtdNaoAlocado + qtdDispPrateleiras;
+
+            const qtdDispNaoAloc = produtoDB.qtd_disponivel - qtdDispPrateleiras
+
+            if(produtoDB.qtd_disponivel < qtdIndisponivel || qtdDispNaoAloc < qtdNaoAlocado)
+                throw new Error("não se pode tirar mais do q está disponivel")
+
+            const desalocaDB = await Promise.all(prateleirasDesalocar.map(async (p) => {
+                const prateleiraDB = prateleirasMap.get(p.id)
+
+                if(!prateleiraDB)
+                    throw new Error("prateleira não foi encontrada")
+
+                if(prateleiraDB.quantidade < p.quantidade)
+                    throw new Error("desloque uma quantidade menor ou iqual a que está na prateleira")
+                
+                if(prateleiraDB.quantidade == p.quantidade){
+                    const realoc = await tx.produto_prateleira.delete({
+                        where: {
+                            id_produto_id_prateleira:{
+                                id_produto: id,
+                                id_prateleira: p.id
+                            }
+                        }
+                    })
+                    return
+                }
+
+                const realoc = await tx.produto_prateleira.update({
+                        where: {
+                            id_produto_id_prateleira:{
+                                id_produto: id,
+                                id_prateleira: p.id
+                            }
+                        },
+                        data: {
+                            quantidade: {
+                                decrement: p.quantidade
+                            }
+                        }
+                    })
+                    return
+                
+            }))
+
+            const mudancas = await Promise.all(prateleiras.map(async (p) => {
+                const prat = prateleirasMap.get(p.id)
+
+                if(!prat)
+                    throw new Error("Não foi possivel acha a prateleira")
+
+                if(prat.quantidade < p.quantidade){
+                    throw new Error("Não é possivel tirar mais do que tem na prateleira")
+                }
+
+                const change = await tx.produto_prateleira.update({
+                    where: {
+                        id_produto_id_prateleira: {
+                            id_prateleira: p.id,
+                            id_produto: id
+                        }
+                    },
+                    data: {
+                        quantidade: {
+                            decrement: p.quantidade
+                        }
+                    }
+                }) 
+                return change
+            }))
+
+            const produtoChange = await tx.produto.update({
+                where: {
+                    id
+                },
+                data: {
+                    qtd_disponivel: {
+                        decrement: qtdIndisponivel
+                    }
+                }
+            })
+
+            return produtoChange
+        })
+
+        return result;
+    }
 
     async update(
         updateProduto: ProdutoUpdateDTO,

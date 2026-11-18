@@ -188,6 +188,6 @@ EXECUTE FUNCTION validar_posicao_prateleira();
 CREATE TABLE IF NOT EXISTS produto_prateleira(
 	id_produto INTEGER REFERENCES produto(id),
 	id_prateleira INTEGER REFERENCES prateleira(id),
-	quantidade INT NOT NULL CHECK (quantidade > 0),
+	quantidade INT NOT NULL CHECK (quantidade >= 0),
 	PRIMARY KEY(id_produto, id_prateleira)
 );
