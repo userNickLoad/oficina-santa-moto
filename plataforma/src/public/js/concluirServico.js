@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () =>{
     const lista = document.getElementById("lista-servicos");
-    const pesquisa = document.getElementById("pesquisar-servico");
+    const pesquisa = document.getElementById("search-input-pesquisar-servico");
     const botaoConcluir = document.getElementById("btn-concluir");
     const botaoCancelar = document.getElementById("btn-cancelar");
 

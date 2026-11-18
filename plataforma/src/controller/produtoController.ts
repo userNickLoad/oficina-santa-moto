@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ProdutoCreateDTO, ProdutoModel, ProdutoUpdateDTO } from "../model/produtoModel.js";
 import { unlink } from "node:fs/promises";
-import { AppError } from "../model/errors.js";
+import { AppError, FormFill } from "../model/errors.js";
 
 const produtoModel = new ProdutoModel();
 
@@ -226,7 +226,7 @@ export async function listarProdutosEstoque(req: Request, res: Response) {
                 !/^\d+$/.test(categoria) || !Number.isSafeInteger(Number(categoria)) || Number(categoria) < 1)
             ) {
                 return res.status(400).json({
-                    mensagem: "Categoria inválida."
+                    mensagem: "Categoria inválida"
                 });
             }
 
@@ -243,7 +243,7 @@ export async function listarProdutosEstoque(req: Request, res: Response) {
                  || !Number.isSafeInteger(Number(marca)) || Number(marca) < 1))
                 {
                     return res.status(400).json({
-                        mensagem: "Marca inválida."
+                        mensagem: "Marca inválida"
                 });
             }
 
@@ -269,10 +269,115 @@ export async function listarProdutosEstoque(req: Request, res: Response) {
         );
 
     } catch (error) {
-        console.error("Erro ao listar produtos do estoque:", error);
+        console.error("Erro ao listar produtos do estoque: ", error);
 
         return res.status(500).json({
-            mensagem: "Erro ao carregar produtos do estoque."
+            mensagem: "Erro ao carregar produtos do estoque"
         });
     }
 }
+
+export async function consultarEstoqueProduto(req: Request, res: Response) {
+    try {
+        const id = Number(req.params.id);
+
+        if (!Number.isSafeInteger(id) || id <= 0) {
+            return res.status(400).json({
+                mensagem: "ID do produto inválido."
+            });
+        }
+
+        const produto = await produtoModel.getProduto(id);
+
+        if (!produto) {
+            return res.status(404).json({
+                mensagem: "Produto não encontrado."
+            });
+        }
+
+        const totalAlocado = produto.prateleiras.reduce(
+            (total, prateleira) => total + prateleira.quantidade,
+            0
+        );
+
+        const quantidadeSemAlocacao = produto.qtd_disponivel - totalAlocado;
+
+        if (quantidadeSemAlocacao < 0) {
+            return res.status(409).json({
+                mensagem: "Inconsistência nas quantidades do estoque"
+            });
+        }
+
+        return res.status(200).json({
+            id: produto.id,
+            nome: produto.nome,
+            qtd_disponivel: produto.qtd_disponivel,
+            quantidade_sem_alocacao: quantidadeSemAlocacao,
+            prateleiras: produto.prateleiras
+        });
+
+    } catch (error) {
+        console.error("Erro ao consultar estoque do produto: ", error);
+
+        return res.status(500).json({
+            mensagem: "Erro ao consultar estoque do produto"
+        });
+    }
+}
+
+export async function darBaixaProduto(req: Request, res: Response) {
+    try {
+        const id = Number(req.params.id);
+        const { quantidade, id_prateleira } = req.body;
+
+        const quantidadeNumero = Number(quantidade);
+
+        const prateleiraId =
+            id_prateleira === null
+                ? null
+                : Number(id_prateleira);
+
+        if (
+            !Number.isSafeInteger(id) ||
+            id <= 0 ||
+            !Number.isSafeInteger(quantidadeNumero) ||
+            quantidadeNumero <= 0 ||
+            (
+                prateleiraId !== null &&
+                (
+                    !Number.isSafeInteger(prateleiraId) ||
+                    prateleiraId <= 0
+                )
+            )
+        ) {
+            return res.status(400).json({
+                mensagem: "Dados da baixa inválidos"
+            });
+        }
+
+        const resultado = await produtoModel.darBaixa(
+            id,
+            quantidadeNumero,
+            prateleiraId
+        );
+
+        return res.status(200).json({
+            confirm: "Baixa realizada com sucesso!",
+            produto: resultado
+        });
+
+    } catch (error) {
+        console.error("Erro ao dar baixa no produto:", error);
+
+        if (error instanceof FormFill) {
+            return res.status(400).json({
+                mensagem: error.message
+            });
+        }
+
+        return res.status(500).json({
+            mensagem: "Não foi possível realizar a baixa"
+        });
+    }
+}
+

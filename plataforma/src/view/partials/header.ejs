@@ -1,10 +1,7 @@
-<header class="w-full h-[10vh] flex items-center bg-primary px-[5vw] text-2xl relative">
 
-    <h1 class="text-secondary text-4xl absolute left-0 w-full text-center font-extrabold pointer-events-none">
-        <%= title %>
-    </h1>
+<header class="w-full h-[80px] sm:h-[10vh] min-h-[70px] flex items-center justify-between bg-primary px-4 sm:px-[5vw] relative">
 
-    <nav class="flex items-center gap-5 z-10">
+    <nav class="flex items-center z-10 shrink-0">
 
         <% if (typeof voltar !== "undefined" && voltar) { %>
             <a
@@ -14,8 +11,7 @@
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="8vh"
-                    height="8vh"
+                    class="w-10 h-10 sm:w-12 sm:h-12"
                     viewBox="0 0 24 24"
                 >
                     <path
@@ -26,10 +22,18 @@
             </a>
         <% } %>
 
-        <a href="/" class="h-[10vh] flex items-center" aria-label="Voltar ao início">
-            <img src="/assets/logo.png" alt="Logo Santa Moto" class="h-full w-auto">
-        </a>
-
     </nav>
+   
+    <h1 class="absolute left-1/2 -translate-x-1/2 text-secondary text-2xl sm:text-3xl lg:text-4xl font-extrabold text-center leading-tight w-[55%] sm:w-[60%] pointer-events-none">
+        <%= title %>
+    </h1>
+
+    <a href="/" class="flex items-center justify-end z-10 shrink-0" aria-label="Voltar ao início">
+        <img
+            src="/assets/logo.png"
+            alt="Logo Santa Moto"
+            class="h-12 sm:h-16 w-auto object-contain"
+        >
+    </a>
 
 </header>

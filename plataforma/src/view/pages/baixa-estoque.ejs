@@ -1,0 +1,268 @@
+<section class="w-full max-w-[600px] mx-auto px-4 pt-6 pb-12">
+
+    <h2 class="text-2xl font-bold mb-2">
+        Dar baixa no estoque
+    </h2>
+
+    <p class="text-gray-500 mb-8">
+        Selecione a localização e informe a quantidade
+        que deseja retirar
+    </p>
+
+    <div class="border border-gray-200 rounded-2xl p-5 mb-6 bg-white">
+
+        <h3 id="nome-produto" class="text-xl font-semibold">
+            Carregando produto...
+        </h3>
+
+        <p class="text-gray-500 mt-2">
+            Quantidade disponível:
+            <span id="estoque-total" class="font-bold text-gray-900">
+                --
+            </span>
+        </p>
+
+    </div>
+
+    <form id="form-baixa-produto" class="flex flex-col gap-5">
+
+        <div>
+            <label for="prateleira" class="block font-semibold mb-2">
+                Localização do produto
+            </label>
+
+            <select id="prateleira" class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white" required>
+                <option value="">
+                    Carregando localizações...
+                </option>
+            </select>
+        </div>
+
+        <div>
+            <label for="quantidade" class="block font-semibold mb-2">
+                Quantidade a retirar
+            </label>
+
+            <input type="number" id="quantidade" min="1" step="1" placeholder="Ex: 2" class="w-full border border-gray-300 rounded-xl px-4 py-3" required>
+            <p id="quantidade-local" class="text-sm text-gray-500 mt-2">
+            </p>
+        </div>
+
+        <button type="submit" id="confirmar-baixa" disabled class="w-full bg-primary rounded-xl py-3 font-semibold hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+            Confirmar baixa
+        </button>
+    </form>
+</section>
+
+<div id="toast-sucesso" class="fixed top-6 right-6 z-50 hidden items-center gap-3 rounded-xl px-5 py-4 shadow-lg" style="background-color: #4ADE80;" role="status">
+
+    <span class="text-xl" style="color: #14532D;">✓</span>
+
+    <p class="mensagem-toast font-semibold" style="color: #14532D;"></p>
+</div>
+
+<div id="toast-erro" class="fixed top-6 right-6 z-50 hidden items-center gap-3 rounded-xl px-5 py-4 shadow-lg" style="background-color: #FCA5A5;" role="alert">
+    <span class="text-xl" style="color: #7F1D1D;">✕</span>
+    <p class="mensagem-toast font-semibold" style="color: #7F1D1D;"></p>
+</div>
+
+<script>
+    const formBaixa = document.getElementById("form-baixa-produto");
+    const campoPrateleira = document.getElementById("prateleira");
+    const campoQuantidade = document.getElementById("quantidade");
+    const botaoConfirmar = document.getElementById("confirmar-baixa");
+    const textoQuantidadeLocal = document.getElementById("quantidade-local");
+
+    const produtoId = Number("<%= innerContent.produto.id %>");
+    
+    let estoqueProduto = null;
+    let temporizadorToast;
+
+    function mostrarToast(tipo, mensagem) {
+        const toast = document.getElementById(
+            tipo === "sucesso" ? "toast-sucesso" : "toast-erro"
+        );
+
+        const outroToast = document.getElementById(
+            tipo === "sucesso" ? "toast-erro" : "toast-sucesso"
+        );
+
+        clearTimeout(temporizadorToast);
+
+        outroToast.classList.add("hidden");
+        outroToast.classList.remove("flex");
+
+        toast.querySelector(".mensagem-toast").textContent = mensagem;
+        toast.classList.remove("hidden");
+        toast.classList.add("flex");
+
+        temporizadorToast = setTimeout(() => {
+            toast.classList.add("hidden");
+            toast.classList.remove("flex");
+        }, 4000);
+    }
+
+    function atualizarQuantidadeLocal() {
+        const opcao = campoPrateleira.selectedOptions[0];
+
+        if (!opcao || campoPrateleira.value === "") {
+            textoQuantidadeLocal.textContent = "";
+            return;
+        }
+
+        const disponivel = Number(opcao.dataset.quantidade);
+
+        textoQuantidadeLocal.textContent =
+            `Disponível nesta localização: ${disponivel} unidade(s)`;
+
+        campoQuantidade.max = disponivel;
+    }
+
+    async function carregarEstoque() {
+        botaoConfirmar.disabled = true;
+
+        try {
+            const resposta = await fetch(
+                `/api/produto/${produtoId}/estoque`
+            );
+
+            const dados = await resposta.json();
+
+            if (!resposta.ok) {
+                throw new Error(
+                    dados.mensagem || "Erro ao carregar o produto."
+                );
+            }
+
+            estoqueProduto = dados;
+
+            document.getElementById("nome-produto").textContent =
+                dados.nome;
+
+            document.getElementById("estoque-total").textContent =
+                `${dados.qtd_disponivel} unidade(s)`;
+
+            campoPrateleira.replaceChildren();
+
+            const inicial = document.createElement("option");
+            inicial.value = "";
+            inicial.textContent = "Selecione a localização";
+            campoPrateleira.appendChild(inicial);
+
+            dados.prateleiras.forEach(prateleira => {
+                if (prateleira.quantidade <= 0) return;
+
+                const opcao = document.createElement("option");
+
+                opcao.value = String(prateleira.id);
+                opcao.dataset.quantidade = prateleira.quantidade;
+
+                opcao.textContent =
+                    `Estante ${prateleira.id_estante} - ` +
+                    `Linha ${prateleira.linha}, ` +
+                    `Coluna ${prateleira.coluna} ` +
+                    `(${prateleira.quantidade} un.)`;
+
+                campoPrateleira.appendChild(opcao);
+            });
+
+            if (dados.quantidade_sem_alocacao > 0) {
+                const opcao = document.createElement("option");
+
+                opcao.value = "sem-alocacao";
+                opcao.dataset.quantidade =
+                    dados.quantidade_sem_alocacao;
+
+                opcao.textContent =
+                    `Sem alocação (${dados.quantidade_sem_alocacao} un.)`;
+
+                campoPrateleira.appendChild(opcao);
+            }
+
+            campoQuantidade.value = "";
+            textoQuantidadeLocal.textContent = "";
+
+            botaoConfirmar.disabled = dados.qtd_disponivel <= 0;
+
+        } catch (erro) {
+            console.error(erro);
+
+            mostrarToast(
+                "erro",
+                erro.message || "Não foi possível carregar o estoque."
+            );
+        }
+    }
+
+    campoPrateleira.addEventListener( "change",atualizarQuantidadeLocal);
+
+    formBaixa.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const quantidade = Number(campoQuantidade.value);
+        const local = campoPrateleira.value;
+        const disponivel = Number(
+            campoPrateleira.selectedOptions[0]?.dataset.quantidade
+        );
+
+        if (
+            !local ||
+            !Number.isSafeInteger(quantidade) ||
+            quantidade <= 0 ||
+            quantidade > disponivel
+        ) {
+            mostrarToast(
+                "erro",
+                "Selecione uma localização e informe uma quantidade válida."
+            );
+            return;
+        }
+
+        const id_prateleira =
+            local === "sem-alocacao" ? null : Number(local);
+
+        botaoConfirmar.disabled = true;
+
+        try {
+            const resposta = await fetch(
+                `/api/produto/${produtoId}/baixa`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        quantidade,
+                        id_prateleira
+                    })
+                }
+            );
+
+            const dados = await resposta.json();
+
+            if (!resposta.ok) {
+                mostrarToast(
+                    "erro",
+                    dados.mensagem || "Não foi possível realizar a baixa."
+                );
+                return;
+            }
+
+            mostrarToast(
+                "sucesso",
+                dados.confirm || "Baixa realizada com sucesso!"
+            );
+
+            await carregarEstoque();
+
+        } catch (erro) {
+            console.error(erro);
+            mostrarToast("erro", "Erro ao conectar com o servidor.");
+        } finally {
+            if (estoqueProduto?.qtd_disponivel > 0) {
+                botaoConfirmar.disabled = false;
+            }
+        }
+    });
+    carregarEstoque();
+</script>
