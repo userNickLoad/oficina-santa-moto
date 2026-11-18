@@ -8,9 +8,7 @@ export const adminMiddleware = (req: Request, res: Response, next: NextFunction)
     );
 
     if (!ehAdmin) {
-        res.status(403).send(
-            "Você não tem permissão para acessar esta funcionalidade"
-        );
+        res.redirect("/?erro=sem-permissao");
         return;
     }
 

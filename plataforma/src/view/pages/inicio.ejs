@@ -24,3 +24,29 @@
                     <% }); %>
         </nav>
     </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        const erro = params.get("erro");
+
+        if (erro !== "sem-permissao") return;
+
+        const toast = document.createElement("div");
+
+        toast.className =
+            "fixed top-5 right-5 z-50 max-w-sm rounded-xl " +
+            "bg-red-100 border border-red-300 text-red-800 " +
+            "px-5 py-4 shadow-lg";
+
+        toast.textContent = "Você não tem permissão para acessar esta funcionalidade";
+        toast.setAttribute("role", "alert");
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.remove(), 5000);
+
+        window.history.replaceState({},"",window.location.pathname
+        );
+    });
+</script>
