@@ -5,27 +5,33 @@ import { title } from "node:process";
 import { VendaModel } from "../model/vendaModel.js";
 import { CategoriaModel } from "../model/categoriaModel.js";
 import { MarcaModel } from "../model/marcaModel.js";
+import { UsuarioController } from "../controller/usuarioController.js";
+import { adminMiddleware } from "../middlewares/adminMiddleware.js";
+import { UsuarioModel } from "../model/usuarioModel.js";
 
 const clienteModel = new ClienteModel();
 const vendaModel = new VendaModel();
 const categoriaModel = new CategoriaModel();
 const marcaModel = new MarcaModel();
+const usuarioController = new UsuarioController();
 
 const router = Router();
 
 router.get("/", authMiddleware, (req: Request, res: Response) => {
 
     const userName = res.locals.usuario.nome;
+    const permissoes = res.locals.usuario.permissoes;
     res.render("./layouts/index", {
         title: "inicio",
         userName,
+        permissoes,
         content: "../pages/inicio",
         voltar: false
     });
 });
 
 router.get("/entrar", (req: Request, res: Response) => {
-    
+
     res.render("./layouts/index", {
         title: "entrar",
         content: "../pages/entrar",
@@ -129,8 +135,8 @@ router.get("/clientes", authMiddleware, async (req: Request, res: Response) => {
         voltar: true,
         innerContent: { clientes }
     });
-    
-}) 
+
+})
 
 router.get("/clientes/cadastrar", authMiddleware, (req: Request, res: Response) => {
     return res.render("./layouts/index", {
@@ -138,7 +144,7 @@ router.get("/clientes/cadastrar", authMiddleware, (req: Request, res: Response) 
         content: "../pages/cadastrar-cliente",
         voltar: true
     });
-}) 
+})
 
 router.get("/clientes/editar/:id", authMiddleware, async(req: Request, res: Response) => {
     try{
@@ -167,7 +173,7 @@ router.get("/clientes/editar/:id", authMiddleware, async(req: Request, res: Resp
         console.log(error)
         res.status(500).json({mensagem: "Erro de servidor."})
     }
-}) 
+})
 
 router.get("/usuairo/atualizar-cadastro", authMiddleware, (req: Request, res: Response) => {
     return res.render("./layouts/index", {
@@ -175,7 +181,7 @@ router.get("/usuairo/atualizar-cadastro", authMiddleware, (req: Request, res: Re
         content: "../pages/configuracoes",
         voltar: true
     });
-}) 
+})
 
 router.get("/vendas", authMiddleware, async (req: Request, res: Response) => {
     try {
@@ -193,7 +199,7 @@ router.get("/vendas", authMiddleware, async (req: Request, res: Response) => {
         console.error("Erro ao buscar vendas:", error);
 
         return res.status(500).json({
-            mensagem: "Erro ao carregar as vendas."
+            mensagem: "Erro ao carregar as vendas"
         });
     }
 });
@@ -225,5 +231,64 @@ router.get("/vendas/historico", authMiddleware, async(req: Request, res: Respons
         });
     }
 });
+
+router.get("/funcionarios", authMiddleware, adminMiddleware, (req: Request, res: Response) =>
+    usuarioController.listarFuncionarios(req,res)
+);
+
+
+router.get("/funcionarios/cadastrar", authMiddleware, adminMiddleware, (req: Request, res: Response) => {
+    return res.render("./layouts/index", {
+        title: "Cadastrar funcionário",
+        userName: res.locals.usuario.nome,
+        permissoes: res.locals.usuario.permissoes,
+        content: "../pages/cadastrar-funcionario",
+        innerContent: {},
+        voltar: true
+    });
+});
+
+router.post("/funcionarios/cadastrar", authMiddleware, adminMiddleware, (req: Request, res: Response) =>
+    usuarioController.cadastrarFuncionario(req, res)
+);
+
+router.get("/funcionarios/editar/:id", authMiddleware, adminMiddleware, async(req: Request, res: Response) => {
+    const id = Number(req.params.id);
+
+    if(!Number.isInteger(id) || id <= 0){
+        return res.status(400).send("ID de funcionario invalido");
+    }
+
+    try{
+        const usuarioModel = new UsuarioModel();
+        const funcionario = await usuarioModel.getFuncionarioById(id);
+
+        if(!funcionario){
+            return res.status(404).send("Funcionario nao encontrado");
+        }
+
+        return res.render("./layouts/index", {
+            title: "Editar funcionário",
+            userName: res.locals.usuario.nome,
+            permissoes: res.locals.usuario.permisoes,
+            content: "../pages/editar-funcionario",
+            innerContent: {
+                funcionario
+            },
+            voltar: true,
+        });
+    } catch(e){
+        console.log(e);
+        return res.status(500).send("Não foi possível carregar o funcionário");
+    }
+});
+
+router.post(
+    "/funcionarios/editar/:id",
+    authMiddleware,
+    adminMiddleware,
+    (req: Request, res: Response) =>
+        usuarioController.editarFuncionario(req, res)
+);
 
 export default router;
