@@ -88,8 +88,13 @@ router.get("/estoque/produto/:id/editar", authMiddleware, getProdutoByIdMiddle, 
 
 router.get("/estoque/produto/:id", authMiddleware, getProdutoByIdMiddle, (req: Request, res: Response) => {
     const produto = res.locals.produto as ProdutoImagemLocalizacaoDTO
-
-    return res.status(200).json({...produto})
+    
+    return  res.render("./layouts/index", {
+        title: "Produto",
+        content: "../pages/produto",
+        voltar: true,
+        innerContent: {produto}
+    });
 })
 
 router.get("/cadastrar-categoria", authMiddleware, (req: Request, res: Response) => {
