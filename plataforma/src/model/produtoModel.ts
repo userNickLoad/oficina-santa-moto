@@ -630,6 +630,106 @@ class ProdutoModel{
         }
     }
 
+    async darBaixa( produtoId: number, quantidade: number, prateleiraId: number | null) {
+        if (!Number.isSafeInteger(produtoId) || produtoId <= 0 || !Number.isSafeInteger(quantidade) || quantidade <= 0 || (prateleiraId !== null 
+            && (!Number.isSafeInteger(prateleiraId) || prateleiraId <= 0))) {
+            throw new FormFill("Dados da baixa inválidos");
+        }
+
+        return prisma.$transaction(async (tx) => {
+
+            const produtos = await tx.$queryRaw<{ id: number; qtd_disponivel: number }[]>` SELECT id, qtd_disponivel FROM produto WHERE id = ${produtoId} FOR UPDATE`;
+
+            const produto = produtos[0];
+
+            if (!produto) {
+                throw new FormFill("Produto não encontrado");
+            }
+
+            if (produto.qtd_disponivel < quantidade) {
+                throw new FormFill("Estoque insuficiente");
+            }
+
+            const prateleiras = await tx.produto_prateleira.findMany({
+                where: { id_produto: produtoId },
+                select: {
+                    id_prateleira: true,
+                    quantidade: true
+                }
+            });
+
+            const totalAlocado = prateleiras.reduce(
+                (total, p) => total + p.quantidade,
+                0
+            );
+
+            const semAlocacao =
+                produto.qtd_disponivel - totalAlocado;
+
+            if (semAlocacao < 0) {
+                throw new Error(
+                    "Inconsistência entre estoque total e prateleiras"
+                );
+            }
+
+            if (prateleiraId === null) {
+
+                if (quantidade > semAlocacao) {
+                    throw new FormFill(
+                        "Quantidade de produtos em estoque insuficiente"
+                    );
+                }
+            } else {
+                const prateleira = prateleiras.find(
+                    p => p.id_prateleira === prateleiraId
+                );
+
+                if (!prateleira) {
+                    throw new FormFill(
+                        "Produto não encontrado nesta prateleira"
+                    );
+                }
+
+                if (prateleira.quantidade < quantidade) {
+                    throw new FormFill(
+                        "Quantidade insuficiente na prateleira"
+                    );
+                }
+
+                await tx.produto_prateleira.update({
+                    where: {
+                        id_produto_id_prateleira: {
+                            id_produto: produtoId,
+                            id_prateleira: prateleiraId
+                        }
+                    },
+                    data: {
+                        quantidade: {
+                            decrement: quantidade
+                        }
+                    }
+                });
+            }
+
+            const atualizado = await tx.produto.update({
+                where: { id: produtoId },
+                data: {
+                    qtd_disponivel: {
+                        decrement: quantidade
+                    }
+                }
+            });
+
+            return {
+                id: atualizado.id,
+                qtd_disponivel: atualizado.qtd_disponivel
+            };
+
+        }, {
+            isolationLevel: Prisma.TransactionIsolationLevel.Serializable
+        });
+    }
+
     async assingToPrateleira(produtoId: number, prateleiraId: number, qtd: number){
         const result = await prisma.produto_prateleira.upsert({
             where: {
