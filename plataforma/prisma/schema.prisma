@@ -242,6 +242,7 @@ model usuario {
   senha             String
   email             String?             @db.VarChar(100)
   telefone          String?             @db.VarChar(14)
+  ativo             Boolean             @default(true)
   compra            compra[]
   usuario_permissao usuario_permissao[]
   venda             venda[]

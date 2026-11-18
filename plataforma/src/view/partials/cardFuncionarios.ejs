@@ -1,0 +1,56 @@
+
+<%
+    const {
+        id,
+        nome,
+        telefone = null,
+        email = null,
+        ativo,
+        usuario_permissao = []
+    } = element;
+
+    const permissoes = usuario_permissao.map(
+        item => item.permissao.nome === "admin"
+            ? "Administrador"
+            : item.permissao.nome
+    );
+%>
+
+<div id="funcionario-<%= id %>" class="w-full flex items-center justify-between gap-4 py-2">
+    <div class="flex flex-col gap-1 min-w-0">
+
+        <h3 class="text-lg font-semibold text-gray-900">
+            <%= nome %>
+        </h3>
+
+        <% if (permissoes.length > 0) { %>
+            <p class="text-sm text-gray-600">
+                <%= permissoes.join(" · ") %>
+            </p>
+        <% } %>
+
+        <% if (email) { %>
+            <p class="text-sm text-gray-600 break-words">
+                <%= email %>
+            </p>
+        <% } %>
+
+        <% if (telefone) { %>
+            <p class="text-sm text-gray-600">
+                <%= telefone %>
+            </p>
+        <% } %>
+
+    </div>
+
+    <div class="flex items-center gap-3 shrink-0">
+        <span class="<%= ativo ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600' %> px-4 py-1.5 rounded-full text-sm font-medium">
+            <%= ativo ? 'Ativo' : 'Inativo' %>
+        </span>
+
+        <a href="/funcionarios/editar/<%= id %>" aria-label="Editar funcionário <%= nome %>" class="flex items-center justify-center
+            w-10 h-10 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+            <img src="/assets/edit.png" alt="Editar" class="w-6 h-6 object-contain"/>
+        </a>
+    </div>
+</div>

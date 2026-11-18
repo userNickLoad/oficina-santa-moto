@@ -14,7 +14,7 @@ type EstanteDTO = estante & {local: Local[]};
 type PrateleiraDTO = prateleira & {estante: EstanteDTO} & {quantidade: number};
 type ProdutoImagemLocalizacaoDTO = produto & {imagens: imagem[], prateleiras: PrateleiraDTO[], atributos: Record<string, number | string | null>, marca: marca | null};
 
-type PrateleiraAddDTO = {id_estante: number, coluna: number, linha: number, quantidade: number} 
+type PrateleiraAddDTO = {id_estante: number, coluna: number, linha: number, quantidade: number}
 
 type ProdutoCreateDTO = Omit<
     Produto,
@@ -507,14 +507,14 @@ class ProdutoModel{
                     id: updateProduto.id
                 },
                 data: {
-                    ...produto,  
+                    ...produto,
                     produto_imagem: {
                         create: imagens.map(i => ({
                             imagem: {
                                 create: {
                                     caminho: i
                                 }
-                            } 
+                            }
                         }))
                     },
                     ...((atributosToAdd)
@@ -541,7 +541,7 @@ class ProdutoModel{
                         : {}
                     ),
 
-                    
+
                 }
             })
 
@@ -635,10 +635,8 @@ class ProdutoModel{
                 }];
             });
         }
-            
-        // Lógica original dos atributos (preservada)
-       
 
+        // Lógica original dos atributos (preservada)
 
         // Evita posições duplicadas
         const posicoes = new Set<string>();
@@ -752,7 +750,7 @@ class ProdutoModel{
                 })
             );
 
-            let marcaId = newProduto.id_marca 
+            let marcaId = newProduto.id_marca
 
             if((marcaId == null || marcaId == 0) && marca != null)
                 marcaId =  (await tx.marca.upsert({
@@ -794,7 +792,6 @@ class ProdutoModel{
                     ...((atributosToAdd)?({produto_atributo: {
                         create: atributosToAdd
                     }}) : {}),
-                    
 
                     produto_prateleira: {
                         create: prateleiraDB.map(p => ({
@@ -851,7 +848,7 @@ class ProdutoModel{
                                 : { valor_texto: at.valor })
                         }
                     }
-                })) 
+                }))
             })
         }
 
@@ -900,7 +897,7 @@ class ProdutoModel{
                             }
                         }
                     }
-                }, 
+                },
                 categoria: true,
                 produto_atributo: {
                     include: {
@@ -916,8 +913,8 @@ class ProdutoModel{
 
         const {produto_prateleira, produto_imagem, produto_atributo = [], ...dados} = result;
 
-        const prateleiras = (await Promise.all(produto_prateleira.map(async pp => {    
-            const localId = pp.prateleira.estante.id_local;          
+        const prateleiras = (await Promise.all(produto_prateleira.map(async pp => {
+            const localId = pp.prateleira.estante.id_local;
                 return {
                     ...pp.prateleira,
                     quantidade: pp.quantidade,
@@ -925,16 +922,16 @@ class ProdutoModel{
                         ...pp.prateleira.estante,
                         local: (localId)? await localModel.getHierarquiaLocal(localId): []
                     }
-                    
+
                 }
-    
+
         }))).filter((p): p is PrateleiraDTO => p !== null)
 
         const atributos: Record<string, number | string | null> = {};
         produto_atributo.map((p) => {
             const {atributo, valor_numerico, valor_texto} = p
             if(atributo.numerico && valor_numerico){
-                atributos[atributo.nome] = Number(valor_numerico)  
+                atributos[atributo.nome] = Number(valor_numerico)
                 return
             }else if(valor_texto){
                 atributos[atributo.nome] = valor_texto
@@ -949,6 +946,106 @@ class ProdutoModel{
             prateleiras: prateleiras,
             atributos: atributos
         }
+    }
+
+    async darBaixa( produtoId: number, quantidade: number, prateleiraId: number | null) {
+        if (!Number.isSafeInteger(produtoId) || produtoId <= 0 || !Number.isSafeInteger(quantidade) || quantidade <= 0 || (prateleiraId !== null 
+            && (!Number.isSafeInteger(prateleiraId) || prateleiraId <= 0))) {
+            throw new FormFill("Dados da baixa inválidos");
+        }
+
+        return prisma.$transaction(async (tx) => {
+
+            const produtos = await tx.$queryRaw<{ id: number; qtd_disponivel: number }[]>` SELECT id, qtd_disponivel FROM produto WHERE id = ${produtoId} FOR UPDATE`;
+
+            const produto = produtos[0];
+
+            if (!produto) {
+                throw new FormFill("Produto não encontrado");
+            }
+
+            if (produto.qtd_disponivel < quantidade) {
+                throw new FormFill("Estoque insuficiente");
+            }
+
+            const prateleiras = await tx.produto_prateleira.findMany({
+                where: { id_produto: produtoId },
+                select: {
+                    id_prateleira: true,
+                    quantidade: true
+                }
+            });
+
+            const totalAlocado = prateleiras.reduce(
+                (total, p) => total + p.quantidade,
+                0
+            );
+
+            const semAlocacao =
+                produto.qtd_disponivel - totalAlocado;
+
+            if (semAlocacao < 0) {
+                throw new Error(
+                    "Inconsistência entre estoque total e prateleiras"
+                );
+            }
+
+            if (prateleiraId === null) {
+
+                if (quantidade > semAlocacao) {
+                    throw new FormFill(
+                        "Quantidade de produtos em estoque insuficiente"
+                    );
+                }
+            } else {
+                const prateleira = prateleiras.find(
+                    p => p.id_prateleira === prateleiraId
+                );
+
+                if (!prateleira) {
+                    throw new FormFill(
+                        "Produto não encontrado nesta prateleira"
+                    );
+                }
+
+                if (prateleira.quantidade < quantidade) {
+                    throw new FormFill(
+                        "Quantidade insuficiente na prateleira"
+                    );
+                }
+
+                await tx.produto_prateleira.update({
+                    where: {
+                        id_produto_id_prateleira: {
+                            id_produto: produtoId,
+                            id_prateleira: prateleiraId
+                        }
+                    },
+                    data: {
+                        quantidade: {
+                            decrement: quantidade
+                        }
+                    }
+                });
+            }
+
+            const atualizado = await tx.produto.update({
+                where: { id: produtoId },
+                data: {
+                    qtd_disponivel: {
+                        decrement: quantidade
+                    }
+                }
+            });
+
+            return {
+                id: atualizado.id,
+                qtd_disponivel: atualizado.qtd_disponivel
+            };
+
+        }, {
+            isolationLevel: Prisma.TransactionIsolationLevel.Serializable
+        });
     }
 
     async assingToPrateleira(produtoId: number, prateleiraId: number, qtd: number){

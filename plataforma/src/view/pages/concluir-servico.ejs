@@ -3,16 +3,14 @@
         <h2 class="text-xl mb-1">
             Serviços em andamento
         </h2>
-        <p class="text-[16px] text-gray-500 font-normal leading-6">
-            Selecione o serviço para finalizar
-        </p>
-        <div class="flex items-center gap-3 bg-[#EEEEEE] rounded-full px-5 h-[40px] mt-5">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <circle cx="11" cy="11" r="7"></circle>
-                <path d="m16 16 5 5"></path>
-            </svg>
-            <input type="search" id="pesquisar-servico" placeholder="Pesquisar por clientes" aria-label="Pesquisar por clientes"
-                class="w-full bg-transparent outline-none text-[16px] placeholder:text-gray-400">
+        <div class="mt-5">
+            <%- include("../partials/searchBar", {
+                search: {
+                    id: "pesquisar-servico",
+                    placeholder: "Pesquisar por clientes",
+                    name: "cliente"
+                }
+            }) %>
         </div>
         <div id="lista-servicos" class="flex flex-col gap-4 mt-12">
             <p class="text-gray-500 text-center">
@@ -21,18 +19,18 @@
         </div>
         <div class="flex flex-col items-center gap-3 mt-10">
             <button type="button" id="btn-concluir" disabled class="flex items-center justify-center gap-3 w-[280px]
-            max-w-full h-[36px] bg-primary rounded-full text-[18px] font-semibold cursor-pointer
-            hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                max-w-full h-[36px] bg-primary rounded-full text-[18px] font-semibold cursor-pointer
+                hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
                 <span class="flex items-center justify-center border border-black rounded-full w-5 h-5 text-[13px]">
-                    ✓
+                    ✓ 
                 </span>
                 Concluir
             </button>
             <button type="button" id="btn-cancelar" disabled class="flex items-center justify-center gap-3 w-[280px]
-            max-w-full h-[36px] border border-red-500 text-red-600 rounded-full text-[18px] font-semibold cursor-pointer
-            hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                max-w-full h-[36px] border border-red-500 text-red-600 rounded-full text-[18px] font-semibold cursor-pointer
+                hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
                 <span class="flex items-center justify-center border border-red-500 rounded-full w-5 h-5 text-[13px]">
-                    ×
+                    × 
                 </span>
                 Cancelar OS
             </button>

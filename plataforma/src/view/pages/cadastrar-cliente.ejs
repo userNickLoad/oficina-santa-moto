@@ -97,6 +97,9 @@
         if(!marcaHidden)
             throw new Error("Não foi possivel achar o hidden de " + marca.id);
 
+        modeloHidden.dataset.ignore = "true";
+        marcaHidden.dataset.ignore = "true";
+
         const marcaInput = marca.querySelector('input[id^="search-input-"]');
 
         if(!marcaInput)
