@@ -94,7 +94,8 @@ async function carregarProdutosEstoque() {
             Number(valor).toLocaleString("pt-BR", {style: "currency", currency: "BRL"});
 
         produtosFiltrados.forEach(produto => {
-            const card = document.createElement("article");
+            const card = document.createElement("a");
+            card.href = "/estoque/produto/" + produto.id
             card.className = "border border-gray-200 rounded-2xl p-3 bg-white shadow-sm max-w-[340px] w-full";
 
             if (produto.imagem) {

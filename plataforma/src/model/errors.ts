@@ -12,4 +12,14 @@ class FormFill extends Error {
     }
 }
 
-export {UniqueError, FormFill}
+class AppError extends Error {
+  public readonly statusCode: number;
+
+  constructor(message: string, statusCode = 500) {
+    super(message);
+    this.statusCode = statusCode;
+    Object.setPrototypeOf(this, AppError.prototype);
+  }
+}
+
+export {UniqueError, FormFill, AppError}

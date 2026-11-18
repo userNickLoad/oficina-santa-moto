@@ -1,8 +1,10 @@
-import { Router, Response, Request } from "express";
+import { Router, Response, Request, NextFunction } from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import { ClienteModel } from "../model/clienteModel.js";
-import { title } from "node:process";
 import { VendaModel } from "../model/vendaModel.js";
+import { AppError } from "../model/errors.js";
+import { ProdutoImagemLocalizacaoDTO } from "../model/produtoModel.js";
+import { getProdutoByIdMiddle } from "../controller/produtoController.js";
 import { CategoriaModel } from "../model/categoriaModel.js";
 import { MarcaModel } from "../model/marcaModel.js";
 import { UsuarioController } from "../controller/usuarioController.js";
@@ -76,6 +78,28 @@ router.get("/cadastrar-produto", authMiddleware, (req: Request, res: Response) =
         title: "Produto",
         content: "../pages/cadastrar-produto",
         voltar: true
+    });
+})
+
+router.get("/estoque/produto/:id/editar", authMiddleware, getProdutoByIdMiddle, (req: Request, res: Response) => {
+    const produto = res.locals.produto as ProdutoImagemLocalizacaoDTO;
+
+    res.render("./layouts/index", {
+        title: "Produto",
+        content: "../pages/editar-produto",
+        voltar: true,
+        innerContent: {produto}
+    });
+})
+
+router.get("/estoque/produto/:id", authMiddleware, getProdutoByIdMiddle, (req: Request, res: Response) => {
+    const produto = res.locals.produto as ProdutoImagemLocalizacaoDTO
+
+    return  res.render("./layouts/index", {
+        title: "Produto",
+        content: "../pages/produto",
+        voltar: true,
+        innerContent: {produto}
     });
 })
 
@@ -233,9 +257,8 @@ router.get("/vendas/historico", authMiddleware, async(req: Request, res: Respons
 });
 
 router.get("/funcionarios", authMiddleware, adminMiddleware, (req: Request, res: Response) =>
-    usuarioController.listarFuncionarios(req,res)
+    usuarioController.listarFuncionarios(req, res)
 );
-
 
 router.get("/funcionarios/cadastrar", authMiddleware, adminMiddleware, (req: Request, res: Response) => {
     return res.render("./layouts/index", {
@@ -252,32 +275,32 @@ router.post("/funcionarios/cadastrar", authMiddleware, adminMiddleware, (req: Re
     usuarioController.cadastrarFuncionario(req, res)
 );
 
-router.get("/funcionarios/editar/:id", authMiddleware, adminMiddleware, async(req: Request, res: Response) => {
+router.get("/funcionarios/editar/:id", authMiddleware, adminMiddleware, async (req: Request, res: Response) => {
     const id = Number(req.params.id);
 
-    if(!Number.isInteger(id) || id <= 0){
+    if (!Number.isInteger(id) || id <= 0) {
         return res.status(400).send("ID de funcionario invalido");
     }
 
-    try{
+    try {
         const usuarioModel = new UsuarioModel();
         const funcionario = await usuarioModel.getFuncionarioById(id);
 
-        if(!funcionario){
+        if (!funcionario) {
             return res.status(404).send("Funcionario nao encontrado");
         }
 
         return res.render("./layouts/index", {
             title: "Editar funcionário",
             userName: res.locals.usuario.nome,
-            permissoes: res.locals.usuario.permisoes,
+            permissoes: res.locals.usuario.permissoes,
             content: "../pages/editar-funcionario",
             innerContent: {
                 funcionario
             },
-            voltar: true,
+            voltar: true
         });
-    } catch(e){
+    } catch (e) {
         console.log(e);
         return res.status(500).send("Não foi possível carregar o funcionário");
     }
@@ -290,5 +313,20 @@ router.post(
     (req: Request, res: Response) =>
         usuarioController.editarFuncionario(req, res)
 );
+
+// Tratamento global de erros
+router.use((err: Error | AppError, req: Request, res: Response, next: NextFunction) => {
+    console.error(err.stack);
+
+    const statusCode = err instanceof AppError ? err.statusCode : 500;
+    const message = err.message || "Algo de errado ocorreu, entre em contato com a equipe tecnica";
+
+    return res.status(statusCode).render("./layouts/index", {
+        title: "Cliente",
+        content: "../pages/error",
+        innerContent: `${statusCode} ${message}`,
+        voltar: true
+    });
+});
 
 export default router;

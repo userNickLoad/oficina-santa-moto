@@ -90,12 +90,12 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
 
 
         form.querySelectorAll<HTMLInputElement>("input").forEach(input => {
-            if(input.disabled || input.classList.contains("hidden"))
+            if(input.disabled || input.classList.contains("hidden") || input.dataset.ignore)
                 return;
 
             const parent = input.closest('[data-parent="inputbox"]');
             if(!parent){
-                throw new Error(`não foi possivel localizar o pai de ${input.id}`)
+                throw new Error(`não foi possivel localizar o pai de ${input}`)
             }
             const errorDisplay = parent.querySelector('[id^="output"]');
 
@@ -138,16 +138,14 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
         // Obtém os dados do formulário
         const formData = new FormData(form);
 
-        const contains_files = Array.from(
-            form.querySelectorAll<HTMLInputElement>('input[type="file"]')
-        ).some(input => input.files && input.files.length > 0);
+        const contains_files =  form.querySelectorAll<HTMLInputElement>('input[type="file"]');
 
         const dados = parseFormData(formData);
 
         let body: FormData | string;
         let headers: HeadersInit | undefined;
 
-        if (contains_files) {
+        if (contains_files.length > 0) {
             const multipart = new FormData();
 
             // Adiciona o JSON com os demais campos
@@ -155,7 +153,7 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
 
 
             // Adiciona os arquivos individualmente
-            form.querySelectorAll<HTMLInputElement>('input[type="file"]').forEach(input => {
+            contains_files.forEach(input => {
                 if (!input.files) return;
 
                 for (const file of input.files) {

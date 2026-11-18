@@ -1,18 +1,19 @@
-import { produto, produto_atributo, Prisma, imagem, local, prateleira, estante } from "../../generated/prisma/client.js";
+import { Decimal } from "@prisma/client/runtime/client";
+import { produto, produto_atributo, Prisma, imagem, local, prateleira, estante, atributo, marca } from "../../generated/prisma/client.js";
 import prisma from "../database/prisma.js";
 import { Atributo } from "./atributoModel.js";
 import { FormFill } from "./errors.js";
 import { Local, LocalModel } from "./localModel.js";
+import { unlink } from "node:fs/promises"
+import path from "node:path";
 
 type Produto = produto;
 type ProdutoGetDTO = produto & {imagens: imagem[]};
 type EstanteDTO = estante & {local: Local[]};
-type PrateleiraDTO = prateleira & {estante: EstanteDTO};
-type ProdutoImagemLocalizacaoDTO = produto & {imagens: imagem[], prateleiras: PrateleiraDTO[]};
+type PrateleiraDTO = prateleira & {estante: EstanteDTO} & {quantidade: number};
+type ProdutoImagemLocalizacaoDTO = produto & {imagens: imagem[], prateleiras: PrateleiraDTO[], atributos: Record<string, number | string | null>, marca: marca | null};
 
-type ProdutoAtributo = produto_atributo;
-
-type PrateleiraAddDTO = {id_estante: number, coluna: number, linha: number, quantidade: number} 
+type PrateleiraAddDTO = {id_estante: number, coluna: number, linha: number, quantidade: number}
 
 type ProdutoCreateDTO = Omit<
     Produto,
@@ -21,6 +22,15 @@ type ProdutoCreateDTO = Omit<
     atributos: Record<string, number | string>[];
     imagens: string[];
 };
+
+type ProdutoUpdateDTO = Omit<
+    Produto,
+     "qtd_disponivel"
+> & {
+    atributos: Record<string, number | string>[];
+    imagens: string[];
+};
+
 type ProdutoFilterDTO = {
     nome?: string,
     id_categoria?: number | number[],
@@ -37,11 +47,201 @@ const localModel = new LocalModel();
 
 class ProdutoModel{
 
+    async update(
+        updateProduto: ProdutoUpdateDTO,
+        marca: string | null,
+        deleteImagens: number[]
+    ): Promise<Produto | null>{
+        const { atributos, imagens, ...produto } = updateProduto;
+
+        let atributosToAdd: Prisma.produto_atributoCreateWithoutProdutoInput[] | null = null
+
+        if (produto.id_categoria){
+            const atributosDB = await prisma.atributo.findMany({
+            where: {
+                id_categoria: produto.id_categoria
+            }
+        });
+
+        atributosToAdd = atributosDB.flatMap<
+            Prisma.produto_atributoCreateWithoutProdutoInput
+            >((atributo) => {
+
+                const nome = atributo.nome.trim().toLowerCase();
+
+                const at = atributos.find(
+                    item => Object.keys(item).some(
+                        chave => chave.trim().toLowerCase() === nome
+                    )
+                );
+
+                let valor = at
+                    ? at[Object.keys(at).find(
+                        chave => chave.trim().toLowerCase() === nome
+                    )!]
+                    : undefined;
+
+                if (valor === undefined || valor === "") {
+                    if (atributo.obrigatorio) {
+                        throw new FormFill(
+                            `Atributo "${atributo.nome}" obrigatório não tem valor`
+                        );
+                    }
+
+                    return [];
+                }
+
+                if (atributo.numerico) {
+                    valor = Number(String(valor ?? "").replace(",", "."))
+                    if (Number.isNaN(valor)) {
+                        throw new FormFill(
+                            `Atributo "${atributo.nome}" deveria ser numérico`
+                        );
+                    }
+
+                    return [{
+                        atributo: {
+                            connect: { id: atributo.id }
+                        },
+                        valor_numerico: valor
+                    }];
+                }
+
+                if (typeof valor !== "string") {
+                    throw new FormFill(
+                        `Atributo "${atributo.nome}" deveria ser textual`
+                    );
+                }
+
+                return [{
+                    atributo: {
+                        connect: { id: atributo.id }
+                    },
+                    valor_texto: valor
+                }];
+            });
+        }
+
+
+        const result = await prisma.$transaction(async (tx)=>{
+            const imageDB = await tx.produto_imagem.findMany({
+                where: {
+                    id_imagem: {
+                        in: deleteImagens
+                    },
+                    id_produto: updateProduto.id
+                },
+                include: {
+                    imagem: true
+                }
+            });
+
+            const produto_imageDelete = await tx.produto_imagem.deleteMany({
+                where: {
+                    id_imagem: {
+                        in: deleteImagens
+                    },
+                    id_produto: updateProduto.id
+                }
+            });
+
+            const imageDelete = await tx.imagem.deleteMany({
+                where: {
+                    id: {
+                        in: imageDB.map((i) => (i.imagem.id))
+                    }
+                }
+            });
+
+            let marcaId = updateProduto.id_marca;
+
+            if(marca){
+                marcaId = (await tx.marca.upsert({
+                    where: {
+                        nome: marca
+                    },
+                    update: {},
+                    create: {
+                        nome: marca
+                    }
+                })).id
+            }
+
+            const produtoDB = await tx.produto.findUnique({
+                where: {
+                    id: updateProduto.id
+                }
+            })
+
+            if(!produtoDB)
+                throw new Error("não foi possivel achar o produto")
+
+            if(produtoDB.id_categoria && produtoDB.id_categoria != updateProduto.id_categoria){
+                const produto_atributoDelete = await tx.produto_atributo.deleteMany({
+                    where: {
+                        id_produto: updateProduto.id
+                    }
+                })
+            }
+
+            const produtoUp = await tx.produto.update({
+                where: {
+                    id: updateProduto.id
+                },
+                data: {
+                    ...produto,
+                    produto_imagem: {
+                        create: imagens.map(i => ({
+                            imagem: {
+                                create: {
+                                    caminho: i
+                                }
+                            }
+                        }))
+                    },
+                    ...((atributosToAdd)
+                        ? {produto_atributo: {
+                            upsert: atributosToAdd.filter(at => (at.atributo.connect?.id)).flatMap(at => {
+                                const idAtributo = at.atributo.connect?.id;
+
+                                if (idAtributo === undefined) {
+                                    return [];
+                                }
+
+                                return [{
+                                    where: {
+                                        id_atributo_id_produto: {
+                                            id_atributo: idAtributo,
+                                            id_produto: updateProduto.id
+                                        }
+                                    },
+                                    create: at,
+                                    update: at
+                                }];
+                            })
+                        }}
+                        : {}
+                    ),
+
+
+                }
+            })
+
+            const imagesDiskDelete = await Promise.all(imageDB.map(i => {return unlink(path.resolve(`./images/${i.imagem.caminho}`))}));
+
+
+            return produtoUp;
+
+        })
+
+        return result
+    }
+
     async create(
         newProduto: ProdutoCreateDTO,
         estante: PrateleiraAddDTO[],
         quantidade: number,
-        marca: string
+        marca: string | null
     ): Promise<Produto> {
 
         const { atributos, imagens, ...produto } = newProduto;
@@ -50,49 +250,62 @@ class ProdutoModel{
 
         estante.map(e => {qtd_disponivel += e.quantidade})
 
-        if (!produto.id_categoria)
-            throw new FormFill("não foi possivel localizar o id da categoria");
+        let atributosToAdd: Prisma.produto_atributoCreateWithoutProdutoInput[] | null = null
 
-        // Lógica original dos atributos (preservada)
-        const atributosDB = await prisma.atributo.findMany({
+        if (produto.id_categoria){
+            const atributosDB = await prisma.atributo.findMany({
             where: {
                 id_categoria: produto.id_categoria
             }
         });
 
-        const atributosToAdd = atributosDB.flatMap<
+        atributosToAdd = atributosDB.flatMap<
             Prisma.produto_atributoCreateWithoutProdutoInput
-        >((atributo) => {
+            >((atributo) => {
 
-            const nome = atributo.nome.trim().toLowerCase();
+                const nome = atributo.nome.trim().toLowerCase();
 
-            const at = atributos.find(
-                item => Object.keys(item).some(
-                    chave => chave.trim().toLowerCase() === nome
-                )
-            );
+                const at = atributos.find(
+                    item => Object.keys(item).some(
+                        chave => chave.trim().toLowerCase() === nome
+                    )
+                );
 
-            let valor = at
-                ? at[Object.keys(at).find(
-                    chave => chave.trim().toLowerCase() === nome
-                )!]
-                : undefined;
+                let valor = at
+                    ? at[Object.keys(at).find(
+                        chave => chave.trim().toLowerCase() === nome
+                    )!]
+                    : undefined;
 
-            if (valor === undefined || valor === "") {
-                if (atributo.obrigatorio) {
-                    throw new FormFill(
-                        `Atributo "${atributo.nome}" obrigatório não tem valor`
-                    );
+                if (valor === undefined || valor === "") {
+                    if (atributo.obrigatorio) {
+                        throw new FormFill(
+                            `Atributo "${atributo.nome}" obrigatório não tem valor`
+                        );
+                    }
+
+                    return [];
                 }
 
-                return [];
-            }
+                if (atributo.numerico) {
+                    valor = Number(String(valor ?? "").replace(",", "."))
+                    if (Number.isNaN(valor)) {
+                        throw new FormFill(
+                            `Atributo "${atributo.nome}" deveria ser numérico`
+                        );
+                    }
 
-            if (atributo.numerico) {
-                valor = Number(String(valor ?? "").replace(",", "."))
-                if (Number.isNaN(valor)) {
+                    return [{
+                        atributo: {
+                            connect: { id: atributo.id }
+                        },
+                        valor_numerico: valor
+                    }];
+                }
+
+                if (typeof valor !== "string") {
                     throw new FormFill(
-                        `Atributo "${atributo.nome}" deveria ser numérico`
+                        `Atributo "${atributo.nome}" deveria ser textual`
                     );
                 }
 
@@ -100,23 +313,13 @@ class ProdutoModel{
                     atributo: {
                         connect: { id: atributo.id }
                     },
-                    valor_numerico: valor
+                    valor_texto: valor
                 }];
-            }
+            });
+        }
 
-            if (typeof valor !== "string") {
-                throw new FormFill(
-                    `Atributo "${atributo.nome}" deveria ser textual`
-                );
-            }
+        // Lógica original dos atributos (preservada)
 
-            return [{
-                atributo: {
-                    connect: { id: atributo.id }
-                },
-                valor_texto: valor
-            }];
-        });
 
 
         // Evita posições duplicadas
@@ -231,9 +434,9 @@ class ProdutoModel{
                 })
             );
 
-            let marcaId = newProduto.id_marca 
+            let marcaId = newProduto.id_marca
 
-            if(marcaId == null || marcaId == 0)
+            if((marcaId == null || marcaId == 0) && marca != null)
                 marcaId =  (await tx.marca.upsert({
                         where: {
                             nome: marca
@@ -270,10 +473,10 @@ class ProdutoModel{
                             }
                         }))
                     },
-
-                    produto_atributo: {
+                    ...((atributosToAdd)?({produto_atributo: {
                         create: atributosToAdd
-                    },
+                    }}) : {}),
+
 
                     produto_prateleira: {
                         create: prateleiraDB.map(p => ({
@@ -330,7 +533,7 @@ class ProdutoModel{
                                 : { valor_texto: at.valor })
                         }
                     }
-                })) 
+                }))
             })
         }
 
@@ -379,32 +582,54 @@ class ProdutoModel{
                             }
                         }
                     }
-                }
+                },
+                categoria: true,
+                produto_atributo: {
+                    include: {
+                        atributo: true
+                    }
+                },
+                marca: true
             }
         })
 
         if(!result)
             return null;
 
-        const {produto_prateleira, produto_imagem, ...dados} = result;
+        const {produto_prateleira, produto_imagem, produto_atributo = [], ...dados} = result;
 
-        const prateleiras = (await Promise.all(produto_prateleira.map(async pp => {    
-            const localId = pp.prateleira.estante.id_local;          
+        const prateleiras = (await Promise.all(produto_prateleira.map(async pp => {
+            const localId = pp.prateleira.estante.id_local;
                 return {
                     ...pp.prateleira,
+                    quantidade: pp.quantidade,
                     estante: {
                         ...pp.prateleira.estante,
                         local: (localId)? await localModel.getHierarquiaLocal(localId): []
                     }
-                    
+
                 }
-    
+
         }))).filter((p): p is PrateleiraDTO => p !== null)
+
+        const atributos: Record<string, number | string | null> = {};
+        produto_atributo.map((p) => {
+            const {atributo, valor_numerico, valor_texto} = p
+            if(atributo.numerico && valor_numerico){
+                atributos[atributo.nome] = Number(valor_numerico)
+                return
+            }else if(valor_texto){
+                atributos[atributo.nome] = valor_texto
+                return
+            }
+            atributos[atributo.nome] = null
+        })
 
         return {
             ...dados,
             imagens: produto_imagem.map(pi => (pi.imagem)),
-            prateleiras: prateleiras
+            prateleiras: prateleiras,
+            atributos: atributos
         }
     }
 
@@ -425,4 +650,4 @@ class ProdutoModel{
     }
 }
 
-export {ProdutoModel, ProdutoCreateDTO }
+export {ProdutoModel, ProdutoCreateDTO, ProdutoImagemLocalizacaoDTO, ProdutoUpdateDTO}
