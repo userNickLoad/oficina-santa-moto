@@ -37,10 +37,6 @@ const setSearchBox = (root: HTMLElement, action: string | any[], onSearch: ((val
         'button[id^="btn-search-"]'
     );
 
-    if(!button){
-        throw new Error("não foi possivel localizar o botão")
-    }
-
     // Índice da opção atualmente selecionada
     let selectedIndex = -1;
 
@@ -63,8 +59,8 @@ const setSearchBox = (root: HTMLElement, action: string | any[], onSearch: ((val
         if (!value)
             return;
     };
-
-    button.addEventListener("click", executeSearch)
+    if(button)
+        button.addEventListener("click", executeSearch)
 
     // Seleciona uma opção
     const selectOption = (index: number) => {

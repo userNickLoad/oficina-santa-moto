@@ -1,3 +1,4 @@
+
 <%
     const {
         id,
@@ -15,207 +16,255 @@
         max_number = "",
         value = null,
         step = "1",
-        output = null
+        output = null,
+        subtitte = null,
+        valueHidden = null
     } = item;
-    const id_applay = name.toLowerCase();
-    const column_applay = (column)? "justify-center py-[1vh]": "flex-col";
 
-    const name_input = (name == null)? id: name;
+    const name_input = name ?? id;
+    const id_applay = String(name_input).toLowerCase();
+    const column_applay = column
+        ? "flex-row items-center"
+        : "flex-col";
 
+    const input_class = `
+        w-full border border-gray-200 rounded-xl
+        px-3 py-3
+        focus:outline-none focus:ring-2 focus:ring-gray-400
+        transition-all duration-200
+        ${text_size}
+    `;
 %>
 
+<div
+    class="<%= size %> flex <%= column_applay %> gap-2"
+    data-parent="inputbox"
+>
+    <% if (title) { %>
+        <label
+            class="<%= text_size %> font-medium flex items-center"
+            for="<%= type === 'search' ? `search-input-${id}` : id_applay %>"
+        >
+            <%- title %>
+        </label>
+    <% } %>
 
-<div class="<%= size %> flex <%= column_applay %> gap-[1vh]" data-parent = "inputbox">
-    <label class="<%= text_size %> flex items-center" for="<%= item.name %>">
-        <%- title %>
-    </label>
+    <% if (subtitte) { %>
+        <p class="text-sm text-gray-500">
+            <%= subtitte %>
+        </p>
+    <% } %>
 
-    <% if(type == "textarea") { %>
-        <textarea 
-            name="<%= name %>" 
+    <% if (type === "textarea") { %>
+
+        <textarea
+            name="<%= name_input %>"
             id="<%= id_applay %>"
-            placeholder="<%= placeholder %>",
+            placeholder="<%= placeholder %>"
             rows="<%= rows %>"
             maxlength="<%= maxlength %>"
-            class="border resize-none h-32 p-3 border-gray-200  rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
-            <% if(value) {%>
-                value="<%value%>"
-            <% } %>
-            ></textarea>
-    <% } else if (type == "radio") { %>
+            class="<%= input_class %> resize-none min-h-32"
+        ><%= value ?? '' %></textarea>
 
-        <div
-            class="w-full flex flex-col items-center justify-center "
-            >
+    <% } else if (type === "radio") { %>
+
+        <div class="w-full flex flex-col gap-3">
             <% radios.forEach(function(radio) { %>
-                <div
-                    class="w-full flex gap-[3vw]"
-                    >
-                    
-                    <input 
-                        type="radio" 
-                        name="<%= name_input %>" 
-                        id="radio-<%= id_applay %>-<%= radio %>"
-                        class="w-[3vh] h-[3vh]"
-                        value="<%= radio %>"
-                    >
-
-                    <label 
-                        for="radio-<%= id_applay %>-<%= radio %>"
-                        class="text-left"
-                    ><%= radio %></label>
-                </div>
-                
-            <% }); %>
-            
-        </div>
-    <% } else if (type == "check") { %>
-
-        <div
-            class="w-full flex"
-            >
-            <input 
-                type="checkbox" 
-                name="<%= name_input %>" 
-                id="<%= id_applay %>"
-                class="w-[5vh] h-[5vh]"
+                <label
+                    for="radio-<%= id_applay %>-<%= radio %>"
+                    class="flex items-center gap-3 cursor-pointer"
                 >
+                    <input
+                        type="radio"
+                        name="<%= name_input %>"
+                        id="radio-<%= id_applay %>-<%= radio %>"
+                        value="<%= radio %>"
+                        class="w-5 h-5 accent-primary"
+                    >
+
+                    <span><%= radio %></span>
+                </label>
+            <% }); %>
         </div>
 
-    <% } else if (type == "image") { %>
+    <% } else if (type === "check") { %>
 
-    <div class="flex flex-col w-full gap-[1vh]">
+        <div class="w-full flex items-center gap-3">
+            <input
+                type="checkbox"
+                name="<%= name_input %>"
+                id="<%= id_applay %>"
+                class="w-5 h-5 accent-primary"
+                <%= value ? "checked" : "" %>
+            >
+        </div>
 
-        <input
-            type="file"
-            name="<%= name_input %>[]"
-            id="<%= id_applay %>"
-            accept="image/png, image/jpeg, image/webp"
-            multiple
-            class="hidden"
-        >
+    <% } else if (type === "image") { %>
 
-        <!-- Botão personalizado -->
-        <label
-            for="<%= id_applay %>"
-            class="flex items-center justify-center w-full
-                bg-primary px-4 py-3 rounded-2xl
-                cursor-pointer hover:opacity-90
-                transition"
-        >
-            <span class="font-bold">
-                Selecionar imagens
-            </span>
-        </label>
+        <div class="flex flex-col w-full gap-3">
 
-        <!-- Pré-visualização -->
+            <input
+                type="file"
+                name="<%= name_input %>[]"
+                id="<%= id_applay %>"
+                accept="image/png, image/jpeg, image/webp"
+                multiple
+                class="hidden"
+            >
+
+            <label
+                for="<%= id_applay %>"
+                class="
+                    flex items-center justify-center gap-2
+                    w-full px-4 py-3
+                    bg-primary rounded-xl
+                    font-semibold
+                    cursor-pointer
+                    hover:opacity-90
+                    transition-all duration-200
+                "
+            >
+                <span>Selecionar imagens</span>
+            </label>
+
+            <div
+                id="<%= id_applay %>-preview"
+                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+            ></div>
+
+            <div class="flex justify-center">
+                <%- include("./button", { button: {
+                    type: "simple",
+                    id: `cancel-${id_applay}`,
+                    name: `cancel-${name_input}`,
+                    content: "Cancelar envio",
+                    size: "w-auto px-6"
+                }}) %>
+            </div>
+
+        </div>
+
+    <% } else if (type === "search") { %>
+
         <div
-            id="<%= id_applay %>-preview"
-            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
-        ></div>
-
-        <div class="flex justify-center mt-[1vh]">
-            <%- include("./button", { button: {
-                type: "simple",
-                id: `cancel-${id_applay}`,
-                name: `cancel-${name_input}`,
-                content: "Cancelar envio",
-                size: "w-auto px-[2vw]"
-            }}) %>
-        </div>
-
-    </div>
-    <%} else if(type === "search"){ %>
-        <div class="relative flex flex-col"
+            class="relative w-full"
             data-pai="searchBar"
             data-input=""
             id="search-<%= id %>"
-            >
-            <div
-                class="w-full h-full relative text-2x z-10"
-                >
+        >
+            <div class="relative w-full z-10">
+
                 <input
                     id="search-hidden-<%= id %>"
-                    name="<%= name %>Id"
-                    type="text"
-                    class="hidden"
-                        <% if(value) {%>
-                            value="<%= value %>"
-                        <% } %>
-                    >
-                <button id="btn-search-<%= id %>" 
-                    class="absolute h-[100%] aspect-square flex justify-center items-center cursor-pointer hidden">
-                        <div 
-                            class="flex h-[80%] aspect-square rounded-full bg-white justify-center items-center 
-                                    transition-transform duration-300 ease-out
-                                    hover:scale-110 hover:z-10">
-                            <img src="/assets/searchIcon.png" alt="Icone de pesquisa"
-                                class="h-[50%] aspect-square"
-                            >
-                        </div>
+                    name="<%= name_input %>Id"
+                    type="hidden"
+                    value="<%= valueHidden ?? '' %>"
+                >
 
-                </button>
-                <input id="search-input-<%= id %>" type="text" placeholder="<%= placeholder %>" maxlength="<%= maxlength %>" name="<%= name %>"
-                    class="border w-full  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
+                <button
+                    id="btn-search-<%= id %>"
+                    type="button"
+                    class="absolute left-2 top-1/2 -translate-y-1/2 hidden"
+                >
+                    <img
+                        src="/assets/searchIcon.png"
+                        alt="Ícone de pesquisa"
+                        class="w-5 h-5"
                     >
+                </button>
+
+                <input
+                    id="search-input-<%= id %>"
+                    type="text"
+                    name="<%= name_input %>"
+                    placeholder="<%= placeholder %>"
+                    maxlength="<%= maxlength %>"
+                    autocomplete="off"
+                    class="<%= input_class %>"
+                    value="<%= value ?? '' %>"
+
+                >
+
             </div>
+
             <div
                 id="search-autocomplete-<%= id %>"
-                class="w-full h-0 flex absolute overflow-y-hidden transition-transform duration-300 top-[2.5vh]"
-                >
+                class="
+                    absolute top-full left-0
+                    translate-y-2
+                    w-full
+                    h-0
+                    flex
+                    overflow-y-hidden
+                    transition-all duration-200
+                    z-20
+                "
+            >
                 <ul
                     id="search-placement-<%= id %>"
-                    class="w-full flex flex-col bg-gray-400 z-9 rounded-2xl  divide-y divide-black overflow-hidden" 
-                    >
+                    class="
+                        w-full flex flex-col
+                        bg-white
+                        border border-gray-200
+                        rounded-xl
+                        shadow-lg
+                        divide-y divide-gray-100
+                        overflow-hidden
+                    "
+                >
                     <li
                         id="search-default-<%= id %>"
-                        class="w-full flex lg:px-[1vw] px-[3vw] items-center hover:bg-gray-500 hover:text-white cursor-pointer hover:outline-2 hover:outline-blue-400 hidden"
-                        >
-                        abacate
+                        class="
+                            w-full px-4 py-3
+                            items-center
+                            cursor-pointer
+                            hover:bg-gray-100
+                            transition-colors
+                            hidden
+                        "
+                    >
+                        Opção
                     </li>
-
                 </ul>
             </div>
-
         </div>
-    <% } else { %>
-            <input
-            
-                class="border  border-gray-200 lg:px-[1vw] px-[3vw] rounded-2xl focus:outline-2 focus:outline-gray-400 <%= text_size %>"
-                type="<%= type %>"
-                id="<%= name %>"
-                name="<%= name_input %>"
-                alt="escreva <%= name %>"
-                maxlength=<%= maxlength %>
-                placeholder="<%= placeholder %>"
-                    <% if (mask === "currency") { %>
-                        data-mask="currency"
-                        inputmode="numeric"
-                    <% } else if(mask === "phone"){%>
-                        data-mask="phone"
-                        inputmode="numeric"
-                    <% } %>
-                <% if(type === "number") {%>
-                    max="<%= max_number %>"
-                    step="<%= step %>"
-                <% } %>
-                <% if(value) {%>
-                    value="<%= value %>"
-                <% } %>
-            >
 
-        <% } %>
+    <% } else { %>
+
+        <input
+            class="<%= input_class %>"
+            type="<%= type %>"
+            id="<%= id_applay %>"
+            name="<%= name_input %>"
+            alt="Escreva <%= name_input %>"
+            maxlength="<%= maxlength %>"
+            placeholder="<%= placeholder %>"
+            <% if (mask === "currency") { %>
+                data-mask="currency"
+                inputmode="numeric"
+            <% } else if (mask === "phone") { %>
+                data-mask="phone"
+                inputmode="numeric"
+            <% } %>
+            <% if (type === "number") { %>
+                max="<%= max_number %>"
+                step="<%= step %>"
+            <% } %>
+            <% if (value !== null && value !== undefined) { %>
+                value="<%= value %>"
+            <% } %>
+        >
+
+    <% } %>
+
     <p
-        class="text-red-900 min-h-[3vh]"
+        class="text-red-900 text-sm min-h-[2vh]"
         id="output-<%= id_applay %>"
     >
-        <% if(output){ %>
-            <span
-                class="text-gray-700 text-sm"
-                >
+        <% if (output) { %>
+            <span class="text-gray-500">
                 <%= output %>
             </span>
         <% } %>
     </p>
 </div>
-    

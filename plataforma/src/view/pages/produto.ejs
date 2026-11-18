@@ -1,0 +1,450 @@
+
+<%
+    const { produto } = innerContent;
+
+    const {
+        id,
+        nome,
+        preco_venda,
+        qtd_disponivel,
+        descricao,
+        categoria = null,
+        marca = null,
+        imagens = [],
+        prateleiras = [],
+        atributos = {}
+    } = produto;
+
+    const qtd_alocada = prateleiras.reduce(
+        (total, prateleira) => total + Number(prateleira.quantidade || 0),
+        0
+    );
+
+    const qtd_nao_alocada = Number(qtd_disponivel) - qtd_alocada;
+
+    const preco_formatado = Number(preco_venda).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+
+    const getLocalizacao = (estante) => {
+        return (estante?.local ?? [])
+            .map(local => local.nome)
+            .filter(Boolean)
+            .join(" / ") || "Local não informado";
+    };
+%>
+<section class="flex flex-col gap-8 py-6">
+
+    <!-- CABEÇALHO -->
+    <header class="flex flex-col gap-5">
+
+        <div>
+            <a
+                href="/estoque"
+                class="text-sm text-gray-500 hover:text-secondary transition-colors"
+            >
+                ← Voltar para o estoque
+            </a>
+
+            <div class="flex flex-wrap justify-between items-center gap-3 mt-3">
+
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold">
+                        <%= nome %>
+                    </h1>
+
+                    <p class="text-gray-500 mt-1">
+                        Produto #<%= id %>
+                    </p>
+                </div>
+
+                <span class="rounded-full px-4 py-2 font-bold text-sm
+                    <%= qtd_disponivel > 0
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                    %>"
+                >
+                    <%= qtd_disponivel > 0 ? "Disponível" : "Sem estoque" %>
+                </span>
+
+            </div>
+        </div>
+
+        <!-- AÇÕES -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+            <a
+                href="/estoque/produto/<%= id %>/editar"
+                class="rounded-xl bg-primary hover:bg-secondary
+                       transition-colors p-3 font-bold text-center"
+            >
+                Editar produto
+            </a>
+
+            <a
+                href="/estoque/produto/<%= id %>/baixa"
+                class="rounded-xl bg-red-600 hover:bg-red-700
+                       text-white transition-colors p-3 font-bold text-center"
+            >
+                Dar baixa
+            </a>
+
+            <a
+                href="/estoque/produto/<%= id %>/entrada"
+                class="rounded-xl bg-green-600 hover:bg-green-700
+                       text-white transition-colors p-3 font-bold text-center"
+            >
+                Dar entrada
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- RESUMO -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+        <article class="rounded-2xl bg-gray-100 p-5">
+
+            <p class="text-sm text-gray-500 font-medium">
+                Preço de venda
+            </p>
+
+            <p class="text-2xl font-bold mt-2">
+                <%= preco_formatado %>
+            </p>
+
+        </article>
+
+        <article class="rounded-2xl bg-gray-100 p-5">
+
+            <p class="text-sm text-gray-500 font-medium">
+                Quantidade disponível
+            </p>
+
+            <p class="text-2xl font-bold mt-2">
+                <%= qtd_disponivel %>
+                <span class="text-base font-normal text-gray-500">
+                    unidades
+                </span>
+            </p>
+
+        </article>
+
+        <article class="rounded-2xl bg-primary/20 p-5">
+
+            <p class="text-sm text-gray-600 font-medium">
+                Quantidade não alocada
+            </p>
+
+            <p class="text-2xl font-bold mt-2
+                <%= qtd_nao_alocada < 0 ? 'text-red-600' : '' %>"
+            >
+                <%= qtd_nao_alocada %>
+                <span class="text-base font-normal">
+                    unidades
+                </span>
+            </p>
+
+        </article>
+
+    </section>
+
+
+    <!-- ARMAZENAMENTO -->
+    <section class="flex flex-col gap-4">
+
+        <div class="flex flex-wrap justify-between items-center gap-2">
+
+            <h2 class="text-2xl font-bold">
+                Armazenamento
+            </h2>
+
+            <span class="text-sm text-gray-500">
+                <%= prateleiras.length %>
+                <%= prateleiras.length === 1 ? "prateleira" : "prateleiras" %>
+            </span>
+
+        </div>
+
+        <% if (prateleiras.length > 0) { %>
+
+            <div class="overflow-x-auto rounded-2xl border border-gray-200">
+
+                <table class="w-full min-w-[550px] text-left">
+
+                    <thead class="bg-gray-100">
+
+                        <tr>
+                            <th class="p-4">Localização</th>
+                            <th class="p-4">Estante</th>
+                            <th class="p-4">Prateleira</th>
+                            <th class="p-4 text-center">Quantidade</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-200">
+
+                        <% prateleiras.forEach(prateleira => { %>
+
+                            <tr class="hover:bg-gray-50 transition-colors">
+
+                                <td class="p-4 font-semibold">
+                                    <%= getLocalizacao(prateleira.estante) %>
+                                </td>
+
+                                <td class="p-4 text-gray-600">
+                                    Linha <%= prateleira.estante?.linha ?? "-" %>,
+                                    coluna <%= prateleira.estante?.coluna ?? "-" %>
+                                </td>
+
+                                <td class="p-4 text-gray-600">
+                                    Linha <%= prateleira.linha %>,
+                                    coluna <%= prateleira.coluna %>
+                                </td>
+
+                                <td class="p-4 text-center">
+
+                                    <span class="inline-flex items-center justify-center
+                                                 rounded-full bg-primary/30
+                                                 min-w-10 px-3 py-1 font-bold">
+                                        <%= prateleira.quantidade %>
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        <% }) %>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        <% } else { %>
+
+            <div class="rounded-2xl bg-gray-100 p-8 text-center">
+
+                <p class="font-semibold text-gray-600">
+                    Nenhuma prateleira encontrada.
+                </p>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    Este produto ainda não foi alocado em uma estante.
+                </p>
+
+            </div>
+
+        <% } %>
+
+
+        <!-- ESTOQUE NÃO ALOCADO -->
+        <div class="rounded-2xl border border-primary/40 p-5
+                    flex flex-wrap justify-between items-center gap-4">
+
+            <div>
+
+                <h3 class="font-bold">
+                    Estoque não alocado
+                </h3>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    Unidades disponíveis que não estão em nenhuma prateleira.
+                </p>
+
+            </div>
+
+            <p class="text-3xl font-extrabold
+                <%= qtd_nao_alocada < 0 ? 'text-red-600' : 'text-secondary' %>"
+            >
+                <%= qtd_nao_alocada %>
+            </p>
+
+        </div>
+
+        <% if (qtd_nao_alocada < 0) { %>
+
+            <p class="text-sm text-red-600">
+                Atenção: a quantidade alocada é superior ao estoque disponível.
+            </p>
+
+        <% } %>
+
+    </section>
+
+
+    <!-- ESPECIFICAÇÕES -->
+    <section class="flex flex-col gap-5">
+
+        <h2 class="text-2xl font-bold">
+            Especificações do produto
+        </h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- IMAGENS -->
+            <div class="flex flex-col gap-3 min-w-0">
+
+                <h3 class="font-bold text-lg">
+                    Imagens
+                </h3>
+
+                <% if (imagens.length > 0) { %>
+
+                    <div
+                        class="flex gap-3 overflow-x-auto snap-x snap-mandatory
+                               scroll-smooth pb-3"
+                        aria-label="Carrossel de imagens do produto"
+                    >
+
+                        <% imagens.forEach((imagem, index) => { %>
+
+                            <div
+                                class="flex-none w-full aspect-square
+                                       rounded-2xl bg-gray-100 overflow-hidden
+                                       snap-center"
+                            >
+
+                                <img
+                                    src="/files/<%= imagem.caminho %>"
+                                    alt="Imagem <%= index + 1 %> de <%= nome %>"
+                                    loading="<%= index === 0 ? 'eager' : 'lazy' %>"
+                                    class="w-full h-full object-contain"
+                                >
+
+                            </div>
+
+                        <% }) %>
+
+                    </div>
+
+                    <% if (imagens.length > 1) { %>
+
+                        <p class="text-xs text-gray-500 text-center">
+                            Deslize para visualizar outras imagens.
+                        </p>
+
+                    <% } %>
+
+                <% } else { %>
+
+                    <div class="aspect-square rounded-2xl bg-gray-100
+                                flex flex-col items-center justify-center
+                                text-gray-400 gap-2">
+
+                        <span class="text-4xl">▧</span>
+
+                        <p class="text-sm">
+                            Nenhuma imagem cadastrada.
+                        </p>
+
+                    </div>
+
+                <% } %>
+
+            </div>
+
+
+            <!-- CATEGORIA E ATRIBUTOS -->
+            <div class="flex flex-col gap-5 min-w-0">
+
+                <!-- CATEGORIA -->
+                <article class="rounded-2xl bg-gray-100 p-5">
+
+                    <h3 class="font-bold text-lg mb-3">
+                        Categoria
+                    </h3>
+
+                    <p class="text-xl font-semibold">
+                        <%= categoria?.nome ?? "Sem categoria" %>
+                    </p>
+
+                    <% if (categoria?.descricao) { %>
+
+                        <p class="text-sm text-gray-500 mt-2">
+                            <%= categoria.descricao %>
+                        </p>
+
+                    <% } %>
+
+                </article>
+
+
+                <!-- ATRIBUTOS -->
+                <article class="rounded-2xl bg-gray-100 p-5">
+
+                    <h3 class="font-bold text-lg mb-3">
+                        Atributos
+                    </h3>
+
+                    <% const listaAtributos = Object.entries(atributos ?? {}); %>
+
+                    <% if (listaAtributos.length > 0) { %>
+
+                        <div class="flex flex-col divide-y divide-gray-300">
+
+                            <% listaAtributos.forEach(([nomeAtributo, valor]) => { %>
+
+                                <div class="flex justify-between items-center
+                                            gap-4 py-3">
+
+                                    <span class="capitalize text-gray-600">
+                                        <%= nomeAtributo %>
+                                    </span>
+
+                                    <span class="font-bold text-right break-all">
+                                        <%= valor ?? "Não informado" %>
+                                    </span>
+
+                                </div>
+
+                            <% }) %>
+
+                        </div>
+
+                    <% } else { %>
+
+                        <p class="text-sm text-gray-500">
+                            Nenhum atributo cadastrado.
+                        </p>
+
+                    <% } %>
+
+                </article>
+
+            </div>
+
+        </div>
+
+
+        <!-- DESCRIÇÃO -->
+        <article class="rounded-2xl bg-gray-100 p-5">
+
+            <h3 class="font-bold text-lg mb-3">
+                Descrição
+            </h3>
+
+            <% if (descricao) { %>
+
+                <p class="text-gray-700 whitespace-pre-line break-words">
+                    <%= descricao %>
+                </p>
+
+            <% } else { %>
+
+                <p class="text-gray-500 text-sm">
+                    Nenhuma descrição cadastrada.
+                </p>
+
+            <% } %>
+
+        </article>
+
+    </section>
+
+</section>

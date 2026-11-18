@@ -1,29 +1,53 @@
-import { setHiddenContainer } from "./hiddenContainer.js";
-import { setAddble } from "./addble.js"; 
+
+import { setAddble } from "./addble.js";
 import { setForm, verifyEmpty } from "./form.js";
 import { setSearchBox } from "./searchBox.js";
 
-const containerCategoria = document.querySelector<HTMLElement>("#container-h-categoria")
-if(!containerCategoria)
-    throw new Error("não foi possivel localizar containerCategoria")
 
-const {update} = setHiddenContainer(containerCategoria, "desassociar");
+// --------------------------------------------------
+// Formulário
+// --------------------------------------------------
 
-const searchCategoria = containerCategoria.querySelector<HTMLElement>("#search-categoria")
-if(!searchCategoria)
-    throw new Error("não")
+const form = document.querySelector<HTMLFormElement>(
+    "#form-editar-produto"
+);
 
-const addbleAtributos = containerCategoria.querySelector<HTMLElement>("#addble-container-atributos")
+if (!form)
+    throw new Error("Não foi possível localizar o formulário");
+
+// --------------------------------------------------
+// Categoria
+// --------------------------------------------------
+
+const searchCategoria = document.querySelector<HTMLElement>(
+    "#search-categoria"
+);
+
+if (!searchCategoria)
+    throw new Error("Não foi possível localizar #search-categoria");
+
+const sectionCategoria = searchCategoria.closest("section") 
+
+if( !sectionCategoria )
+    throw new Error("Não foi possível localizar #search-categoria section")
+
+const defaultCategoriaSet = sectionCategoria.dataset.categoria;
+
+const defaultCategoria = (defaultCategoriaSet != undefined && defaultCategoriaSet != "")? JSON.parse(defaultCategoriaSet): null
+
+const categoriaId = searchCategoria.querySelector<HTMLInputElement>(
+    "#search-hidden-categoria"
+);
+
+if (!categoriaId)
+    throw new Error("Não foi possível localizar #search-hidden-categoria");
+
+const addbleAtributos = document.querySelector<HTMLElement>("#addble-container-atributos")
 if(!addbleAtributos)
     throw new Error("#addble-container-atributos")
 
-const categoriaId = searchCategoria.querySelector<HTMLInputElement>('#search-hidden-categoria')
-if(!categoriaId)
-    throw new Error("#search-hidden-categoria")
-
 let i = 0
 const { addELement, wipeout } = setAddble(addbleAtributos, "atributo", i);
-
 
 setSearchBox(searchCategoria, "/api/categoria?nome=", null, "nome", (value, content)=>{
    
@@ -31,15 +55,24 @@ setSearchBox(searchCategoria, "/api/categoria?nome=", null, "nome", (value, cont
         const categoria = content[0]
 
         categoriaId.value = (categoria.id ?? "")
+        wipeout()
+        console.log(defaultCategoria)
 
         categoria.atributos.map((at: any) => {
             const clone = addELement(undefined, at.nome)
-
             const label = clone.querySelector<HTMLElement>("label");
+            const input = clone.querySelector<HTMLInputElement>("input")
 
             if(!label)
                 throw new Error("label")
-            label.innerText = String(at.nome[0]).toLocaleUpperCase() + at.nome.slice(1, at.nome.length-1)
+
+            if(!input)
+                throw new Error("input")
+
+            label.innerText = String(at.nome[0]).toLocaleUpperCase() + at.nome.slice(1, at.nome.length)
+
+            if(value.trim().toLocaleUpperCase() == defaultCategoria.categoria.trim().toLocaleUpperCase())
+                input.value = defaultCategoria.atributos[at.nome]
 
             if(at.obrigatorio){
                 const btnRemove = clone.querySelector<HTMLElement>('button');
@@ -77,350 +110,184 @@ setSearchBox(searchCategoria, "/api/categoria?nome=", null, "nome", (value, cont
         wipeout()
         categoriaId.value = ""
     }
-    update()
 })
 
+const inputCategorio =  searchCategoria.querySelector<HTMLInputElement>("#search-input-categoria");
 
-const containerMarca = document.querySelector<HTMLElement>("#container-h-marca")
-if(!containerMarca)
-    throw new Error("não foi possivel localizar containerMarca")
+if(!inputCategorio)
+    throw new Error("#search-input-categoria");
 
-setHiddenContainer(containerMarca, "desassociar");
+inputCategorio.dispatchEvent(new Event("input"))
 
-const searchMarca = containerMarca.querySelector<HTMLElement>("#search-marca")
-if(!searchMarca)
-    throw new Error("não")
-setSearchBox(searchMarca, "/api/marca?nome=")
+// Se o usuário apagar o texto manualmente, desassocia a categoria.
+const inputCategoria = searchCategoria.querySelector<HTMLInputElement>(
+    "#search-input-categoria"
+);
 
-const hiddenPrateleira = document.querySelector<HTMLElement>('#container-h-prateleiras');
+inputCategoria?.addEventListener("input", () => {
+    if (inputCategoria.value === "")
+        categoriaId.value = "";
+});
 
-if(!hiddenPrateleira)
-    throw new Error("não foi possivel localizar #container-h-prateleiras")
+// --------------------------------------------------
+// Marca
+// --------------------------------------------------
 
-const prateleirasH = setHiddenContainer(hiddenPrateleira, "não editar")
+const searchMarca = document.querySelector<HTMLElement>(
+    "#search-marca"
+);
 
+if (!searchMarca)
+    throw new Error("Não foi possível localizar #search-marca");
 
-const prateleiras = document.querySelector<HTMLElement>('#addble-container-prateleiras');
+const marcaId = searchMarca.querySelector<HTMLInputElement>(
+    "#search-hidden-marca"
+);
 
-if(!prateleiras)
-    throw new Error("não foi possivel localizar #addble-container-prateleiras")
+if (!marcaId)
+    throw new Error("Não foi possível localizar #search-hidden-marca");
 
+setSearchBox(
+    searchMarca,
+    "/api/marca?nome=",
+    null,
+    "nome",
+    (value, content) => {
+        const marca = content.find(
+            (item: any) => item.nome === value
+        );
 
-let prateleiraIt = 0
-
-const deactivate = (ele: HTMLInputElement | HTMLElement) => {
-    const parent = ele.closest('[data-parent="inputbox"]');
-    if(!parent)
-        throw new Error("Não foi possivel localizar o parente do input");
-
-    parent.classList.add("opacity-50");
-
-    if(ele instanceof HTMLInputElement){
-        ele.value = ""
-        ele.disabled = true;
+        marcaId.value = String(marca?.id ?? "");
     }
-    else{
-        const i = ele.querySelectorAll("input")
-        if(i)
-            i.forEach(j => {j.disabled = true; j.value = ""});
-            
+);
 
-    }
-  
-}
+const inputMarca = searchMarca.querySelector<HTMLInputElement>(
+    "#search-input-marca"
+);
 
-const activate = (ele: HTMLInputElement | HTMLElement) => {
-    const parent = ele.closest('[data-parent="inputbox"]');
-    
-    if(!parent)
-        throw new Error("Não foi possivel localizar o parente do input");
+inputMarca?.addEventListener("input", () => {
+    if (inputMarca.value === "")
+        marcaId.value = "";
+});
 
-    parent.classList.remove("opacity-50");
+// --------------------------------------------------
+// Imagens
+// --------------------------------------------------
 
-    if(ele instanceof HTMLInputElement)
-        ele.disabled = false;
-    else{
-        const i = ele.querySelectorAll("input")
-        console.log(i, "ativado")
-        if(i)
-            i.forEach(j => {j.disabled = false});
-    }
-}
+const inputImagem = document.querySelector<HTMLInputElement>(
+    "#imagem"
+);
 
-setAddble(prateleiras, "prateleira", prateleiraIt, (clone: HTMLElement) => {
-    const { update } = prateleirasH;
+const imagemPreview = document.querySelector<HTMLElement>(
+    "#imagem-preview"
+);
 
-    clone.querySelectorAll<HTMLInputElement>("input").forEach(input => { 
-        if(input.id =="search-input-local" || "search-hidden-local" == input.id)
+if (!inputImagem || !imagemPreview)
+    throw new Error("Não foi possível localizar os elementos de imagem");
+
+let urlsPreview: string[] = [];
+
+const limparPreview = () => {
+    urlsPreview.forEach(url => URL.revokeObjectURL(url));
+    urlsPreview = [];
+    imagemPreview.innerHTML = "";
+};
+
+inputImagem.addEventListener("change", () => {
+    limparPreview();
+
+    const arquivos = Array.from(inputImagem.files ?? []);
+
+    arquivos.forEach((arquivo, index) => {
+        if (!arquivo.type.startsWith("image/"))
             return;
 
-        deactivate(input)
-    })
+        const url = URL.createObjectURL(arquivo);
+        urlsPreview.push(url);
 
+        const container = document.createElement("div");
+        container.className = "flex flex-col gap-1";
 
-    const localSearch = clone.querySelector<HTMLElement>("#search-local")
-    console.log(localSearch?.innerHTML)
+        const imagem = document.createElement("img");
+        imagem.src = url;
+        imagem.alt = `Nova imagem ${index + 1}`;
+        imagem.className = "w-full aspect-square object-cover rounded-lg";
 
+        const nome = document.createElement("p");
+        nome.className = "text-xs text-gray-500 truncate";
+        nome.textContent = arquivo.name;
 
-    if(!localSearch)
-        throw new Error("Não foi possivel achar o #search-local")
+        container.append(imagem, nome);
+        imagemPreview.appendChild(container);
+    });
+});
 
-    const localId = clone.querySelector<HTMLInputElement>('#search-hidden-local');
-    if(!localId)
-        throw new Error("Não foi possivel achar localId")
-
-    const estanteId = clone.querySelector<HTMLInputElement>('#estanteId');
-    if(!estanteId)
-        throw new Error("Não foi possivel achar estanteId")
-
-    estanteId.disabled = false;
-
-    const estanteRow = clone.querySelector<HTMLElement>('#search-estanteRow');
-    if(!estanteRow)
-        throw new Error("Não foi possivel achar estanteRow")
-
-    const estanteCol = clone.querySelector<HTMLElement>('#search-estanteCol')
-    if(!estanteCol)
-        throw new Error("Não foi possivel achar estanteCol")
-
-    const prateleiraRow = clone.querySelector<HTMLElement>('#search-prateleiraRow')
-    if(!prateleiraRow)
-        throw new Error("Não foi possivel achar prateleiraRow")
-
-    const prateleiraCol = clone.querySelector<HTMLElement>('#search-prateleiraCol')
-    if(!prateleiraCol)
-        throw new Error("Não foi possivel achar prateleiraCol")
-
-    const quantidade = clone.querySelector<HTMLElement>('#quantidade')
-    if(!quantidade)
-        throw new Error("Não foi possivel achar quantidade")
-    
-    let p = {row: false, col: false}
-    let e = {row: false, col: false}
-    let q = false;
-
-    type Prateleira = {id: number, linha: number, coluna: number};
-    let prateleira: {id: number, linha: number, coluna: number} = {id: 0, linha: 0, coluna: 0};
-    type Estante = {id: number, linha: number, coluna: number, qtd_linhas: number, qtd_colunas: number};
-    let estante: Estante = {
-        id: 0,
-        coluna: 0,
-        qtd_colunas: 0,
-        linha: 0,
-        qtd_linhas: 0
-    };
-    let local: {id: number, linhas: number, colunas: number, estantes: Estante[]} | null = null;
-
-    const setQuantidade = () => {
-        if(prateleira.coluna != 0 && prateleira.linha != 0){
-            activate(quantidade)
-            q = true
-        } else {
-            if(q){
-                q = false;
-                deactivate(quantidade)
-            }
-        }
-    }
-
-    const setPrateleira = (rows: number, cols: number) => {
-        if(rows > 1){
-            activate(prateleiraRow)
-
-            setSearchBox(prateleiraRow, Array.from(Array(rows+1).keys()).slice(1), null, undefined, (value, content)=>{
-                prateleira.linha = Number(value ?? "")
-                setQuantidade()
-
-            }, true)
-            p.row = true
-        } else if(rows == 1){
-            prateleira.linha = 1
-        } 
-
-        if(cols > 1){
-            activate(prateleiraCol)
-
-            setSearchBox(prateleiraCol, Array.from(Array(cols+1).keys()).slice(1), null, undefined, (value, content) => {
-                prateleira.coluna = Number(value ?? "")
-
-                setQuantidade()
-            }, true)
-            p.col = true
-        } else if(cols == 1){
-            prateleira.coluna = 1
-        } 
-
-    }
-
-    const destoryEstante = () => {
-        deactivate(estanteRow)
-        deactivate(estanteCol)
-
-    }
-
-    const destroyEstante = () => {
-        if(p.col){
-            deactivate(prateleiraCol)
-            p.col = false
-        }
-
-        if(p.row){
-            deactivate(prateleiraRow)
-            p.row = false
-        }
-
-        if(q){
-            deactivate(quantidade)
-            q = false;
-        }
-    }
-
-    const setEstante = () => {
-        if(estante.linha != 0 && estante.coluna != 0){
-            if(!local){
-                throw Error("error")
-            }
-            
-            const es = local.estantes.find((f: Estante) => (f.coluna == estante.coluna && f.linha == estante.linha))
-            console.log("Status estante: ", es != undefined)
-            if(es){
-                estanteId.value = String(es.id);
-                console.log(estanteId, estanteId.value)
-                estante = es;
-                setPrateleira(estante.qtd_linhas, estante.qtd_colunas);
-            }else {
-                estanteId.value = ""
-                destroyEstante()
-            }
-        }else {
-            estanteId.value = ""
-            destroyEstante()
-        }
-    }
-
-    setSearchBox(localSearch, "/api/local?path=",null, "path", (value, content) => {
-        const v = value;
-
-        if(content.length == 1 && v == content[0].path){
-            localId.value = content[0].id
-            local = content[0]
-            // estante = content[0].estantes.filter((f: {id: number, linha: number, coluna: number}) => (f.coluna == ))
-
-            if(local == null)
-                return
-
-            const rows = local.linhas
-            const cols = local.colunas
-
-            if(rows > 1){
-                activate(estanteRow)
-
-                setSearchBox(estanteRow, Array.from(Array(rows+1).keys()).slice(1), null, undefined, (value, content) => {
-                    estante.linha = (typeof value == "string")? Number(value ?? ""): 0;
-
-                    setEstante()
-
-                }, true);
-                e.row = true
-            } else if(rows == 1){
-                estante.linha = 1
-          
-            } 
-
-            if(cols > 1){
-                activate(estanteCol)
-                console.log("ativando coluna")
-
-                setSearchBox(estanteCol, Array.from(Array(cols+1).keys()).slice(1), null, undefined, (value, content) => {
-                    estante.coluna = (typeof value == "string")? Number(value ?? ""): 0;
-
-                    setEstante()
-                }, true);
-
-                e.col = true
-            } else if(cols == 1){
-                estante.coluna = 1;
-
-            } 
-        } else{
-            localId.value = ""
-
-            console.log("estatos: ", e)
-            if(e.col){
-                console.log("Desativando coluna")
-                deactivate(estanteCol)
-                e.col = false
-            }
-            if(e.row){
-                deactivate(estanteRow)
-                e.row = false
-            }
-
-            if(p.col){
-                deactivate(prateleiraCol)
-                p.col = false
-            }
-
-            if(p.row){
-                deactivate(prateleiraRow)
-                p.row = false
-            }
-
-            if(q){
-                deactivate(quantidade)
-                q = false;
-            }
-        }
-  
-    })
-
-    update();
-})
+// --------------------------------------------------
+// Validações
+// --------------------------------------------------
 
 setForm(null, {
-    "search-input-categoria": (value)=>{
-        const emp = verifyEmpty(value)
+    "nome": value => {
+        const erro = verifyEmpty(value);
 
-        if(emp)
-            return emp;
-        const empId = verifyEmpty(categoriaId.value)
+        if (erro)
+            return erro;
 
-        if(empId)
-            return "A categoria deve ser valida e previamente criada"
-        return null
+        return null;
     },
-    "search-input-local": (value, input)=>{
-        const emp = verifyEmpty(value)
 
-        if(emp)
-            return emp;
+    "search-input-categoria": value => {
+        // Categoria é opcional.
+        if (!value)
+            return null;
 
-        if(!input)
-            throw new Error("fuck")
+        const erro = verifyEmpty(value);
 
-        const localId = input.closest("div")?.querySelector<HTMLInputElement>("#search-hidden-local");
+        if (erro)
+            return erro;
 
-        if(!localId)
-            throw new Error("fuck 2")
+        if (!categoriaId.value)
+            return "Selecione uma categoria válida da lista";
 
-        const idEmp = verifyEmpty(localId.value)
-        
-        if(idEmp)
-            return "O local deve ser valido"
-
-        return null
+        return null;
     },
-    "quantidade": (value, input) => {
-        const prateleiras = document.querySelectorAll('[id$="[remove-prateleiras]"]').length
 
-        if(prateleiras)
-            return null
+    "search-input-marca": value => {
+        // Marca também é opcional.
+        if (!marcaId.value)
+            return "Selecione uma marca válida da lista";
 
-        const emp = verifyEmpty(value)
+        return null;
+    },
 
-        if(emp)
-            return "Preencha ou associe a prateleiras"
+    "quantidade": value => {
+        const erro = verifyEmpty(value);
 
-        return null
+        if (erro)
+            return erro;
+
+        if (Number(value) < 0)
+            return "A quantidade não pode ser negativa";
+
+        return null;
+    },
+
+    "preco": value => {
+        const erro = verifyEmpty(value);
+
+        if (erro)
+            return erro;
+
+        return null;
+    },
+
+    "alerta_quantidade": value => {
+        if (value === "")
+            return null;
+
+        if (Number(value) < 0)
+            return "O alerta não pode ser negativo";
+
+        return null;
     }
-})
+});

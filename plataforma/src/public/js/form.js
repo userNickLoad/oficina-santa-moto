@@ -58,11 +58,11 @@ const setForm = (formId = null, verifyIssues = null) => {
         errorOutput.innerText = "";
         let errors = 0;
         form.querySelectorAll("input").forEach(input => {
-            if (input.disabled || input.classList.contains("hidden"))
+            if (input.disabled || input.classList.contains("hidden") || input.dataset.ignore)
                 return;
             const parent = input.closest('[data-parent="inputbox"]');
             if (!parent) {
-                throw new Error(`não foi possivel localizar o pai de ${input.id}`);
+                throw new Error(`não foi possivel localizar o pai de ${input}`);
             }
             const errorDisplay = parent.querySelector('[id^="output"]');
             if (!errorDisplay) {

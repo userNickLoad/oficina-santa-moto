@@ -1,9 +1,74 @@
 import { NextFunction, Request, Response } from "express";
-import { ProdutoCreateDTO, ProdutoModel } from "../model/produtoModel.js";
+import { ProdutoCreateDTO, ProdutoModel, ProdutoUpdateDTO } from "../model/produtoModel.js";
 import { unlink } from "node:fs/promises";
 import { AppError } from "../model/errors.js";
 
 const produtoModel = new ProdutoModel();
+
+export async function update(req: Request, res: Response) {
+    const id = Number(req.params.id ?? "")
+
+    const arquivos = req.files as Express.Multer.File[] | undefined;
+
+    try {
+        const contentString = (req.body.content ?? "");
+        
+        if(!id){
+            throw new Error("produto invalido")
+        }
+
+        if(contentString == "")
+            throw new Error("Content não achado")
+
+        const content = JSON.parse(contentString);
+        const {atributo = [], preco, marcaId, categoriaId, categoria, marca, alerta_quantidade, images = [], ...produto} = content;
+
+        if(produto["imagem[]"])
+            delete produto["imagem[]"]
+
+        const updateProduto: ProdutoUpdateDTO = {
+            id: id,
+            ...produto,
+            codigo_barras: null,
+            id_categoria: Number(categoriaId),
+            id_marca: marcaId
+                ? Number(marcaId)
+                : null,
+            altura: null,
+            comprimento: null,
+            largura: null,
+            preco_venda: parseCurrency(preco),
+            atributos: atributo,
+            alerta_quantidade: Number(alerta_quantidade ?? ""),
+            imagens: arquivos?.map(arquivo => arquivo.filename) ?? []
+        };
+
+        const result = await produtoModel.update(updateProduto, marca, images.map((i: {remove: string}) => (Number(i.remove))))
+
+        
+        if(!result){
+            throw new Error()
+        }
+
+        return res.status(200).json({confirm: "Produto atualizado"})
+
+    } catch (error) {
+        console.error("Erro ao cadastrar produto:", error);
+
+        if (arquivos?.length) {
+            await Promise.allSettled(
+                arquivos.map(arquivo => unlink(arquivo.path))
+            );
+        }
+
+        return res.status(400).json({
+            mensagem: error instanceof Error
+                ? error.message
+                : "Erro ao atualizar produto"
+        });
+        
+    }
+}
 
 export async function buscarProdutos(req: Request, res: Response) {
     try {

@@ -21,9 +21,6 @@ const setSearchBox = (root, action, onSearch = null, key = "nome", onInput = nul
     if (!defaultElement)
         throw new Error("não foi possivel achar o defaultElement");
     const button = root.querySelector('button[id^="btn-search-"]');
-    if (!button) {
-        throw new Error("não foi possivel localizar o botão");
-    }
     // Índice da opção atualmente selecionada
     let selectedIndex = -1;
     // Retorna todas as opções disponíveis
@@ -40,7 +37,8 @@ const setSearchBox = (root, action, onSearch = null, key = "nome", onInput = nul
         if (!value)
             return;
     };
-    button.addEventListener("click", executeSearch);
+    if (button)
+        button.addEventListener("click", executeSearch);
     // Seleciona uma opção
     const selectOption = (index) => {
         const options = getOptions();

@@ -1,0 +1,56 @@
+[1mdiff --git a/plataforma/src/public/css/output.css b/plataforma/src/public/css/output.css[m
+[1mindex 8592406..4f7b7f0 100644[m
+[1m--- a/plataforma/src/public/css/output.css[m
+[1m+++ b/plataforma/src/public/css/output.css[m
+[36m@@ -576,15 +576,6 @@[m
+   .max-w-\[500px\] {[m
+     max-width: 500px;[m
+   }[m
+[31m-  .max-w-\[650\] {[m
+[31m-    max-width: 650;[m
+[31m-  }[m
+[31m-  .max-w-\[650px\] {[m
+[31m-    max-width: 650px;[m
+[31m-  }[m
+[31m-  .max-w-\[900px\] {[m
+[31m-    max-width: 900px;[m
+[31m-  }[m
+   .max-w-\[1100px\] {[m
+     max-width: 1100px;[m
+   }[m
+[36m@@ -633,9 +624,6 @@[m
+   .grid-cols-2 {[m
+     grid-template-columns: repeat(2, minmax(0, 1fr));[m
+   }[m
+[31m-  .grid-cols-3 {[m
+[31m-    grid-template-columns: repeat(3, minmax(0, 1fr));[m
+[31m-  }[m
+   .flex-col {[m
+     flex-direction: column;[m
+   }[m
+[36m@@ -648,15 +636,9 @@[m
+   .items-center {[m
+     align-items: center;[m
+   }[m
+[31m-  .items-end {[m
+[31m-    align-items: flex-end;[m
+[31m-  }[m
+   .items-start {[m
+     align-items: flex-start;[m
+   }[m
+[31m-  .items-stretch {[m
+[31m-    align-items: stretch;[m
+[31m-  }[m
+   .justify-around {[m
+     justify-content: space-around;[m
+   }[m
+[36m@@ -963,6 +945,9 @@[m
+   .py-\[2\.5vh\] {[m
+     padding-block: 2.5vh;[m
+   }[m
+[32m+[m[32m  .pt-\[2vh\] {[m
+[32m+[m[32m    padding-top: 2vh;[m
+[32m+[m[32m  }[m
+   .pl-3 {[m
+     padding-left: calc(var(--spacing) * 3);[m
+   }[m
