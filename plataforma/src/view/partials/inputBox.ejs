@@ -18,7 +18,9 @@
         step = "1",
         output = null,
         subtitte = null,
-        valueHidden = null
+        valueHidden = null,
+        css = "",
+        checked = false
     } = item;
 
     const name_input = name ?? id;
@@ -89,13 +91,14 @@
 
     <% } else if (type === "check") { %>
 
-        <div class="w-full flex items-center gap-3">
+        <div class="w-full flex items-center gap-3 <%= css %>">
             <input
                 type="checkbox"
                 name="<%= name_input %>"
                 id="<%= id_applay %>"
-                class="w-5 h-5 accent-primary"
-                <%= value ? "checked" : "" %>
+                class="w-full aspect-square accent-primary"
+                <%= checked ? "checked" : "" %>
+                value="<%= value %>"
             >
         </div>
 
@@ -157,7 +160,7 @@
                 <input
                     id="search-hidden-<%= id %>"
                     name="<%= name_input %>Id"
-                    type="hidden"
+                    class="hidden"
                     value="<%= valueHidden ?? '' %>"
                 >
 

@@ -1,0 +1,340 @@
+<%
+    const p = innerContent.produto;
+
+    const prateleiras = p.prateleiras ?? [];
+
+    const qtdAlocada = prateleiras.reduce(
+        (total, item) => total + Number(item.quantidade ?? 0),
+        0
+    );
+
+    const qtdNaoAlocada = Number(p.qtd_disponivel ?? 0) - qtdAlocada;
+%>
+
+<section class="flex flex-col gap-6 py-6">
+
+    <!-- Resumo do estoque -->
+    <section class="rounded-2xl border border-gray-300 bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-sm text-gray-500 font-medium">
+                    Quantidade disponível
+                </span>
+
+                <strong class="text-3xl font-bold text-gray-900">
+                    <%= p.qtd_disponivel %>
+                    <span class="text-base font-medium text-gray-500">un.</span>
+                </strong>
+            </div>
+
+            <div class="flex items-center justify-center rounded-xl bg-orange-100 text-orange-600 p-3">
+                <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mt-5">
+            <div class="rounded-xl bg-gray-50 p-3">
+                <span class="text-xs text-gray-500">Alocado</span>
+                <p class="text-xl font-semibold text-gray-800">
+                    <%= qtdAlocada %>
+                </p>
+            </div>
+
+            <div class="rounded-xl bg-gray-50 p-3">
+                <span class="text-xs text-gray-500">Não alocado</span>
+                <p class="text-xl font-semibold text-gray-800">
+                    <%= qtdNaoAlocada %>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Locais disponíveis -->
+    <form id="form-baixa-produto"
+        action="/api/produto/<%= p.id %>/baixa"
+        method="post"
+        class="flex flex-col gap-4">
+
+        <div class="flex flex-col gap-1">
+            <h2 class="text-lg font-bold text-gray-900">
+                Selecionar locais
+            </h2>
+
+            <p class="text-sm text-gray-500">
+                Selecione de onde deseja retirar os produtos e informe as quantidades.
+            </p>
+        </div>
+
+        <% if (qtdNaoAlocada > 0) { %>
+            <section
+                class="rounded-2xl border border-gray-300 bg-white p-4 flex flex-col gap-4"
+                data-opcao="nao-alocado"
+            >
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="rounded-xl bg-gray-100 p-3 text-gray-600">
+                            <i class="fa-solid fa-box-open"></i>
+                        </div>
+
+                        <div class="flex flex-col">
+                            <h3 class="font-semibold text-gray-900">
+                                Não alocado
+                            </h3>
+                            <span class="text-xs text-gray-500">
+                                Estoque fora das prateleiras
+                            </span>
+                        </div>
+                    </div>
+
+                    <span class="rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-700">
+                        <%= qtdNaoAlocada %> un.
+                    </span>
+                </div>
+
+                <div class="flex items-center border-t border-gray-100 pt-3 lg:gap-[2vw] gap-[8vw]">
+                    <div class="w-12 shrink-0">
+                        <%- include("../partials/inputBox", {
+                            item: {
+                                title: "Selecionar",
+                                type: "check",
+                                id: "check",
+                                name: "nao-alocado[check]",
+                                value: "true",
+                                size: "w-full",
+                                css: "items-center"
+                            }
+                        }) %>
+                    </div>
+
+                    <div class="flex-1">
+                        <%- include("../partials/inputBox", {
+                            item: {
+                                title: "Quantidade",
+                                type: "number",
+                                id: "quantidade",
+                                name: "nao-alocado[quantidade]",
+                                size: "w-full",
+                                min_number: 1,
+                                max_number: qtdNaoAlocada
+                            }
+                        }) %>
+                    </div>
+                </div>
+            </section>
+        <% } %>
+
+        <% prateleiras.forEach((prateleira, index) => {
+            const local = prateleira.estante.local ?? [];
+            const caminho = local.map(l => l.nome).join(" / ");
+            console.log(prateleira)
+        %>
+            <section
+                class="rounded-2xl border border-gray-300 bg-white p-4 flex flex-col gap-4"
+                data-opcao="prateleira-<%= prateleira.id %>"
+            >
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="rounded-xl bg-orange-100 p-3 text-orange-600">
+                            <i class="fa-solid fa-warehouse"></i>
+                        </div>
+
+                        <div class="flex flex-col min-w-0">
+                            <h3 class="font-semibold text-gray-900">
+                                <%= caminho || "Local não identificado" %>
+                            </h3>
+
+                            <span class="text-xs text-gray-500">
+                                Estante Linha <%= prateleira.estante.linha %> · Coluna <%= prateleira.estante.coluna %> - Prateleira Linha <%= prateleira.linha %> · Coluna <%= prateleira.coluna %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <span class="shrink-0 rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-700">
+                        <%= prateleira.quantidade %> un.
+                    </span>
+                </div>
+
+                <%- include("../partials/inputBox", {
+                        item: {
+                            type: "text",
+                            id: `id`,
+                            name: `prateleira[${index}][id]`,
+                            value: prateleira.id,
+                            size: "hidden",
+                            css: "hidden"
+                        }
+                    }) %>
+                <div class="flex items-center lg:gap-[2vw] gap-[8vw] border-t border-gray-100 pt-3">
+                    <div class="w-12 shrink-0">
+                        <%- include("../partials/inputBox", {
+                            item: {
+                                title: "Selecionar",
+                                type: "check",
+                                id: "check",
+                                name: `prateleira[${index}][check]`,
+                                value: "true",
+                                size: "w-full",
+                                css: "items-center"
+                            }
+                        }) %>
+                    </div>
+
+                    <div class="w-12 shrink-0">
+                        <%- include("../partials/inputBox", {
+                            item: {
+                                title: "Desalocar",
+                                type: "check",
+                                id: "desalocar",
+                                name: `prateleira[${index}][desalocar]`,
+                                value: "true",
+                                size: "w-full",
+                                css: "items-center"
+                            }
+                        }) %>
+                    </div>
+
+                    <div class="flex-1">
+                        <%- include("../partials/inputBox", {
+                            item: {
+                                title: "Quantidade",
+                                type: "number",
+                                id: `quantidade`,
+                                name: `prateleira[${index}][quantidade]`,
+                                size: "w-full",
+                                min_number: 1,
+                                max_number: prateleira.quantidade
+                            }
+                        }) %>
+                    </div>
+                </div>
+            </section>
+        <% }) %>
+        <p id="error" class="h-[2vh] text-red-900 min-h-[3vh] text-center"></p>
+
+        <div class="w-full flex justify-center">
+            <div class="w-auto">
+                <%- include("../partials/button", {button: {type: "submit", submit: true, content: "Dar baixa"}}) %>
+            </div>
+        </div>
+        
+    </form>
+</section>
+
+<script type="module">
+    import { setForm, verifyEmpty } from "/js/form.js";
+
+    const form = document.querySelector("#form-baixa-produto");
+
+    if (!form)
+        throw new Error("#form-baixa-produto");
+
+    form.querySelectorAll("section[data-opcao]").forEach((s) => {
+
+        const desalocar = s.querySelector('input[name$="[desalocar]"]');
+
+        if (!desalocar && s.dataset.opcao !== "nao-alocado")
+            throw new Error('input[name$="[desalocar]"]');
+
+        const check = s.querySelector('input[name$="[check]"]');
+
+        if (!check)
+            throw new Error('input[name$="[check]"]');
+
+        const quantidade = s.querySelector('input[name$="[quantidade]"]');
+
+        if (!quantidade)
+            throw new Error('input[name$="[quantidade]"]');
+        
+        const parent = quantidade.closest('[data-parent="inputbox"]')
+
+        if(!parent)
+            throw new Error('[data-parent="inputbox"]');
+        
+        const desalocarP = desalocar?.closest('[data-parent="inputbox"]')
+
+        if(!desalocarP && desalocar)
+            throw new Error('[data-parent="inputbox"] desalocarP');
+
+        const checkP = check.closest('[data-parent="inputbox"]')
+
+        if(!checkP && s.dataset.opcao !== "nao-alocado")
+            throw new Error('[data-parent="inputbox"] checkP');
+
+        const select = () => {
+            if(!check.checked){
+                if(desalocarP){
+                    desalocarP.classList.remove("opacity-50")
+                    desalocar.disabled = false;
+
+                }
+                parent.classList.add("opacity-50")
+                quantidade.disabled = true;
+            } else {
+                if(desalocarP){
+                    desalocarP.classList.add("opacity-50")
+                    desalocar.disabled = true;
+                }
+                parent.classList.remove("opacity-50")
+                quantidade.disabled = false;
+            }
+        }
+
+        select();
+
+        check.addEventListener("input", select);
+
+        if(desalocar)
+        desalocar.addEventListener("input", () => {
+            if(desalocar.checked){
+                check.checked = false
+                check.disabled = true
+                parent.classList.remove("opacity-50")
+                quantidade.disabled = false;
+                checkP.classList.add("opacity-50")
+                
+            } else {
+                check.disabled = false
+                parent.classList.add("opacity-50")
+                checkP.classList.remove("opacity-50")
+                quantidade.disabled = true;
+            }
+        })
+
+        if(s.dataset.opcao == "nao-alocado")
+            return
+        
+
+        const id = s.querySelector('input[name$="[id]"]');
+
+        if (!id)
+            throw new Error('input[name$="[id]"]');
+
+    });
+
+    setForm("form-baixa-produto", {
+        "form": (value) => {
+            const checks = form.querySelectorAll('input[name$="[check]"], input[name$="[desalocar]"]')
+            console.log(checks)
+            let checked = false;
+
+            checks.forEach((c) => {
+                checked = (!checked)? c.checked: checked
+            })
+
+            if(!checked)
+                return "Selecione um local para descontar o produto"
+
+            return null
+        },
+        "quantidade": (value, input) => {
+            const emp = verifyEmpty(value)
+
+            if(emp)
+                return emp
+
+
+            
+            return null
+        }
+    });
+</script>

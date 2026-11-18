@@ -160,7 +160,7 @@ setAddble(prateleiras, "prateleira", prateleiraIt, (clone: HTMLElement) => {
     if(!localId)
         throw new Error("Não foi possivel achar localId")
 
-    const estanteId = clone.querySelector<HTMLInputElement>('#estanteId');
+    const estanteId = clone.querySelector<HTMLInputElement>('#estanteid');
     if(!estanteId)
         throw new Error("Não foi possivel achar estanteId")
 

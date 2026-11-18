@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { criarProduto, buscarProdutos, getProdutoByIdMiddle, listarProdutosEstoque, update} from "../controller/produtoController.js";
+import { criarProduto, buscarProdutos, getProdutoByIdMiddle, listarProdutosEstoque, update, baixa, entrada} from "../controller/produtoController.js";
 import { upload } from "../middlewares/multerConfig.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
@@ -11,6 +11,11 @@ router.get("/", buscarProdutos);
 router.get("/estoque",  listarProdutosEstoque);
 
 router.post("/:id/editar", upload.array("imagem[]", 10), update);
+
+router.post("/:id/baixa", baixa);
+router.post("/:id/entrada", entrada);
+
+
 
 
 export default router;

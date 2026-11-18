@@ -50,12 +50,19 @@ const setForm = (formId = null, verifyIssues = null) => {
     }
     const errorOutput = document.querySelector("#error");
     if (!errorOutput) {
-        throw new Error("ErrorOutput não localizado");
+        throw new Error("ErrorOutput não localizado ");
     }
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
         // Limpa erros anteriores
         errorOutput.innerText = "";
+        if (verifyIssues && verifyIssues["form"]) {
+            const err = verifyIssues["form"]("");
+            if (err) {
+                errorOutput.innerText = err;
+                return;
+            }
+        }
         let errors = 0;
         form.querySelectorAll("input").forEach(input => {
             if (input.disabled || input.classList.contains("hidden") || input.dataset.ignore)

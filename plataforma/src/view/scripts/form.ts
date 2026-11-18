@@ -78,7 +78,7 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
     const errorOutput = document.querySelector<HTMLElement>("#error");
 
     if (!errorOutput) {
-        throw new Error("ErrorOutput não localizado");
+        throw new Error("ErrorOutput não localizado ");
     } 
 
 
@@ -87,6 +87,15 @@ const setForm = (formId: string | null = null, verifyIssues: Record<string, veri
 
         // Limpa erros anteriores
         errorOutput.innerText = "";
+
+        if(verifyIssues && verifyIssues["form"]){
+            const err = verifyIssues["form"]("")
+
+            if(err){
+                errorOutput.innerText = err;
+                return 
+            }
+        }
 
         let errors = 0;
 

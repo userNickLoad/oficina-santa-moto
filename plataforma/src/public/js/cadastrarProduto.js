@@ -112,7 +112,7 @@ setAddble(prateleiras, "prateleira", prateleiraIt, (clone) => {
     const localId = clone.querySelector('#search-hidden-local');
     if (!localId)
         throw new Error("Não foi possivel achar localId");
-    const estanteId = clone.querySelector('#estanteId');
+    const estanteId = clone.querySelector('#estanteid');
     if (!estanteId)
         throw new Error("Não foi possivel achar estanteId");
     estanteId.disabled = false;

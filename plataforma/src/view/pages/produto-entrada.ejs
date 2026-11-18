@@ -1,0 +1,798 @@
+<%
+    const p = innerContent.produto;
+
+    const prateleiras = p.prateleiras ?? [];
+
+    const qtdAlocada = prateleiras.reduce(
+        (total, item) => total + Number(item.quantidade ?? 0),
+        0
+    );
+
+    const qtdNaoAlocada = Number(p.qtd_disponivel ?? 0) - qtdAlocada;
+%>
+
+<section class="flex flex-col gap-6 py-6">
+
+    <!-- Resumo do estoque -->
+    <section class="rounded-2xl border border-gray-300 bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-4">
+            <div class="flex flex-col gap-1">
+                <span class="text-sm text-gray-500 font-medium">
+                    Quantidade disponível
+                </span>
+
+                <strong class="text-3xl font-bold text-gray-900">
+                    <%= p.qtd_disponivel %>
+                    <span class="text-base font-medium text-gray-500">un.</span>
+                </strong>
+            </div>
+
+            <div class="flex items-center justify-center rounded-xl bg-orange-100 text-orange-600 p-3">
+                <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mt-5">
+            <div class="rounded-xl bg-gray-50 p-3">
+                <span class="text-xs text-gray-500">Alocado</span>
+                <p class="text-xl font-semibold text-gray-800">
+                    <%= qtdAlocada %>
+                </p>
+            </div>
+
+            <div class="rounded-xl bg-gray-50 p-3">
+                <span class="text-xs text-gray-500">Não alocado</span>
+                <p class="text-xl font-semibold text-gray-800">
+                    <%= qtdNaoAlocada %>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Locais disponíveis -->
+    <form id="form-baixa-produto"
+        action="/api/produto/<%= p.id %>/entrada"
+        method="post"
+        class="flex flex-col gap-4">
+
+        <div class="flex flex-col gap-1">
+            <h2 class="text-lg font-bold text-gray-900">
+                Selecionar locais
+            </h2>
+
+            <p class="text-sm text-gray-500">
+                Selecione de onde deseja retirar os produtos e informe as quantidades.
+            </p>
+        </div>
+
+            <section
+                class="rounded-2xl border border-gray-300 bg-white p-4 flex flex-col gap-4"
+                data-opcao="nao-alocado"
+            >
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="rounded-xl bg-orange-100 p-3 text-orange-600">
+                            <i class="fa-solid fa-warehouse"></i>
+                        </div>
+
+                        <div class="flex flex-col min-w-0">
+                            <h3 class="font-semibold text-gray-900">
+                                Adicionar sem prateleira
+                            </h3>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex items-center lg:gap-[2vw] gap-[8vw] border-t border-gray-100 pt-3">
+                    <div class="w-12 shrink-0">
+                        <%- include("../partials/inputBox", {
+                            item: {
+                                title: "Selecionar",
+                                type: "check",
+                                id: "check",
+                                name: `desalocado[check]`,
+                                value: "true",
+                                size: "w-full",
+                                css: "items-center"
+                            }
+                        }) %>
+                    </div>
+
+                    <div class="flex-1">
+                        <%- include("../partials/inputBox", {
+                            item: {
+                                title: "Quantidade",
+                                type: "number",
+                                id: `quantidade`,
+                                name: `desalocado[quantidade]`,
+                                size: "w-full",
+                                min_number: 1
+                            }
+                        }) %>
+                    </div>
+                </div>
+            </section>
+
+        <% prateleiras.forEach((prateleira, index) => {
+            const local = prateleira.estante.local ?? [];
+            const caminho = local.map(l => l.nome).join(" / ");
+            console.log(prateleira)
+        %>
+            <section
+                class="rounded-2xl border border-gray-300 bg-white p-4 flex flex-col gap-4"
+                data-opcao="prateleira-<%= prateleira.id %>"
+            >
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="rounded-xl bg-orange-100 p-3 text-orange-600">
+                            <i class="fa-solid fa-warehouse"></i>
+                        </div>
+
+                        <div class="flex flex-col min-w-0">
+                            <h3 class="font-semibold text-gray-900">
+                                <%= caminho || "Local não identificado" %>
+                            </h3>
+
+                            <span class="text-xs text-gray-500">
+                                Estante Linha <%= prateleira.estante.linha %> · Coluna <%= prateleira.estante.coluna %> - Prateleira Linha <%= prateleira.linha %> · Coluna <%= prateleira.coluna %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <span class="shrink-0 rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-700">
+                        <%= prateleira.quantidade %> un.
+                    </span>
+                </div>
+
+                <%- include("../partials/inputBox", {
+                        item: {
+                            type: "text",
+                            id: `id`,
+                            name: `prateleira[${index}][id]`,
+                            value: prateleira.id,
+                            size: "hidden",
+                            css: "hidden"
+                        }
+                    }) %>
+                <div class="flex items-center lg:gap-[2vw] gap-[8vw] border-t border-gray-100 pt-3">
+                    <div class="w-12 shrink-0">
+                        <%- include("../partials/inputBox", {
+                            item: {
+                                title: "Selecionar",
+                                type: "check",
+                                id: "check",
+                                name: `prateleira[${index}][check]`,
+                                value: "true",
+                                size: "w-full",
+                                css: "items-center"
+                            }
+                        }) %>
+                    </div>
+
+                    <div class="w-12 shrink-0">
+                        <%- include("../partials/inputBox", {
+                            item: {
+                                title: "Desalocar",
+                                type: "check",
+                                id: "desalocar",
+                                name: `prateleira[${index}][desalocar]`,
+                                value: "true",
+                                size: "w-full",
+                                css: "items-center"
+                            }
+                        }) %>
+                    </div>
+
+                    <div class="flex-1">
+                        <%- include("../partials/inputBox", {
+                            item: {
+                                title: "Quantidade",
+                                type: "number",
+                                id: `quantidade`,
+                                name: `prateleira[${index}][quantidade]`,
+                                size: "w-full",
+                                min_number: 1
+                            }
+                        }) %>
+                    </div>
+                </div>
+            </section>
+        <% }) %>
+        <section
+                class="rounded-2xl border border-gray-300 bg-white p-4 flex flex-col gap-4"
+                data-opcao="adicionar-prateleira"
+            >
+            <%- include("../partials/cadastrar/inputs", {
+                element: {
+                        type: "addble_container",     
+                        container: {
+                            id: "prateleiras",
+                            title: "Prateleiras",
+                            flex: "flex flex-col",
+                            mask: "./addbleMaskInputVeiculo",
+                            elements: [
+                                {type: "input", input: {size: "hidden", id: "estanteId", name: "estanteId"}},
+                                {type: "input", input: {title: "Localize a estante na loja (Faça primeiro)", type: "search", id: "local", name: "local", placeholder: "ex: estoque/parafusos, frente/ganchos", output: 'Separar com / (barra) as camadas de estoque'}},
+                                {
+                                    type: "container", 
+                                    container: {
+                                        id: "cordenadas",
+                                        title: "Identificação da estante",
+                                        css: "w-full flex flex-row justify-around",
+                                        elements: [
+                                            {type: "input", input: {title: "Linha", type: "search", name: "estanteRow", id: "estanteRow", size: "w-[40%]", placeholder: "ex: 2"}},
+                                            {type: "input", input: {title: "Coluna", type: "search", name: "estanteCol", id: "estanteCol", size: "w-[40%]", placeholder: "ex: 2"}},
+                                        ]
+                                    }
+                                },
+                                {
+                                    type: "container", 
+                                    container: {
+                                        id: "cordenadas",
+                                        title: "Identificação da prateleira",
+                                        css: "w-full flex flex-row justify-around mt-[1vh]",
+                                        elements: [
+                                            {type: "input", input: {title: "Linha", type: "search", name: "prateleiraRow", id: "prateleiraRow", size: "w-[40%]", placeholder: "ex: 1"}},
+                                            {type: "input", input: {title: "Coluna", type: "search", name: "prateleiraCol", id: "prateleiraCol", size: "w-[40%]", placeholder: "ex: 3"}},
+                                        ]
+                                    }
+                                },
+                                {type: "input", input: {type: "number", title: "Quantidade do produto na prateleira", id: "quantidade", name: "quantidade"}}
+                            ]
+                        }
+                    }
+            }) %>
+        </section>
+
+        <p id="error" class="h-[2vh] text-red-900 min-h-[3vh] text-center"></p>
+
+
+        <div class="w-full flex justify-center">
+            <div class="w-auto">
+                <%- include("../partials/button", {button: {type: "submit", submit: true, content: "Dar baixa"}}) %>
+            </div>
+        </div>
+        
+    </form>
+</section>
+
+<script type="module">
+    import { setHiddenContainer } from "/js/hiddenContainer.js";
+    import { setAddble } from "/js/addble.js"; 
+    import { setForm, verifyEmpty } from "/js/form.js";
+    import { setSearchBox } from "/js/searchBox.js";
+
+    const form = document.querySelector("#form-baixa-produto");
+
+    if (!form)
+        throw new Error("#form-baixa-produto não encontrado");
+
+    // =====================================================
+    // SELEÇÃO DOS LOCAIS EXISTENTES
+    // =====================================================
+
+    form.querySelectorAll("section[data-opcao]").forEach((s) => {
+        if(s.dataset.opcao === "adicionar-prateleira")
+            return; 
+
+        const check = s.querySelector('input[name$="[check]"]');
+
+        if (!check)
+            throw new Error('input[name$="[check]"]');
+
+        const quantidade = s.querySelector('input[name$="[quantidade]"]');
+
+        if (!quantidade)
+            throw new Error('input[name$="[quantidade]"]');
+
+        const parent = quantidade.closest('[data-parent="inputbox"]');
+
+        if (!parent)
+            throw new Error('[data-parent="inputbox"] quantidade');
+
+        const desalocar = s.querySelector('input[name$="[desalocar]"]');
+
+        const desalocarP = desalocar?.closest('[data-parent="inputbox"]');
+
+        if (desalocar && !desalocarP)
+            throw new Error('[data-parent="inputbox"] desalocar');
+
+        const checkP = check.closest('[data-parent="inputbox"]');
+
+        if (!checkP)
+            throw new Error('[data-parent="inputbox"] check');
+
+        const atualizarSelecao = () => {
+            const selecionado = check.checked;
+
+            quantidade.disabled = !selecionado;
+
+            parent.classList.toggle("opacity-50", !selecionado);
+
+            if (desalocar) {
+                desalocar.disabled = selecionado;
+
+                desalocarP.classList.toggle("opacity-50", selecionado);
+            }
+
+            if (!selecionado && !desalocar?.checked)
+                quantidade.value = "";
+        };
+
+        atualizarSelecao();
+
+        check.addEventListener("change", atualizarSelecao);
+
+        if (desalocar) {
+            const atualizarDesalocacao = () => {
+                if (desalocar.checked) {
+                    check.checked = false;
+                    check.disabled = true;
+
+                    checkP.classList.add("opacity-50");
+
+                    quantidade.disabled = false;
+                    parent.classList.remove("opacity-50");
+
+                } else {
+                    check.disabled = false;
+
+                    checkP.classList.remove("opacity-50");
+
+                    quantidade.disabled = true;
+                    parent.classList.add("opacity-50");
+
+                    quantidade.value = "";
+                }
+            };
+
+            desalocar.addEventListener("change", atualizarDesalocacao);
+
+            atualizarDesalocacao();
+        }
+
+        if (s.dataset.opcao === "nao-alocado")
+            return;
+
+        const id = s.querySelector('input[name$="[id]"]');
+
+        if (!id)
+            throw new Error('input[name$="[id]"]');
+    });
+
+    // =====================================================
+    // CADASTRO DINÂMICO DE PRATELEIRAS
+    // =====================================================
+
+    const prateleiras = document.querySelector(
+        "#addble-container-prateleiras"
+    );
+
+    if (!prateleiras)
+        throw new Error("Não foi possível localizar #addble-container-prateleiras");
+
+    let prateleiraIt = 0;
+
+    // =====================================================
+    // ATIVAÇÃO E DESATIVAÇÃO DE CAMPOS
+    // =====================================================
+
+    const deactivate = (ele) => {
+        const parent = ele.closest('[data-parent="inputbox"]');
+
+        if (!parent)
+            throw new Error("Não foi possível localizar o parente do input");
+
+        parent.classList.add("opacity-50");
+
+        if (ele instanceof HTMLInputElement) {
+            ele.value = "";
+            ele.disabled = true;
+        } else {
+            ele.querySelectorAll("input").forEach((input) => {
+                input.disabled = true;
+                input.value = "";
+            });
+        }
+    };
+
+    const activate = (ele) => {
+        const parent = ele.closest('[data-parent="inputbox"]');
+
+        if (!parent)
+            throw new Error("Não foi possível localizar o parente do input");
+
+        parent.classList.remove("opacity-50");
+
+        if (ele instanceof HTMLInputElement) {
+            ele.disabled = false;
+        } else {
+            ele.querySelectorAll("input").forEach((input) => {
+                input.disabled = false;
+            });
+        }
+    };
+
+    // =====================================================
+    // CRIAÇÃO DOS CAMPOS DINÂMICOS
+    // =====================================================
+
+    setAddble(prateleiras, "newPrateleiras", prateleiraIt, (clone) => {
+
+        console.log(clone.getHTML())
+
+        clone.querySelectorAll("input").forEach((input) => {
+            if (
+                input.id === "search-input-local" ||
+                input.id === "search-hidden-local"
+            ) {
+                return;
+            }
+
+            deactivate(input);
+        });
+
+        const localSearch = clone.querySelector("#search-local");
+
+        if (!localSearch)
+            throw new Error("Não foi possível achar o #search-local");
+
+        const localId = clone.querySelector("#search-hidden-local");
+
+        if (!localId)
+            throw new Error("Não foi possível achar localId");
+
+        const estanteId = clone.querySelector("#estanteid");
+
+        if (!estanteId)
+            throw new Error("Não foi possível achar estanteId");
+
+        estanteId.disabled = false;
+
+        const estanteRow = clone.querySelector("#search-estanteRow");
+
+        if (!estanteRow)
+            throw new Error("Não foi possível achar estanteRow");
+
+        const estanteCol = clone.querySelector("#search-estanteCol");
+
+        if (!estanteCol)
+            throw new Error("Não foi possível achar estanteCol");
+
+        const prateleiraRow = clone.querySelector("#search-prateleiraRow");
+
+        if (!prateleiraRow)
+            throw new Error("Não foi possível achar prateleiraRow");
+
+        const prateleiraCol = clone.querySelector("#search-prateleiraCol");
+
+        if (!prateleiraCol)
+            throw new Error("Não foi possível achar prateleiraCol");
+
+        const quantidade = clone.querySelector("#quantidade");
+
+        if (!quantidade)
+            throw new Error("Não foi possível achar quantidade");
+
+        // =================================================
+        // ESTADO
+        // =================================================
+
+        const p = {
+            row: false,
+            col: false
+        };
+
+        const e = {
+            row: false,
+            col: false
+        };
+
+        let q = false;
+
+        let prateleira = {
+            id: 0,
+            linha: 0,
+            coluna: 0
+        };
+
+        let estante = {
+            id: 0,
+            linha: 0,
+            coluna: 0,
+            qtd_linhas: 0,
+            qtd_colunas: 0
+        };
+
+        let local = null;
+
+        // =================================================
+        // QUANTIDADE
+        // =================================================
+
+        const setQuantidade = () => {
+            if (prateleira.coluna !== 0 && prateleira.linha !== 0) {
+                activate(quantidade);
+                q = true;
+            } else if (q) {
+                q = false;
+                deactivate(quantidade);
+            }
+        };
+
+        // =================================================
+        // PRATELEIRA
+        // =================================================
+
+        const setPrateleira = (rows, cols) => {
+
+            if (rows > 1) {
+                activate(prateleiraRow);
+
+                setSearchBox(
+                    prateleiraRow,
+                    Array.from({ length: rows }, (_, i) => i + 1),
+                    null,
+                    undefined,
+                    (value) => {
+                        prateleira.linha = Number(value ?? "");
+                        setQuantidade();
+                    },
+                    true
+                );
+
+                p.row = true;
+
+            } else if (rows === 1) {
+                prateleira.linha = 1;
+            }
+
+            if (cols > 1) {
+                activate(prateleiraCol);
+
+                setSearchBox(
+                    prateleiraCol,
+                    Array.from({ length: cols }, (_, i) => i + 1),
+                    null,
+                    undefined,
+                    (value) => {
+                        prateleira.coluna = Number(value ?? "");
+                        setQuantidade();
+                    },
+                    true
+                );
+
+                p.col = true;
+
+            } else if (cols === 1) {
+                prateleira.coluna = 1;
+            }
+
+            setQuantidade();
+        };
+
+        // =================================================
+        // LIMPEZA DA ESTANTE
+        // =================================================
+
+        const destroyEstante = () => {
+
+            if (p.col) {
+                deactivate(prateleiraCol);
+                p.col = false;
+                prateleira.coluna = 0;
+            }
+
+            if (p.row) {
+                deactivate(prateleiraRow);
+                p.row = false;
+                prateleira.linha = 0;
+            }
+
+            if (q) {
+                deactivate(quantidade);
+                q = false;
+            }
+        };
+
+        // =================================================
+        // SELEÇÃO DA ESTANTE
+        // =================================================
+
+        const setEstante = () => {
+
+            if (estante.linha !== 0 && estante.coluna !== 0) {
+
+                if (!local)
+                    throw new Error("Local não selecionado");
+
+                const encontrada = local.estantes.find(
+                    (f) =>
+                        f.coluna === estante.coluna &&
+                        f.linha === estante.linha
+                );
+
+                if (encontrada) {
+                    estanteId.value = String(encontrada.id);
+
+                    estante = encontrada;
+
+                    setPrateleira(
+                        estante.qtd_linhas,
+                        estante.qtd_colunas
+                    );
+
+                } else {
+                    estanteId.value = "";
+                    destroyEstante();
+                }
+
+            } else {
+                estanteId.value = "";
+                destroyEstante();
+            }
+        };
+
+        // =================================================
+        // AUTOCOMPLETE DO LOCAL
+        // =================================================
+
+        setSearchBox(
+            localSearch,
+            "/api/local?path=",
+            null,
+            "path",
+            (value, content) => {
+
+                if (
+                    content.length === 1 &&
+                    value === content[0].path
+                ) {
+                    localId.value = content[0].id;
+
+                    local = content[0];
+
+                    const rows = local.linhas;
+                    const cols = local.colunas;
+
+                    if (rows > 1) {
+                        activate(estanteRow);
+
+                        setSearchBox(
+                            estanteRow,
+                            Array.from({ length: rows }, (_, i) => i + 1),
+                            null,
+                            undefined,
+                            (value) => {
+                                estante.linha =
+                                    typeof value === "string"
+                                        ? Number(value)
+                                        : 0;
+
+                                setEstante();
+                            },
+                            true
+                        );
+
+                        e.row = true;
+
+                    } else if (rows === 1) {
+                        estante.linha = 1;
+                    }
+
+                    if (cols > 1) {
+                        activate(estanteCol);
+
+                        setSearchBox(
+                            estanteCol,
+                            Array.from({ length: cols }, (_, i) => i + 1),
+                            null,
+                            undefined,
+                            (value) => {
+                                estante.coluna =
+                                    typeof value === "string"
+                                        ? Number(value)
+                                        : 0;
+
+                                setEstante();
+                            },
+                            true
+                        );
+
+                        e.col = true;
+
+                    } else if (cols === 1) {
+                        estante.coluna = 1;
+                    }
+
+                    setEstante();
+
+                } else {
+
+                    localId.value = "";
+                    estanteId.value = "";
+
+                    local = null;
+
+                    estante.linha = 0;
+                    estante.coluna = 0;
+
+                    prateleira.linha = 0;
+                    prateleira.coluna = 0;
+
+                    if (e.col) {
+                        deactivate(estanteCol);
+                        e.col = false;
+                    }
+
+                    if (e.row) {
+                        deactivate(estanteRow);
+                        e.row = false;
+                    }
+
+                    destroyEstante();
+                }
+            }
+        );
+    });
+
+    // =====================================================
+    // VALIDAÇÃO DO FORMULÁRIO
+    // =====================================================
+
+    setForm("form-baixa-produto", {
+        form: () => {
+            const checks = form.querySelectorAll(
+                'input[name$="[check]"], input[name$="[desalocar]"]'
+            );
+
+            const adds = form.querySelectorAll(
+                '#addble-element-prateleiras'
+            )
+
+            const selecionado = Array.from(checks).some(
+                (input) => input.checked
+            );
+
+            if (!(adds.length || selecionado))
+                return "Selecione um local para descontar o produto";
+
+            return null;
+        },
+
+        quantidade: (value, input) => {
+            const emp = verifyEmpty(value);
+
+            if (emp)
+                return emp;
+
+            const quantidade = Number(value);
+
+            if (!Number.isInteger(quantidade) || quantidade <= 0)
+                return "Informe uma quantidade inteira maior que zero";
+
+            const secao = input.closest("section[data-opcao]");
+
+            if (!secao)
+                return null;
+
+            const desalocar = secao.querySelector(
+                'input[name$="[desalocar]"]'
+            );
+
+            const max = input.max;
+
+            if (
+                desalocar?.checked &&
+                max &&
+                quantidade > Number(max)
+            ) {
+                return `A quantidade máxima permitida é ${max}`;
+            }
+
+            return null;
+        }
+    });
+
+</script>

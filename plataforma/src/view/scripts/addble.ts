@@ -6,9 +6,15 @@ type prop = {
 const setAddble = function (element: HTMLElement, name: string, iterator: number, cloneExpecific: ((clone: HTMLElement) => void) | null = null): prop  {
     const btn_add = element.querySelector('button[id^="add-new-"]');
 
-    const addble = element.querySelector<HTMLElement>('[id^="addble-element-"]');
+    const a = element.querySelector<HTMLElement>('[id^="addble-element-"]');
+    if(!a)
+        throw new Error(`não foi possivel localizar o elemento clonavel `);
+
+    const addble = a.cloneNode(true) as HTMLElement;
     if(!addble)
         throw new Error(`não foi possivel localizar o elemento clonavel `);
+
+    a.remove()
 
     addble.querySelectorAll("input").forEach(input => {
         input.disabled = true;

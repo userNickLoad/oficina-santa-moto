@@ -86,6 +86,28 @@ router.get("/estoque/produto/:id/editar", authMiddleware, getProdutoByIdMiddle, 
     });
 })
 
+router.get("/estoque/produto/:id/baixa", authMiddleware, getProdutoByIdMiddle, (req: Request, res: Response) => {
+    const produto = res.locals.produto as ProdutoImagemLocalizacaoDTO;
+
+    res.render("./layouts/index", {
+        title: "Produto",
+        content: "../pages/produto-baixa",
+        voltar: true,
+        innerContent: {produto}
+    });
+})
+
+router.get("/estoque/produto/:id/entrada", authMiddleware, getProdutoByIdMiddle, (req: Request, res: Response) => {
+    const produto = res.locals.produto as ProdutoImagemLocalizacaoDTO;
+
+    res.render("./layouts/index", {
+        title: "Produto",
+        content: "../pages/produto-entrada",
+        voltar: true,
+        innerContent: {produto}
+    });
+})
+
 router.get("/estoque/produto/:id", authMiddleware, getProdutoByIdMiddle, (req: Request, res: Response) => {
     const produto = res.locals.produto as ProdutoImagemLocalizacaoDTO
     

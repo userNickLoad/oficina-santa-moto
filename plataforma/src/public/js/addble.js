@@ -1,8 +1,12 @@
 const setAddble = function (element, name, iterator, cloneExpecific = null) {
     const btn_add = element.querySelector('button[id^="add-new-"]');
-    const addble = element.querySelector('[id^="addble-element-"]');
+    const a = element.querySelector('[id^="addble-element-"]');
+    if (!a)
+        throw new Error(`não foi possivel localizar o elemento clonavel `);
+    const addble = a.cloneNode(true);
     if (!addble)
         throw new Error(`não foi possivel localizar o elemento clonavel `);
+    a.remove();
     addble.querySelectorAll("input").forEach(input => {
         input.disabled = true;
     });
