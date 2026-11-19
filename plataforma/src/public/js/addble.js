@@ -15,6 +15,7 @@ const setAddble = function (element, name, iterator, cloneExpecific = null) {
         throw new Error("não foi possivel localizar o placement");
     const buildClone = (selfName = null) => {
         const clone = addble.cloneNode(true);
+        console.log(clone.getHTML());
         clone.classList.remove("hidden");
         clone.classList.add("flex");
         const btn_rm = clone.querySelector('[id^="remove-"]');

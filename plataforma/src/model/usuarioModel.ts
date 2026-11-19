@@ -1,10 +1,10 @@
     import db from "../database/prisma.js";
-    import { Prisma, type usuario, type usuario_permissao } from "../../generated/prisma/client.js";
+    import { Prisma, usuario, usuario_permissao } from "../../generated/prisma/client.js";
     import type { Permissao } from "./permissaoModel.js";
     import { hashPassword, verifyPassword, generateSessionToken, hashSessionToken } from "./criptografia.js";
     import { redisdb } from "../../redis.config.js"
     import { FormFill } from "./errors.js";
-import { permission } from "node:process";
+    import { permission } from "node:process";
 
     export type Usuario = usuario;
     export type UsuarioCadastroDTO = Omit<Usuario, "id">;

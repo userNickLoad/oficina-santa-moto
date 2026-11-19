@@ -23,10 +23,11 @@ setSearchBox(searchCategoria, "/api/categoria?nome=", null, "nome", (value, cont
         categoriaId.value = (categoria.id ?? "");
         categoria.atributos.map((at) => {
             const clone = addELement(undefined, at.nome);
+            console.log(clone.getHTML());
             const label = clone.querySelector("label");
             if (!label)
                 throw new Error("label");
-            label.innerText = String(at.nome[0]).toLocaleUpperCase() + at.nome.slice(1, at.nome.length - 1);
+            label.innerText = String(at.nome[0]).toLocaleUpperCase() + at.nome.slice(1, at.nome.length);
             if (at.obrigatorio) {
                 const btnRemove = clone.querySelector('button');
                 if (!btnRemove)

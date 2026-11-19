@@ -7,7 +7,7 @@ const containerCategoria = document.querySelector<HTMLElement>("#container-h-cat
 if(!containerCategoria)
     throw new Error("não foi possivel localizar containerCategoria")
 
-const {update} = setHiddenContainer(containerCategoria, "desassociar");
+const { update } = setHiddenContainer(containerCategoria, "desassociar");
 
 const searchCategoria = containerCategoria.querySelector<HTMLElement>("#search-categoria")
 if(!searchCategoria)
@@ -34,12 +34,13 @@ setSearchBox(searchCategoria, "/api/categoria?nome=", null, "nome", (value, cont
 
         categoria.atributos.map((at: any) => {
             const clone = addELement(undefined, at.nome)
-
+            console.log(clone.getHTML())
             const label = clone.querySelector<HTMLElement>("label");
 
             if(!label)
                 throw new Error("label")
-            label.innerText = String(at.nome[0]).toLocaleUpperCase() + at.nome.slice(1, at.nome.length-1)
+
+            label.innerText = String(at.nome[0]).toLocaleUpperCase() + at.nome.slice(1, at.nome.length)
 
             if(at.obrigatorio){
                 const btnRemove = clone.querySelector<HTMLElement>('button');

@@ -61,7 +61,7 @@
             </h2>
 
             <p class="text-sm text-gray-500">
-                Selecione de onde deseja retirar os produtos e informe as quantidades.
+                Selecione onde os produtos seram alocados.
             </p>
         </div>
 
@@ -173,7 +173,7 @@
                     <div class="w-12 shrink-0">
                         <%- include("../partials/inputBox", {
                             item: {
-                                title: "Desalocar",
+                                title: "Alocar",
                                 type: "check",
                                 id: "desalocar",
                                 name: `prateleira[${index}][desalocar]`,
@@ -250,7 +250,7 @@
 
         <div class="w-full flex justify-center">
             <div class="w-auto">
-                <%- include("../partials/button", {button: {type: "submit", submit: true, content: "Dar baixa"}}) %>
+                <%- include("../partials/button", {button: {type: "submit", submit: true, content: "Dar entrada"}}) %>
             </div>
         </div>
         

@@ -11,6 +11,6 @@ export const adminMiddleware = (req: Request, res: Response, next: NextFunction)
         res.redirect("/?erro=sem-permissao");
         return;
     }
-
+    
     next();
 };

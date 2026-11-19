@@ -89,7 +89,7 @@ router.get("/estoque/produto/:id/baixa", authMiddleware, getProdutoByIdMiddle, (
 
     return res.render("./layouts/index", {
         title: "Baixa de Produto",
-        content: "../pages/baixa-estoque",
+        content: "../pages/produto-baixa",
         voltar: true,
         voltarPara: `/estoque/produto/${produto.id}`,
         innerContent: { produto }
@@ -103,17 +103,6 @@ router.get("/estoque/produto/:id/editar", authMiddleware, getProdutoByIdMiddle, 
     res.render("./layouts/index", {
         title: "Produto",
         content: "../pages/editar-produto",
-        voltar: true,
-        innerContent: {produto}
-    });
-})
-
-router.get("/estoque/produto/:id/baixa", authMiddleware, getProdutoByIdMiddle, (req: Request, res: Response) => {
-    const produto = res.locals.produto as ProdutoImagemLocalizacaoDTO;
-
-    res.render("./layouts/index", {
-        title: "Produto",
-        content: "../pages/produto-baixa",
         voltar: true,
         innerContent: {produto}
     });
@@ -204,6 +193,7 @@ router.get("/clientes/cadastrar", authMiddleware, (req: Request, res: Response) 
     return res.render("./layouts/index", {
         title: "Clientes",
         content: "../pages/cadastrar-cliente",
+        voltarPara: "/clientes",
         voltar: true
     });
 })

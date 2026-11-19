@@ -9,4 +9,6 @@ if(!add)
 let iterator = 0;
 
 setAddble(add, "atributo", iterator);
-setForm();
+setForm(null, {
+    obrigatorio: ()=>(null)
+});

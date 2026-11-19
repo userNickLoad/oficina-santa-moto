@@ -76,7 +76,7 @@ const setHiddenContainer = (containerId: string | HTMLElement, opened_message: s
         if(container_root.dataset.open === "true"){
             const currentHeight = hidden.offsetHeight;
             hidden.style.height = `${currentHeight}px`;
-
+            
             requestAnimationFrame(() => {
                 hidden.style.height = `${hidden.scrollHeight}px`;
             });

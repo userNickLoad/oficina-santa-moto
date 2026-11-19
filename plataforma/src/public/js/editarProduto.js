@@ -157,9 +157,6 @@ setForm(null, {
         return null;
     },
     "search-input-marca": value => {
-        // Marca também é opcional.
-        if (!marcaId.value)
-            return "Selecione uma marca válida da lista";
         return null;
     },
     "quantidade": value => {

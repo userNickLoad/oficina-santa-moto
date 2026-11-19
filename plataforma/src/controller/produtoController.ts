@@ -121,6 +121,7 @@ export async function baixa(req: Request, res: Response) {
 
 export async function update(req: Request, res: Response) {
     const id = Number(req.params.id ?? "")
+    console.log(req.body)
 
     const arquivos = req.files as Express.Multer.File[] | undefined;
 
@@ -135,7 +136,7 @@ export async function update(req: Request, res: Response) {
             throw new Error("Content não achado")
 
         const content = JSON.parse(contentString);
-        const {atributo = [], preco, marcaId, categoriaId, categoria, marca, alerta_quantidade, images = [], ...produto} = content;
+        const {atributo = [], preco, marcaId, categoriaId, categoria, marca = null, alerta_quantidade, images = [], ...produto} = content;
 
         if(produto["imagem[]"])
             delete produto["imagem[]"]
@@ -144,7 +145,7 @@ export async function update(req: Request, res: Response) {
             id: id,
             ...produto,
             codigo_barras: null,
-            id_categoria: Number(categoriaId),
+            id_categoria: (categoriaId)? Number(categoriaId): null,
             id_marca: marcaId
                 ? Number(marcaId)
                 : null,
@@ -157,7 +158,9 @@ export async function update(req: Request, res: Response) {
             imagens: arquivos?.map(arquivo => arquivo.filename) ?? []
         };
 
-        const result = await produtoModel.update(updateProduto, marca, images.map((i: {remove: string}) => (Number(i.remove))))
+        const marcaa = marca.trim().toLowerCase()
+
+        const result = await produtoModel.update(updateProduto, (marcaa != "")? marcaa: null , images.map((i: {remove: string}) => (Number(i.remove))))
 
 
         if(!result){

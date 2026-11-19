@@ -1,4 +1,4 @@
-INSERT INTO permissao (nome) VALUES ('admin');
+INSERT INTO permissao (nome) VALUES ('admin'), ('funcionario');
 INSERT INTO caminho (path) VALUES ('/');
 INSERT INTO permissao_caminho (id_caminho, id_permissao) values (1, 1);
 
@@ -58,3 +58,4 @@ insert into estante (id_local, id_modelo_estante, coluna, linha) values
 (1, 1, 4, 3),
 (1, 1, 4, 4),
 (1, 1, 4, 5);
+

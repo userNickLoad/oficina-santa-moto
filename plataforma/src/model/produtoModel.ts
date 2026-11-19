@@ -371,7 +371,7 @@ class ProdutoModel{
         deleteImagens: number[]
     ): Promise<Produto | null>{
         const { atributos, imagens, ...produto } = updateProduto;
-
+        console.log(produto)
         let atributosToAdd: Prisma.produto_atributoCreateWithoutProdutoInput[] | null = null
 
         if (produto.id_categoria){
@@ -472,8 +472,8 @@ class ProdutoModel{
             });
 
             let marcaId = updateProduto.id_marca;
-
-            if(marca){
+            console.log("marca: ", marca)
+            if(marca && ! marcaId){
                 marcaId = (await tx.marca.upsert({
                     where: {
                         nome: marca
@@ -540,8 +540,7 @@ class ProdutoModel{
                         }}
                         : {}
                     ),
-
-
+                    ...((marcaId)? {id_marca: marcaId}: {})
                 }
             })
 

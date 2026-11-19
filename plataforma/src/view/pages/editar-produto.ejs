@@ -20,6 +20,16 @@
 
     const atributosJson = (p.categoria)? JSON.stringify({categoria: p.categoria.nome, atributos: atributos}): "";
 
+    const categoria = p.categoria ?? null
+
+    const categoriaNome = (categoria)? categoria.nome : ""
+    const categoriaId = (categoria)? categoria.id : ""
+
+    const marca = (p.marca)? p.marca: null
+
+    const marcaNome = (marca)? marca.nome: ""
+    const marcaId = (marca)? marca.id : ""
+
     console.log(p)
 %>
 
@@ -56,11 +66,12 @@
                 <p id="output-nome" class="text-red-900 min-h-[2vh]"></p>
             </div>
 
+            
             <!-- Categoria -->
             <section class="border border-gray-300 rounded-2xl p-4 flex flex-col gap-3"
                 data-categoria="<%= atributosJson %>"
                 >
-                <%- include("../partials/inputBox", { item: {title: "Nome da categoria", subtitte: "Campo opcional, mas útil para organizar e localizar produtos.", name: "categoria", id: "categoria", type: "search", maxlength: 50, placeholder: "ex: bateria, óleo, pneu, ect..", text_size: "text-md", size: "w-full", value: p.categoria.nome, valueHidden: p.categoria.id}}) %>
+                <%- include("../partials/inputBox", { item: {title: "Nome da categoria", subtitte: "Campo opcional, mas útil para organizar e localizar produtos.", name: "categoria", id: "categoria", type: "search", maxlength: 50, placeholder: "ex: bateria, óleo, pneu, ect..", text_size: "text-md", size: "w-full", value: categoriaNome, valueHidden: categoriaId}}) %>
                 <%- include("../partials/cadastrar/addbleContainer", {container: {
                                     id: "atributos",
                                     title: "Atributos",
@@ -75,7 +86,7 @@
 
             <!-- Marca -->
             <section class="border border-gray-300 rounded-2xl p-4 flex flex-col gap-3">
-                <%- include("../partials/inputBox", {item: {title: "Marca", subtitte: "Campo opcional, mas útil para organizar e localizar produtos.", name: "marca", id: "marca", type: "search", maxlength: 50, placeholder: "ex: bateria, óleo, pneu, ect..", text_size: "text-md", size: "w-full", value: p.marca.nome, valueHidden: p.marca.id}}) %>
+                <%- include("../partials/inputBox", {item: {title: "Marca", subtitte: "Campo opcional, mas útil para organizar e localizar produtos.", name: "marca", id: "marca", type: "search", maxlength: 50, placeholder: "ex: bateria, óleo, pneu, ect..", text_size: "text-md", size: "w-full", value: marcaNome, valueHidden: marcaId}}) %>
             </section>
 
             <!-- Estoque e preço -->

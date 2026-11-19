@@ -29,6 +29,8 @@ const setAddble = function (element: HTMLElement, name: string, iterator: number
     const buildClone = (selfName: string | null = null): HTMLElement => {
         const clone = addble.cloneNode(true) as HTMLElement;
 
+        console.log(clone.getHTML())
+
         clone.classList.remove("hidden");
         clone.classList.add("flex");
 

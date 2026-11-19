@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS usuario (
 	nome VARCHAR(100) NOT NULL UNIQUE,
 	senha TEXT NOT NULL,
 	email VARCHAR(100),
-	telefone VARCHAR(14) 
+	telefone VARCHAR(14),
+	ativo Boolean DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS permissao (
