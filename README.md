@@ -1,4 +1,4 @@
-# Projeto feito para a loja Santa Monto
+# Projeto feito para a loja Santa Motoca
 Projeto de faculdade criado para um comercio real. O sistema é um gerenciador de estoque e comercio, permitindo trazer ordem e observabilidade para operações de lojas.
 
 
